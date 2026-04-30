@@ -1,0 +1,700 @@
+[
+  {
+    "case_id": "L1_007",
+    "level": 1,
+    "domain": "CCCD",
+    "question": "Thẻ căn cước gắn chip có giá trị thế nào?",
+    "expected_answer": "Mô tả giá trị pháp lý của thẻ căn cước.",
+    "expected_keywords": [
+      "giá trị",
+      "thẻ căn cước",
+      "xác minh"
+    ],
+    "expected_citations": [
+      "26/2023/QH15"
+    ]
+  },
+  {
+    "case_id": "L1_006",
+    "level": 1,
+    "domain": "CCCD",
+    "question": "Làm CCCD lần đầu cần chuẩn bị gì?",
+    "expected_answer": "Nêu yêu cầu giấy tờ và thông tin định danh.",
+    "expected_keywords": [
+      "CCCD",
+      "lần đầu",
+      "thông tin"
+    ],
+    "expected_citations": [
+      "26/2023/QH15"
+    ]
+  },
+  {
+    "case_id": "L1_008",
+    "level": 1,
+    "domain": "CCCD",
+    "question": "Mất thẻ căn cước thì làm gì?",
+    "expected_answer": "Nêu hướng xử lý khi mất thẻ căn cước.",
+    "expected_keywords": [
+      "mất thẻ",
+      "cấp lại",
+      "căn cước"
+    ],
+    "expected_citations": [
+      "59/2022/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L4_005",
+    "level": 4,
+    "domain": "CCCD",
+    "question": "CMND 9 số của tôi còn dùng được mãi không?",
+    "expected_answer": "Nêu yêu cầu chuyển đổi giấy tờ định danh theo quy định mới.",
+    "expected_keywords": [
+      "CMND 9 số",
+      "chuyển đổi",
+      "căn cước"
+    ],
+    "expected_citations": [
+      "26/2023/QH15",
+      "59/2014/QH13"
+    ]
+  },
+  {
+    "case_id": "L3_020",
+    "level": 3,
+    "domain": "CCCD,DoanhNghiep",
+    "question": "Hộ kinh doanh lên doanh nghiệp có cần cập nhật định danh gì?",
+    "expected_answer": "Nêu yêu cầu định danh chủ thể khi chuyển đổi.",
+    "expected_keywords": [
+      "hộ kinh doanh",
+      "lên doanh nghiệp",
+      "định danh"
+    ],
+    "expected_citations": [
+      "26/2023/QH15",
+      "59/2020/QH14"
+    ]
+  },
+  {
+    "case_id": "L3_016",
+    "level": 3,
+    "domain": "CCCD,Thue",
+    "question": "Cá nhân kinh doanh dùng CCCD gắn chip để khai thuế điện tử thế nào?",
+    "expected_answer": "Nêu điều kiện xác thực định danh và khai thuế.",
+    "expected_keywords": [
+      "cá nhân kinh doanh",
+      "CCCD gắn chip",
+      "khai thuế điện tử"
+    ],
+    "expected_citations": [
+      "26/2023/QH15",
+      "38/2019/QH14"
+    ]
+  },
+  {
+    "case_id": "L2_006",
+    "level": 2,
+    "domain": "CCCD",
+    "question": "Tích hợp thông tin vào thẻ căn cước thực hiện thế nào?",
+    "expected_answer": "Tóm tắt nguyên tắc tích hợp thông tin định danh.",
+    "expected_keywords": [
+      "tích hợp",
+      "thông tin",
+      "thẻ căn cước"
+    ],
+    "expected_citations": [
+      "26/2023/QH15"
+    ]
+  },
+  {
+    "case_id": "L2_007",
+    "level": 2,
+    "domain": "CCCD",
+    "question": "So sánh quy định cũ CMND và căn cước mới về giá trị sử dụng",
+    "expected_answer": "Nêu điểm khác biệt chính giữa giấy tờ định danh cũ/mới.",
+    "expected_keywords": [
+      "CMND",
+      "căn cước",
+      "giá trị sử dụng"
+    ],
+    "expected_citations": [
+      "59/2014/QH13",
+      "26/2023/QH15"
+    ]
+  },
+  {
+    "case_id": "L2_005",
+    "level": 2,
+    "domain": "CCCD",
+    "question": "Cấp lại CCCD do sai thông tin gồm các bước nào?",
+    "expected_answer": "Nêu quy trình xử lý cấp lại do sai thông tin.",
+    "expected_keywords": [
+      "cấp lại",
+      "sai thông tin",
+      "CCCD"
+    ],
+    "expected_citations": [
+      "59/2022/ND-CP",
+      "26/2023/QH15"
+    ]
+  },
+  {
+    "case_id": "L1_010",
+    "level": 1,
+    "domain": "DatDai",
+    "question": "Hộ gia đình có quyền chuyển nhượng đất khi nào?",
+    "expected_answer": "Nêu điều kiện cơ bản để chuyển nhượng đất.",
+    "expected_keywords": [
+      "chuyển nhượng",
+      "đất",
+      "điều kiện"
+    ],
+    "expected_citations": [
+      "31/2024/QH15"
+    ]
+  },
+  {
+    "case_id": "L1_011",
+    "level": 1,
+    "domain": "DatDai",
+    "question": "Thu hồi đất do vi phạm được quy định ra sao?",
+    "expected_answer": "Tóm tắt nguyên tắc thu hồi đất do vi phạm.",
+    "expected_keywords": [
+      "thu hồi",
+      "vi phạm",
+      "đất đai"
+    ],
+    "expected_citations": [
+      "31/2024/QH15"
+    ]
+  },
+  {
+    "case_id": "L1_012",
+    "level": 1,
+    "domain": "DatDai",
+    "question": "Đăng ký đất đai lần đầu cần lưu ý gì?",
+    "expected_answer": "Nêu khâu đăng ký ban đầu và hồ sơ chính.",
+    "expected_keywords": [
+      "đăng ký",
+      "đất đai",
+      "hồ sơ"
+    ],
+    "expected_citations": [
+      "43/2014/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L3_010",
+    "level": 3,
+    "domain": "DatDai,Thue",
+    "question": "Khi chuyển mục đích đất sang thương mại có phát sinh thuế gì?",
+    "expected_answer": "Nêu nghĩa vụ tài chính kèm chuyển mục đích sử dụng đất.",
+    "expected_keywords": [
+      "chuyển mục đích",
+      "đất thương mại",
+      "thuế"
+    ],
+    "expected_citations": [
+      "31/2024/QH15",
+      "38/2019/QH14"
+    ]
+  },
+  {
+    "case_id": "L3_009",
+    "level": 3,
+    "domain": "DatDai,DoanhNghiep",
+    "question": "Doanh nghiệp nhận chuyển nhượng đất cần các bước pháp lý nào?",
+    "expected_answer": "Kết hợp điều kiện nhận chuyển nhượng và đăng ký biến động.",
+    "expected_keywords": [
+      "nhận chuyển nhượng",
+      "đăng ký biến động",
+      "doanh nghiệp"
+    ],
+    "expected_citations": [
+      "31/2024/QH15",
+      "43/2014/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L4_018",
+    "level": 4,
+    "domain": "DatDai",
+    "question": "Sổ đỏ cũ và sổ hồng khác gì khi giao dịch?",
+    "expected_answer": "Giải thích giá trị pháp lý và tránh nhầm lẫn thuật ngữ.",
+    "expected_keywords": [
+      "sổ đỏ",
+      "sổ hồng",
+      "giá trị pháp lý"
+    ],
+    "expected_citations": [
+      "45/2013/QH13",
+      "31/2024/QH15"
+    ]
+  },
+  {
+    "case_id": "L2_010",
+    "level": 2,
+    "domain": "DatDai",
+    "question": "Trình tự chuyển mục đích sử dụng đất gồm các bước nào?",
+    "expected_answer": "Nêu hồ sơ, thẩm quyền và nghĩa vụ tài chính.",
+    "expected_keywords": [
+      "chuyển mục đích",
+      "sử dụng đất",
+      "nghĩa vụ tài chính"
+    ],
+    "expected_citations": [
+      "31/2024/QH15",
+      "148/2020/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L2_012",
+    "level": 2,
+    "domain": "DatDai",
+    "question": "Khi tranh chấp đất, hồ sơ hòa giải ở cấp xã cần gì?",
+    "expected_answer": "Nêu thành phần hồ sơ và đầu mối tiếp nhận.",
+    "expected_keywords": [
+      "tranh chấp",
+      "hòa giải",
+      "cấp xã"
+    ],
+    "expected_citations": [
+      "45/2013/QH13",
+      "31/2024/QH15"
+    ]
+  },
+  {
+    "case_id": "L2_009",
+    "level": 2,
+    "domain": "DatDai",
+    "question": "Điều kiện tách thửa theo khung pháp luật đất đai mới là gì?",
+    "expected_answer": "Tổng hợp điều kiện tách thửa theo luật và nghị định hướng dẫn.",
+    "expected_keywords": [
+      "tách thửa",
+      "điều kiện",
+      "đất đai"
+    ],
+    "expected_citations": [
+      "31/2024/QH15",
+      "43/2014/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L1_013",
+    "level": 1,
+    "domain": "DoanhNghiep",
+    "question": "Thành lập công ty cần bước nào đầu tiên?",
+    "expected_answer": "Nêu bước đăng ký doanh nghiệp cơ bản.",
+    "expected_keywords": [
+      "thành lập",
+      "đăng ký doanh nghiệp",
+      "hồ sơ"
+    ],
+    "expected_citations": [
+      "59/2020/QH14"
+    ]
+  },
+  {
+    "case_id": "L1_015",
+    "level": 1,
+    "domain": "DoanhNghiep",
+    "question": "Vốn điều lệ có bắt buộc chứng minh không?",
+    "expected_answer": "Nêu quy định chung về vốn điều lệ khi đăng ký.",
+    "expected_keywords": [
+      "vốn điều lệ",
+      "đăng ký",
+      "doanh nghiệp"
+    ],
+    "expected_citations": [
+      "59/2020/QH14"
+    ]
+  },
+  {
+    "case_id": "L1_014",
+    "level": 1,
+    "domain": "DoanhNghiep",
+    "question": "Tên doanh nghiệp phải đáp ứng điều kiện gì?",
+    "expected_answer": "Nêu nguyên tắc đặt tên doanh nghiệp.",
+    "expected_keywords": [
+      "tên doanh nghiệp",
+      "đặt tên",
+      "không trùng"
+    ],
+    "expected_citations": [
+      "59/2020/QH14"
+    ]
+  },
+  {
+    "case_id": "L4_017",
+    "level": 4,
+    "domain": "DoanhNghiep,Thue",
+    "question": "Ngừng kinh doanh tạm thời có cần nộp lệ phí môn bài không?",
+    "expected_answer": "Nêu điều kiện miễn/không miễn theo thời gian ngừng.",
+    "expected_keywords": [
+      "tạm ngừng",
+      "lệ phí môn bài",
+      "điều kiện"
+    ],
+    "expected_citations": [
+      "59/2020/QH14",
+      "126/2020/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L4_008",
+    "level": 4,
+    "domain": "DoanhNghiep",
+    "question": "Tên công ty giống thương hiệu nổi tiếng có được không?",
+    "expected_answer": "Trả lời thận trọng, phân biệt pháp luật doanh nghiệp và sở hữu trí tuệ.",
+    "expected_keywords": [
+      "tên công ty",
+      "không trùng",
+      "nhầm lẫn"
+    ],
+    "expected_citations": [
+      "59/2020/QH14"
+    ]
+  },
+  {
+    "case_id": "L4_003",
+    "level": 4,
+    "domain": "DoanhNghiep,Thue",
+    "question": "Doanh nghiệp tôi mới giải thể xong có phải nộp gì nữa không?",
+    "expected_answer": "Trả lời theo hướng cần thông tin thời điểm và trạng thái quyết toán.",
+    "expected_keywords": [
+      "giải thể",
+      "quyết toán",
+      "nghĩa vụ còn lại"
+    ],
+    "expected_citations": [
+      "59/2020/QH14",
+      "38/2019/QH14"
+    ]
+  },
+  {
+    "case_id": "L2_015",
+    "level": 2,
+    "domain": "DoanhNghiep",
+    "question": "Giải thể doanh nghiệp cần thanh toán nghĩa vụ theo thứ tự nào?",
+    "expected_answer": "Nêu thứ tự xử lý nghĩa vụ khi giải thể.",
+    "expected_keywords": [
+      "giải thể",
+      "thanh toán",
+      "nghĩa vụ"
+    ],
+    "expected_citations": [
+      "59/2020/QH14"
+    ]
+  },
+  {
+    "case_id": "L2_016",
+    "level": 2,
+    "domain": "DoanhNghiep",
+    "question": "Điều kiện tạm ngừng kinh doanh và thông báo thế nào?",
+    "expected_answer": "Nêu thời hạn và cách thức thông báo tạm ngừng.",
+    "expected_keywords": [
+      "tạm ngừng",
+      "thông báo",
+      "kinh doanh"
+    ],
+    "expected_citations": [
+      "59/2020/QH14"
+    ]
+  },
+  {
+    "case_id": "L2_014",
+    "level": 2,
+    "domain": "DoanhNghiep",
+    "question": "Quy trình thay đổi người đại diện pháp luật ra sao?",
+    "expected_answer": "Nêu nghĩa vụ đăng ký thay đổi nội dung doanh nghiệp.",
+    "expected_keywords": [
+      "người đại diện",
+      "thay đổi",
+      "đăng ký"
+    ],
+    "expected_citations": [
+      "59/2020/QH14",
+      "168/2025/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L1_001",
+    "level": 1,
+    "domain": "HoTich",
+    "question": "Thủ tục đăng ký khai sinh cần giấy tờ gì?",
+    "expected_answer": "Nêu hồ sơ cơ bản khi đăng ký khai sinh.",
+    "expected_keywords": [
+      "khai sinh",
+      "hồ sơ",
+      "đăng ký"
+    ],
+    "expected_citations": [
+      "60/2014/QH13"
+    ]
+  },
+  {
+    "case_id": "L1_002",
+    "level": 1,
+    "domain": "HoTich",
+    "question": "Cơ quan nào có thẩm quyền đăng ký kết hôn?",
+    "expected_answer": "Trả lời cơ quan đăng ký hộ tịch có thẩm quyền.",
+    "expected_keywords": [
+      "kết hôn",
+      "thẩm quyền",
+      "ủy ban"
+    ],
+    "expected_citations": [
+      "123/2015/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L1_004",
+    "level": 1,
+    "domain": "HoTich",
+    "question": "Cải chính hộ tịch thực hiện theo quy định nào?",
+    "expected_answer": "Chỉ ra văn bản và thủ tục cải chính hộ tịch.",
+    "expected_keywords": [
+      "cải chính",
+      "hộ tịch",
+      "thủ tục"
+    ],
+    "expected_citations": [
+      "04/2020/TT-BTP"
+    ]
+  },
+  {
+    "case_id": "L4_010",
+    "level": 4,
+    "domain": "HoTich,CCCD",
+    "question": "Sai tên trên CCCD khác với khai sinh thì sửa bên nào trước?",
+    "expected_answer": "Nêu quy trình ưu tiên chỉnh hộ tịch gốc rồi cập nhật căn cước.",
+    "expected_keywords": [
+      "sai tên",
+      "CCCD",
+      "khai sinh"
+    ],
+    "expected_citations": [
+      "04/2020/TT-BTP",
+      "26/2023/QH15"
+    ]
+  },
+  {
+    "case_id": "L3_012",
+    "level": 3,
+    "domain": "HoTich,CCCD",
+    "question": "Đăng ký khai tử có ảnh hưởng thế nào đến dữ liệu căn cước?",
+    "expected_answer": "Nêu nguyên tắc đồng bộ dữ liệu hộ tịch - căn cước.",
+    "expected_keywords": [
+      "khai tử",
+      "dữ liệu căn cước",
+      "đồng bộ"
+    ],
+    "expected_citations": [
+      "60/2014/QH13",
+      "26/2023/QH15"
+    ]
+  },
+  {
+    "case_id": "L4_006",
+    "level": 4,
+    "domain": "HoTich",
+    "question": "Muốn sửa năm sinh trên giấy khai sinh thì làm sao?",
+    "expected_answer": "Yêu cầu làm rõ căn cứ chứng minh và cơ quan giải quyết.",
+    "expected_keywords": [
+      "sửa năm sinh",
+      "cải chính",
+      "chứng minh"
+    ],
+    "expected_citations": [
+      "60/2014/QH13",
+      "04/2020/TT-BTP"
+    ]
+  },
+  {
+    "case_id": "L2_002",
+    "level": 2,
+    "domain": "HoTich",
+    "question": "Thay đổi cải chính hộ tịch cho người chưa thành niên cần điều kiện gì?",
+    "expected_answer": "Nêu điều kiện và chủ thể có quyền yêu cầu.",
+    "expected_keywords": [
+      "thay đổi",
+      "cải chính",
+      "chưa thành niên"
+    ],
+    "expected_citations": [
+      "60/2014/QH13",
+      "04/2020/TT-BTP"
+    ]
+  },
+  {
+    "case_id": "L2_004",
+    "level": 2,
+    "domain": "HoTich",
+    "question": "Đăng ký hộ tịch trực tuyến cần lưu ý gì về đối chiếu giấy tờ?",
+    "expected_answer": "Nêu yêu cầu kiểm tra hồ sơ bản giấy/bản điện tử.",
+    "expected_keywords": [
+      "trực tuyến",
+      "đối chiếu",
+      "giấy tờ"
+    ],
+    "expected_citations": [
+      "87/2020/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L2_003",
+    "level": 2,
+    "domain": "HoTich",
+    "question": "Đăng ký nhận cha mẹ con cần chứng cứ nào?",
+    "expected_answer": "Nêu yêu cầu chứng cứ chứng minh quan hệ huyết thống.",
+    "expected_keywords": [
+      "nhận cha mẹ con",
+      "chứng cứ",
+      "hộ tịch"
+    ],
+    "expected_citations": [
+      "123/2015/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L1_018",
+    "level": 1,
+    "domain": "Thue",
+    "question": "Doanh nghiệp mới thành lập cần làm thủ tục thuế gì?",
+    "expected_answer": "Nêu thủ tục thuế ban đầu cho doanh nghiệp mới.",
+    "expected_keywords": [
+      "doanh nghiệp mới",
+      "thủ tục thuế",
+      "đăng ký"
+    ],
+    "expected_citations": [
+      "38/2019/QH14"
+    ]
+  },
+  {
+    "case_id": "L1_020",
+    "level": 1,
+    "domain": "Thue",
+    "question": "Khấu trừ thuế đầu vào cần điều kiện gì?",
+    "expected_answer": "Nêu điều kiện cơ bản để được khấu trừ thuế.",
+    "expected_keywords": [
+      "khấu trừ",
+      "thuế đầu vào",
+      "điều kiện"
+    ],
+    "expected_citations": [
+      "80/2021/TT-BTC"
+    ]
+  },
+  {
+    "case_id": "L1_017",
+    "level": 1,
+    "domain": "Thue",
+    "question": "Kê khai thuế GTGT theo tháng hay quý?",
+    "expected_answer": "Nêu nguyên tắc xác định kỳ kê khai thuế GTGT.",
+    "expected_keywords": [
+      "kê khai",
+      "GTGT",
+      "tháng",
+      "quý"
+    ],
+    "expected_citations": [
+      "126/2020/ND-CP"
+    ]
+  },
+  {
+    "case_id": "L4_012",
+    "level": 4,
+    "domain": "Thue",
+    "question": "Hóa đơn tháng trước xuất sai mà nay mới phát hiện xử lý thế nào?",
+    "expected_answer": "Yêu cầu nêu quy trình điều chỉnh/thay thế theo văn bản hiện hành.",
+    "expected_keywords": [
+      "hóa đơn sai",
+      "điều chỉnh",
+      "thay thế"
+    ],
+    "expected_citations": [
+      "80/2021/TT-BTC",
+      "86/2024/TT-BTC"
+    ]
+  },
+  {
+    "case_id": "L4_002",
+    "level": 4,
+    "domain": "Thue",
+    "question": "Thông tư cũ về hóa đơn còn áp dụng không?",
+    "expected_answer": "Yêu cầu xác định hiệu lực văn bản và nêu văn bản thay thế.",
+    "expected_keywords": [
+      "hiệu lực",
+      "hóa đơn",
+      "văn bản thay thế"
+    ],
+    "expected_citations": [
+      "80/2021/TT-BTC",
+      "86/2024/TT-BTC"
+    ]
+  },
+  {
+    "case_id": "L3_019",
+    "level": 3,
+    "domain": "Thue,DatDai",
+    "question": "Thuế liên quan hợp đồng thuê đất trả tiền hàng năm gồm gì?",
+    "expected_answer": "Nêu sắc thuế và nghĩa vụ tài chính thường gặp.",
+    "expected_keywords": [
+      "thuê đất",
+      "trả tiền hàng năm",
+      "nghĩa vụ thuế"
+    ],
+    "expected_citations": [
+      "31/2024/QH15",
+      "38/2019/QH14"
+    ]
+  },
+  {
+    "case_id": "L2_020",
+    "level": 2,
+    "domain": "Thue",
+    "question": "Nghĩa vụ lưu trữ chứng từ kế toán phục vụ kê khai thuế",
+    "expected_answer": "Nêu yêu cầu lưu trữ hóa đơn/chứng từ.",
+    "expected_keywords": [
+      "lưu trữ",
+      "chứng từ",
+      "kê khai thuế"
+    ],
+    "expected_citations": [
+      "38/2019/QH14"
+    ]
+  },
+  {
+    "case_id": "L2_018",
+    "level": 2,
+    "domain": "Thue",
+    "question": "Trình tự điều chỉnh hóa đơn sai sót theo thông tư hiện hành",
+    "expected_answer": "Nêu cách xử lý hóa đơn sai và lập chứng từ điều chỉnh.",
+    "expected_keywords": [
+      "hóa đơn sai sót",
+      "điều chỉnh",
+      "thông tư"
+    ],
+    "expected_citations": [
+      "80/2021/TT-BTC",
+      "86/2024/TT-BTC"
+    ]
+  },
+  {
+    "case_id": "L2_017",
+    "level": 2,
+    "domain": "Thue",
+    "question": "Điều kiện khai thuế theo quý đối với doanh nghiệp nhỏ là gì?",
+    "expected_answer": "Nêu tiêu chí và căn cứ xác định khai quý.",
+    "expected_keywords": [
+      "khai thuế",
+      "theo quý",
+      "doanh nghiệp nhỏ"
+    ],
+    "expected_citations": [
+      "126/2020/ND-CP"
+    ]
+  }
+]

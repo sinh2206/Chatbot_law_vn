@@ -1,0 +1,119 @@
+﻿<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatbot Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/dashboard-static/style.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <header class="topbar">
+        <div>
+          <h1>Dashboard - Legal Chatbot</h1>
+          <p>Giám sát chất lượng trả lời và hiệu năng vận hành</p>
+        </div>
+        <div class="top-actions">
+          <a href="/" class="nav-btn">Mở Chat</a>
+          <button id="refreshBtn" class="nav-btn" type="button">Làm mới</button>
+        </div>
+      </header>
+
+      <section id="alertsPanel" class="alerts-panel"></section>
+
+      <section class="card-grid" id="summaryCards"></section>
+
+      <section class="chart-grid">
+        <article class="panel">
+          <h2>Xu hướng theo ngày</h2>
+          <canvas id="timeseriesChart"></canvas>
+        </article>
+
+        <article class="panel">
+          <h2>Phân bố thời gian phản hồi</h2>
+          <canvas id="histogramChart"></canvas>
+        </article>
+
+        <article class="panel">
+          <h2>Phân tích theo lĩnh vực</h2>
+          <canvas id="domainChart"></canvas>
+        </article>
+
+        <article class="panel">
+          <h2>Accuracy theo cấp độ test</h2>
+          <canvas id="levelChart"></canvas>
+        </article>
+
+        <article class="panel">
+          <h2>So sánh accuracy giữa các run</h2>
+          <canvas id="runHistoryChart"></canvas>
+        </article>
+      </section>
+
+      <section class="table-grid">
+        <article class="panel table-panel">
+          <h2>Top phản hồi không hữu ích</h2>
+          <div class="table-wrap">
+            <table id="lowFeedbackTable">
+              <thead>
+                <tr>
+                  <th>Thời điểm</th>
+                  <th>Câu hỏi</th>
+                  <th>Fallback</th>
+                  <th>Đánh giá</th>
+                  <th>Ghi chú</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel table-panel">
+          <h2>Lịch sử test suite</h2>
+          <div class="table-wrap">
+            <table id="testHistoryTable">
+              <thead>
+                <tr>
+                  <th>Run ID</th>
+                  <th>Mode</th>
+                  <th>Tổng câu</th>
+                  <th>Accuracy</th>
+                  <th>Avg Score</th>
+                  <th>Avg Latency</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel table-panel">
+          <h2>Câu hỏi test hay sai</h2>
+          <div class="table-wrap">
+            <table id="frequentFailuresTable">
+              <thead>
+                <tr>
+                  <th>Case ID</th>
+                  <th>Câu hỏi</th>
+                  <th>Số lần fail</th>
+                  <th>Avg score</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/dashboard-static/script.js"></script>
+  </body>
+</html>

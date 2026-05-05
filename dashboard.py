@@ -1,5 +1,7 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from statistics import mean
 from typing import Any
@@ -7,11 +9,91 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
+from api import TelemetryStore
 from config import TEST_API_BASE_URL, TEST_DATASET_FILE
-from run_test_suite import difficulty_label, run_suite
-from telemetry_store import TelemetryStore
+from test_runner import difficulty_label, run_suite
 
 st.set_page_config(page_title="Legal Chatbot Test Dashboard", layout="wide")
+
+
+@dataclass
+class AlertItem:
+    level: str
+    code: str
+    message: str
+    value: float
+    threshold: float
+
+
+class DashboardMetricsService:
+    def __init__(self, telemetry: TelemetryStore) -> None:
+        self.telemetry = telemetry
+
+    def summary(self) -> dict[str, Any]:
+        row = self.telemetry.query_one(
+            """
+            SELECT
+                COUNT(*) AS total_questions,
+                COALESCE(AVG(response_time_ms), 0) AS avg_response_ms,
+                COALESCE(MAX(response_time_ms), 0) AS max_response_ms,
+                COALESCE(SUM(fallback_used), 0) AS fallback_count,
+                COALESCE(SUM(multi_domain), 0) AS multi_domain_count
+            FROM interactions
+            WHERE run_type = 'user'
+            """
+        )
+
+        total = int(row["total_questions"]) if row else 0
+        fallback_count = int(row["fallback_count"]) if row else 0
+        multi_domain_count = int(row["multi_domain_count"]) if row else 0
+
+        return {
+            "total_questions": total,
+            "avg_response_ms": float(row["avg_response_ms"] if row else 0),
+            "max_response_ms": int(row["max_response_ms"] if row else 0),
+            "fallback_rate": self._safe_ratio(fallback_count, total),
+            "multi_domain_rate": self._safe_ratio(multi_domain_count, total),
+        }
+
+    def timeseries(self, days: int = 14) -> list[dict[str, Any]]:
+        rows = self.telemetry.query(
+            """
+            SELECT
+                DATE(created_at) AS day,
+                COUNT(*) AS total_questions,
+                COALESCE(AVG(response_time_ms), 0) AS avg_response_ms,
+                COALESCE(SUM(fallback_used), 0) AS fallback_count
+            FROM interactions
+            WHERE run_type = 'user' AND created_at >= ?
+            GROUP BY DATE(created_at)
+            ORDER BY day ASC
+            """,
+            (self._cutoff_iso(days=days),),
+        )
+
+        items: list[dict[str, Any]] = []
+        for row in rows:
+            total = int(row["total_questions"])
+            items.append(
+                {
+                    "day": row["day"],
+                    "total_questions": total,
+                    "avg_response_ms": float(row["avg_response_ms"]),
+                    "fallback_rate": self._safe_ratio(int(row["fallback_count"]), total),
+                }
+            )
+        return items
+
+    @staticmethod
+    def _safe_ratio(numerator: int, denominator: int) -> float:
+        if denominator <= 0:
+            return 0.0
+        return numerator / denominator
+
+    @staticmethod
+    def _cutoff_iso(days: int = 0, hours: int = 0) -> str:
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days, hours=hours)
+        return cutoff.isoformat()
 
 
 def resolved_score(item: dict[str, Any]) -> float:
@@ -128,6 +210,28 @@ def render_charts(df: pd.DataFrame) -> None:
 
         st.subheader("F1 thực thể pháp lý theo câu")
         st.line_chart(df[["entity_f1", "citation_f1"]])
+
+
+def render_runtime_metrics(metrics_service: DashboardMetricsService) -> None:
+    st.subheader("Runtime Metrics (User Chat)")
+    summary = metrics_service.summary()
+    col1, col2, col3, col4, col5 = st.columns(5)
+    col1.metric("User Questions", f"{summary['total_questions']}")
+    col2.metric("Avg Latency", f"{summary['avg_response_ms']:.0f} ms")
+    col3.metric("Max Latency", f"{summary['max_response_ms']:.0f} ms")
+    col4.metric("Fallback Rate", f"{summary['fallback_rate'] * 100:.2f}%")
+    col5.metric("Multi-domain Rate", f"{summary['multi_domain_rate'] * 100:.2f}%")
+
+    ts = metrics_service.timeseries(days=14)
+    if ts:
+        ts_df = pd.DataFrame(ts)
+        left, right = st.columns(2)
+        with left:
+            st.caption("Số câu hỏi theo ngày")
+            st.line_chart(ts_df.set_index("day")[["total_questions"]])
+        with right:
+            st.caption("Avg latency theo ngày")
+            st.line_chart(ts_df.set_index("day")[["avg_response_ms"]])
 
 
 def render_manual_review(
@@ -249,6 +353,7 @@ def run_dashboard() -> None:
     st.title("Dashboard đánh giá chatbot pháp luật")
 
     telemetry = TelemetryStore()
+    metrics_service = DashboardMetricsService(telemetry)
 
     with st.sidebar:
         st.header("Cấu hình chạy test")
@@ -284,6 +389,9 @@ def run_dashboard() -> None:
             )
         st.session_state["last_run_id"] = result["run_id"]
         st.success(f"Đã chạy xong test suite. Run ID: {result['run_id']}")
+
+    render_runtime_metrics(metrics_service)
+    st.markdown("---")
 
     run_rows = telemetry.query(
         """

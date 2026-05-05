@@ -46,7 +46,7 @@ services:
   scheduler:
     build: .
     container_name: legal-chatbot-scheduler
-    command: python schedule_test_runner.py --plan weekly-full --runner-mode api --send-report-email
+    command: python test_runner.py --schedule weekly --runner-mode api --send-report-email
     env_file:
       - .env
     environment:

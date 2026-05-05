@@ -1,12 +1,13 @@
-﻿chromadb>=0.5.5
-google-generativeai>=0.8.3
-sentence-transformers>=3.0.1
-python-dotenv>=1.0.1
-python-docx>=1.1.2
-fastapi>=0.115.0
-uvicorn>=0.30.0
-pywin32>=306; platform_system == "Windows"
-duckduckgo-search>=8.1.1
-requests>=2.32.0
-pandas>=2.2.2
-streamlit>=1.39.0
+﻿chromadb
+google-generativeai
+sentence-transformers
+python-dotenv
+python-docx
+fastapi
+uvicorn
+pywin32; platform_system == "Windows"
+duckduckgo-search
+requests
+pandas
+streamlit
+pytest

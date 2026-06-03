@@ -1,0 +1,83 @@
+{
+  "train_basic": {
+    "rows": 900,
+    "query_char_mean": 119.89,
+    "query_char_median": 119.0,
+    "query_char_p95": 189,
+    "positive_char_mean": 616.0,
+    "positive_char_median": 618.0,
+    "positive_char_p95": 881,
+    "duplicate_pairs": 0,
+    "duplicate_pairs_pct": 0.0,
+    "domains": {
+      "mixed": 900
+    },
+    "suspicious_questionmark_rows": 0
+  },
+  "valid_basic": {
+    "rows": 100,
+    "query_char_mean": 123.34,
+    "query_char_median": 126.5,
+    "query_char_p95": 196,
+    "positive_char_mean": 645.24,
+    "positive_char_median": 685.0,
+    "positive_char_p95": 878,
+    "duplicate_pairs": 0,
+    "duplicate_pairs_pct": 0.0,
+    "domains": {
+      "mixed": 100
+    },
+    "suspicious_questionmark_rows": 0
+  },
+  "test_basic": {
+    "rows": 250,
+    "query_char_mean": 119.27,
+    "query_char_median": 117.0,
+    "query_char_p95": 193,
+    "positive_char_mean": 616.71,
+    "positive_char_median": 615.5,
+    "positive_char_p95": 875,
+    "duplicate_pairs": 0,
+    "duplicate_pairs_pct": 0.0,
+    "domains": {
+      "mixed": 250
+    },
+    "suspicious_questionmark_rows": 0
+  },
+  "train_token_estimate": {
+    "sampled_rows": 900,
+    "query_token_mean": 32.89,
+    "query_token_median": 33.0,
+    "query_token_p95": 51,
+    "positive_token_mean": 175.34,
+    "positive_token_median": 177.0,
+    "positive_token_p95": 259,
+    "positive_truncated_count": 49,
+    "positive_truncated_pct": 5.44,
+    "model_name": "dangvantuan/vietnamese-embedding",
+    "max_seq_length": 256
+  },
+  "train_valid_source_overlap": {
+    "train_source_count": 900,
+    "valid_source_count": 100,
+    "overlap_source_count": 0,
+    "overlap_sources_preview": []
+  },
+  "train_test_source_overlap": {
+    "train_source_count": 900,
+    "test_source_count": 250,
+    "overlap_source_count": 0,
+    "overlap_sources_preview": []
+  },
+  "valid_test_source_overlap": {
+    "valid_source_count": 100,
+    "test_source_count": 250,
+    "overlap_source_count": 0,
+    "overlap_sources_preview": []
+  },
+  "recommendations": {
+    "max_seq_length": 256,
+    "truncate_warning": "Truncation ratio is acceptable.",
+    "leakage_warning": "No source-file leakage detected."
+  }
+}

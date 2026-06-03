@@ -1,0 +1,13 @@
+{
+  "source": "manual_qa_txt",
+  "train_questions_path": "D:\\Documents\\Thực tập doanh nghiệp\\Chatbot_law_vn\\data\\train\\questions.txt",
+  "train_answers_path": "D:\\Documents\\Thực tập doanh nghiệp\\Chatbot_law_vn\\data\\train\\reference_answers.txt",
+  "test_questions_path": "D:\\Documents\\Thực tập doanh nghiệp\\Chatbot_law_vn\\data\\test\\questons.txt",
+  "test_answers_path": "D:\\Documents\\Thực tập doanh nghiệp\\Chatbot_law_vn\\data\\test\\reference_answers.txt",
+  "manual_train_pairs_total": 1000,
+  "train_pairs": 900,
+  "valid_pairs": 100,
+  "test_pairs": 250,
+  "valid_ratio": 0.1,
+  "seed": 42
+}

@@ -1,7 +1,11 @@
-﻿.venv/
+.venv/
 __pycache__/
 *.pyc
 .env
-vector_store/
 logs/
 reports/
+
+# Large local artifacts. Recreate/download them on each machine/server.
+model/
+data/models/
+checkpoints/

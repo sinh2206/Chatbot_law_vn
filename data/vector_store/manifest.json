@@ -1,0 +1,18 @@
+{
+  "created_at": "2026-06-02T21:24:27.662683+00:00",
+  "total_chunks": 4291,
+  "embedding_model": "dangvantuan/vietnamese-embedding",
+  "chunk_size": 1000,
+  "chunk_overlap": 150,
+  "domains": [
+    "CCCD",
+    "DatDai",
+    "DoanhNghiep",
+    "HoTich",
+    "Thue"
+  ],
+  "index_backend": "numpy",
+  "faiss_index_path": "D:\\Documents\\Thực tập doanh nghiệp\\Chatbot_law_vn\\data\\vector_store\\faiss.index",
+  "embeddings_npy_path": "D:\\Documents\\Thực tập doanh nghiệp\\Chatbot_law_vn\\data\\vector_store\\embeddings.npy",
+  "metadata_path": "D:\\Documents\\Thực tập doanh nghiệp\\Chatbot_law_vn\\data\\vector_store\\metadata.jsonl"
+}

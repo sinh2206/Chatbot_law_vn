@@ -1,0 +1,28 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.ipynb_checkpoints
+
+.env
+logs
+reports
+
+# Large generated artifacts are mounted from the host at runtime.
+checkpoints
+model
+data/models
+data/vector_store
+data/finetune
+
+# Local editor/system files.
+.idea
+.vscode
+Thumbs.db
+.DS_Store

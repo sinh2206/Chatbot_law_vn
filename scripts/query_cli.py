@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from dataclasses import dataclass
+from datetime import date, datetime
 from pathlib import Path
 import sys
 
@@ -16,10 +18,19 @@ from config import (  # noqa: E402
     EMBEDDING_MODEL_NAME,
     EMBEDDINGS_NPY_PATH,
     FAISS_INDEX_PATH,
+    GEMINI_API_KEY,
+    GEMINI_FALLBACK_ENABLED,
+    GEMINI_MODEL,
+    LEGAL_DOCUMENT_METADATA_PATH,
     MANIFEST_PATH,
     MAX_CANDIDATE_MULTIPLIER,
     METADATA_PATH,
+    MIN_RETRIEVAL_SCORE,
     TOP_K,
+)
+from scripts.gemini_fallback import (  # noqa: E402
+    GeminiFallbackRequest,
+    generate_gemini_fallback_answer,
 )
 
 
@@ -37,6 +48,33 @@ class RetrievedItem:
     source_file: str
     chunk_index: int
     text: str
+    is_expired: bool = False
+    expiry_date: str = ""
+    document_title: str = ""
+    document_number: str = ""
+    status: str = ""
+
+
+@dataclass
+class LegalDocumentStatus:
+    source_file: str
+    domain: str
+    document_title: str = ""
+    document_number: str = ""
+    issued_date: str = ""
+    effective_date: str = ""
+    expiry_date: str = ""
+    status: str = ""
+    replaced_by: str = ""
+
+
+@dataclass
+class RetrievalDecision:
+    use_internal: bool
+    reason: str
+    usable_results: list[RetrievedItem]
+    expired_results: list[RetrievedItem]
+    low_confidence_results: list[RetrievedItem]
 
 
 def validate_local_model_dir(model_name: str) -> None:
@@ -93,6 +131,192 @@ def load_metadata(metadata_path: Path) -> list[dict[str, object]]:
     return rows
 
 
+def normalize_source_file(value: str) -> str:
+    return value.replace("\\", "/").strip().lstrip("./")
+
+
+def parse_date(value: str) -> date | None:
+    value = value.strip()
+    if not value:
+        return None
+    formats = ["%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y", "%Y/%m/%d"]
+    for fmt in formats:
+        try:
+            return datetime.strptime(value, fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
+def is_status_expired(status: str) -> bool:
+    normalized = status.lower().strip().replace(" ", "_").replace("-", "_")
+    return normalized in {
+        "expired",
+        "het_hieu_luc",
+        "hethieuluc",
+        "inactive",
+        "khong_con_hieu_luc",
+    }
+
+
+def load_legal_document_status(
+    metadata_csv_path: Path,
+) -> dict[str, LegalDocumentStatus]:
+    if not metadata_csv_path.exists():
+        return {}
+
+    statuses: dict[str, LegalDocumentStatus] = {}
+    with metadata_csv_path.open("r", encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            source_file = normalize_source_file(str(row.get("source_file", "")))
+            if not source_file:
+                continue
+            status = LegalDocumentStatus(
+                source_file=source_file,
+                domain=str(row.get("domain", "")).strip(),
+                document_title=str(row.get("document_title", "")).strip(),
+                document_number=str(row.get("document_number", "")).strip(),
+                issued_date=str(row.get("issued_date", "")).strip(),
+                effective_date=str(row.get("effective_date", "")).strip(),
+                expiry_date=str(row.get("expiry_date", "")).strip(),
+                status=str(row.get("status", "")).strip(),
+                replaced_by=str(row.get("replaced_by", "")).strip(),
+            )
+            statuses[source_file] = status
+            statuses[Path(source_file).name] = status
+    return statuses
+
+
+def get_document_status(
+    source_file: str,
+    statuses: dict[str, LegalDocumentStatus],
+) -> LegalDocumentStatus | None:
+    normalized = normalize_source_file(source_file)
+    return statuses.get(normalized) or statuses.get(Path(normalized).name)
+
+
+def document_is_expired(status: LegalDocumentStatus | None, today: date | None = None) -> bool:
+    if status is None:
+        return False
+    if is_status_expired(status.status):
+        return True
+    expiry = parse_date(status.expiry_date)
+    if expiry is None:
+        return False
+    today = today or date.today()
+    return today > expiry
+
+
+def attach_document_status(
+    results: list[RetrievedItem],
+    statuses: dict[str, LegalDocumentStatus],
+) -> list[RetrievedItem]:
+    today = date.today()
+    enriched: list[RetrievedItem] = []
+    for item in results:
+        status = get_document_status(item.source_file, statuses)
+        if status is None:
+            enriched.append(item)
+            continue
+        enriched.append(
+            RetrievedItem(
+                score=item.score,
+                domain=item.domain,
+                source_file=item.source_file,
+                chunk_index=item.chunk_index,
+                text=item.text,
+                is_expired=document_is_expired(status, today=today),
+                expiry_date=status.expiry_date,
+                document_title=status.document_title,
+                document_number=status.document_number,
+                status=status.status,
+            )
+        )
+    return enriched
+
+
+def format_source(item: RetrievedItem) -> str:
+    parts = [item.source_file]
+    if item.document_number:
+        parts.append(f"so_hieu={item.document_number}")
+    if item.document_title:
+        parts.append(f"ten={item.document_title}")
+    if item.expiry_date:
+        parts.append(f"het_hieu_luc={item.expiry_date}")
+    if item.status:
+        parts.append(f"status={item.status}")
+    parts.append(f"score={item.score:.4f}")
+    return " | ".join(parts)
+
+
+def decide_retrieval(
+    results: list[RetrievedItem],
+    metadata: list[dict[str, object]],
+    domain: str | None,
+    min_score: float,
+) -> RetrievalDecision:
+    available_domains = {str(row.get("domain", "")).strip() for row in metadata}
+    if domain and domain not in available_domains:
+        return RetrievalDecision(
+            use_internal=False,
+            reason=(
+                f"Khong tim thay tai lieu thuoc linh vuc '{domain}' trong vector store. "
+                f"Cac linh vuc hien co: {', '.join(sorted(available_domains)) or 'N/A'}."
+            ),
+            usable_results=[],
+            expired_results=[],
+            low_confidence_results=[],
+        )
+
+    if not results:
+        scope = f" linh vuc '{domain}'" if domain else ""
+        return RetrievalDecision(
+            use_internal=False,
+            reason=f"Khong truy xuat duoc doan tai lieu phu hop trong kho noi bo{scope}.",
+            usable_results=[],
+            expired_results=[],
+            low_confidence_results=[],
+        )
+
+    expired_results = [item for item in results if item.is_expired]
+    non_expired = [item for item in results if not item.is_expired]
+    if not non_expired:
+        return RetrievalDecision(
+            use_internal=False,
+            reason=(
+                "Cac doan truy xuat duoc deu thuoc van ban da het hieu luc "
+                "hoac bi danh dau khong con hieu luc trong metadata."
+            ),
+            usable_results=[],
+            expired_results=expired_results,
+            low_confidence_results=[],
+        )
+
+    usable_results = [item for item in non_expired if item.score >= min_score]
+    low_confidence_results = [item for item in non_expired if item.score < min_score]
+    if not usable_results:
+        best_score = max(item.score for item in non_expired)
+        return RetrievalDecision(
+            use_internal=False,
+            reason=(
+                f"Cac doan noi bo co score thap hon nguong tin cay "
+                f"({best_score:.4f} < {min_score:.4f})."
+            ),
+            usable_results=[],
+            expired_results=expired_results,
+            low_confidence_results=low_confidence_results,
+        )
+
+    return RetrievalDecision(
+        use_internal=True,
+        reason="Tim thay can cu hop le trong kho noi bo.",
+        usable_results=usable_results,
+        expired_results=expired_results,
+        low_confidence_results=low_confidence_results,
+    )
+
+
 def load_embedder(model_name: str):
     try:
         from sentence_transformers import SentenceTransformer
@@ -145,12 +369,29 @@ def search(
 
     max_candidates = max(top_k, top_k * max(1, candidate_multiplier))
     if backend == "faiss":
+        if domain:
+            max_candidates = len(metadata)
         scores, indices = index.search(query_vec, max_candidates)
         score_list = scores[0]
         index_list = indices[0]
     else:
         all_scores = np.dot(index, query_vec[0])
-        sorted_indices = np.argsort(-all_scores)[:max_candidates]
+        if domain:
+            allowed_indices = np.asarray(
+                [
+                    i
+                    for i, row in enumerate(metadata)
+                    if str(row.get("domain", "")) == domain
+                ],
+                dtype=np.int64,
+            )
+            if allowed_indices.size == 0:
+                return []
+            allowed_scores = all_scores[allowed_indices]
+            sorted_local = np.argsort(-allowed_scores)[:max_candidates]
+            sorted_indices = allowed_indices[sorted_local]
+        else:
+            sorted_indices = np.argsort(-all_scores)[:max_candidates]
         score_list = all_scores[sorted_indices]
         index_list = sorted_indices
 
@@ -189,6 +430,15 @@ def print_results(results: list[RetrievedItem], show_full: bool, snippet_chars: 
             f"[{i}] score={item.score:.4f} | domain={item.domain} | "
             f"source={item.source_file} | chunk={item.chunk_index}"
         )
+        if item.document_number or item.document_title or item.expiry_date or item.status:
+            print(
+                "document_meta="
+                f"number={item.document_number or 'N/A'} | "
+                f"title={item.document_title or 'N/A'} | "
+                f"expiry={item.expiry_date or 'N/A'} | "
+                f"status={item.status or 'N/A'} | "
+                f"expired={item.is_expired}"
+            )
         if show_full:
             print(item.text)
         else:
@@ -196,6 +446,106 @@ def print_results(results: list[RetrievedItem], show_full: bool, snippet_chars: 
             if len(item.text) > snippet_chars:
                 snippet += " ..."
             print(snippet)
+
+
+def print_expired_warning(expired_results: list[RetrievedItem]) -> None:
+    if not expired_results:
+        return
+    print("\n[WARN] Da loai bo cac doan thuoc van ban het hieu luc/khong con hieu luc:")
+    seen: set[str] = set()
+    for item in expired_results:
+        key = item.source_file
+        if key in seen:
+            continue
+        seen.add(key)
+        print(f"- {format_source(item)}")
+
+
+def run_query(
+    query: str,
+    backend: str,
+    index,
+    metadata: list[dict[str, object]],
+    embedder,
+    domain: str | None,
+    top_k: int,
+    candidate_multiplier: int,
+    document_statuses: dict[str, LegalDocumentStatus],
+    min_score: float,
+    show_full: bool,
+    snippet_chars: int,
+    gemini_fallback: bool,
+    gemini_model: str,
+    gemini_api_key: str,
+) -> None:
+    results = search(
+        backend=backend,
+        index=index,
+        metadata=metadata,
+        embedder=embedder,
+        query=query,
+        top_k=top_k,
+        domain=domain,
+        candidate_multiplier=candidate_multiplier,
+    )
+    results = attach_document_status(results, document_statuses)
+    decision = decide_retrieval(
+        results=results,
+        metadata=metadata,
+        domain=domain,
+        min_score=min_score,
+    )
+
+    if decision.use_internal:
+        print("\n[LOCAL RAG] Su dung can cu tu data/processed. Khong goi Gemini API.")
+        print_expired_warning(decision.expired_results)
+        print_results(
+            decision.usable_results,
+            show_full=show_full,
+            snippet_chars=snippet_chars,
+        )
+        return
+
+    print("\n[FALLBACK REQUIRED]")
+    print(decision.reason)
+    if decision.expired_results:
+        print("Tai lieu noi bo bi loai do het hieu luc:")
+        for item in decision.expired_results:
+            print(f"- {format_source(item)}")
+    if decision.low_confidence_results:
+        print("Tai lieu noi bo bi loai do score thap:")
+        for item in decision.low_confidence_results[:5]:
+            print(f"- {format_source(item)}")
+
+    if not gemini_fallback:
+        print(
+            "\nGemini fallback dang tat. Bat bang --gemini-fallback "
+            "hoac GEMINI_FALLBACK_ENABLED=true va thiet lap GEMINI_API_KEY."
+        )
+        return
+
+    print("\n[GEMINI FALLBACK] Dang goi Gemini vi khong co can cu noi bo hop le.")
+    request = GeminiFallbackRequest(
+        question=query,
+        reason=decision.reason,
+        domain=domain,
+        expired_sources=[format_source(item) for item in decision.expired_results],
+        low_confidence_sources=[
+            format_source(item) for item in decision.low_confidence_results[:5]
+        ],
+    )
+    try:
+        answer = generate_gemini_fallback_answer(
+            request=request,
+            api_key=gemini_api_key,
+            model_name=gemini_model,
+        )
+    except Exception as exc:
+        print(f"\n[ERROR] Khong the goi Gemini fallback: {exc}")
+        return
+
+    print("\n" + "=" * 90)
+    print(answer)
 
 
 def read_manifest(manifest_path: Path) -> dict[str, object]:
@@ -218,9 +568,33 @@ def main() -> None:
     parser.add_argument("--index-path", default=str(FAISS_INDEX_PATH))
     parser.add_argument("--metadata-path", default=str(METADATA_PATH))
     parser.add_argument("--manifest-path", default=str(MANIFEST_PATH))
+    parser.add_argument(
+        "--legal-metadata-path",
+        default=str(LEGAL_DOCUMENT_METADATA_PATH),
+        help="CSV metadata with source_file/domain/expiry_date/status for expiry checks.",
+    )
     parser.add_argument("--show-full", action="store_true")
     parser.add_argument("--snippet-chars", type=int, default=350)
     parser.add_argument("--candidate-multiplier", type=int, default=MAX_CANDIDATE_MULTIPLIER)
+    parser.add_argument(
+        "--min-score",
+        type=float,
+        default=MIN_RETRIEVAL_SCORE,
+        help="Minimum cosine score required to trust local retrieval.",
+    )
+    parser.add_argument(
+        "--gemini-fallback",
+        action="store_true",
+        default=GEMINI_FALLBACK_ENABLED,
+        help="Call Gemini only when local RAG cannot provide valid evidence.",
+    )
+    parser.add_argument(
+        "--no-gemini-fallback",
+        action="store_false",
+        dest="gemini_fallback",
+        help="Disable Gemini fallback even if GEMINI_FALLBACK_ENABLED=true.",
+    )
+    parser.add_argument("--gemini-model", default=GEMINI_MODEL)
     args = parser.parse_args()
 
     manifest = read_manifest(Path(args.manifest_path).resolve())
@@ -239,11 +613,13 @@ def main() -> None:
         index_display = str(index_path)
 
     metadata = load_metadata(Path(args.metadata_path).resolve())
+    legal_metadata_path = Path(args.legal_metadata_path).resolve()
+    document_statuses = load_legal_document_status(legal_metadata_path)
     manifest_model = str(manifest.get("embedding_model", "")).strip()
     embedding_model = args.embedding_model.strip() or manifest_model or EMBEDDING_MODEL_NAME
     embedder = load_embedder(embedding_model)
 
-    print("=== OFFLINE QUERY CLI (NO API) ===")
+    print("=== LOCAL RAG QUERY CLI ===")
     if manifest:
         print(f"Chunks: {manifest.get('total_chunks', 'N/A')}")
         print(f"Embedding model in manifest: {manifest.get('embedding_model', 'N/A')}")
@@ -251,21 +627,34 @@ def main() -> None:
     print(f"Index backend: {backend}")
     print(f"Index data: {index_display}")
     print(f"Metadata: {args.metadata_path}")
+    print(f"Legal metadata: {legal_metadata_path} ({len(document_statuses)} keys)")
+    print(f"Min local score: {args.min_score:.4f}")
+    print(
+        "Gemini fallback: "
+        f"{'enabled' if args.gemini_fallback else 'disabled'} | "
+        f"model={args.gemini_model}"
+    )
 
     domain = args.domain.strip() or None
 
     if args.query.strip():
-        results = search(
+        run_query(
+            query=args.query,
             backend=backend,
             index=index,
             metadata=metadata,
             embedder=embedder,
-            query=args.query,
             top_k=max(1, args.top_k),
             domain=domain,
             candidate_multiplier=max(1, args.candidate_multiplier),
+            document_statuses=document_statuses,
+            min_score=args.min_score,
+            show_full=args.show_full,
+            snippet_chars=max(50, args.snippet_chars),
+            gemini_fallback=args.gemini_fallback,
+            gemini_model=args.gemini_model,
+            gemini_api_key=GEMINI_API_KEY,
         )
-        print_results(results, show_full=args.show_full, snippet_chars=max(50, args.snippet_chars))
         return
 
     print("\nNhap cau hoi (go 'exit' de thoat).")
@@ -277,17 +666,23 @@ def main() -> None:
             print("Ket thuc.")
             return
 
-        results = search(
+        run_query(
+            query=query,
             backend=backend,
             index=index,
             metadata=metadata,
             embedder=embedder,
-            query=query,
             top_k=max(1, args.top_k),
             domain=domain,
             candidate_multiplier=max(1, args.candidate_multiplier),
+            document_statuses=document_statuses,
+            min_score=args.min_score,
+            show_full=args.show_full,
+            snippet_chars=max(50, args.snippet_chars),
+            gemini_fallback=args.gemini_fallback,
+            gemini_model=args.gemini_model,
+            gemini_api_key=GEMINI_API_KEY,
         )
-        print_results(results, show_full=args.show_full, snippet_chars=max(50, args.snippet_chars))
 
 
 if __name__ == "__main__":

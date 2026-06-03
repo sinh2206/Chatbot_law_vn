@@ -5,6 +5,14 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
+
+if load_dotenv is not None:
+    load_dotenv(BASE_DIR / ".env")
+
 # Source documents (.doc/.docx/.txt) by domain.
 RAW_DOCS_DIR = BASE_DIR / "Multi-Agent"
 
@@ -23,6 +31,7 @@ FAISS_INDEX_PATH = VECTOR_STORE_DIR / "faiss.index"
 EMBEDDINGS_NPY_PATH = VECTOR_STORE_DIR / "embeddings.npy"
 METADATA_PATH = VECTOR_STORE_DIR / "metadata.jsonl"
 MANIFEST_PATH = VECTOR_STORE_DIR / "manifest.json"
+LEGAL_DOCUMENT_METADATA_PATH = BASE_DIR / "metadata" / "legal_documents_metadata.csv"
 
 # File handling.
 ALLOWED_SOURCE_EXTENSIONS = {".doc", ".docx", ".txt"}
@@ -55,6 +64,17 @@ EMBEDDING_BATCH_SIZE = int(os.getenv("EMBEDDING_BATCH_SIZE", "32"))
 # Retrieval defaults.
 TOP_K = int(os.getenv("TOP_K", "5"))
 MAX_CANDIDATE_MULTIPLIER = int(os.getenv("MAX_CANDIDATE_MULTIPLIER", "6"))
+MIN_RETRIEVAL_SCORE = float(os.getenv("MIN_RETRIEVAL_SCORE", "0.45"))
+
+# Gemini is a fallback only. Local RAG must always be attempted first.
+GEMINI_FALLBACK_ENABLED = os.getenv("GEMINI_FALLBACK_ENABLED", "false").lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
 
 
 def ensure_directories() -> None:

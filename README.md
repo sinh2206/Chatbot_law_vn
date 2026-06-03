@@ -1,30 +1,32 @@
-# Offline Legal RAG (No API)
+﻿# Chatbot Law VN - Offline Legal RAG
 
-Du an xu ly van ban phap luat theo huong offline:
-- Khong dung OpenAI/Gemini API.
-- Embedding dung `sentence-transformers` voi model local/Hugging Face.
-- Vector search dung FAISS local neu cai duoc, fallback sang numpy brute-force neu chua co FAISS.
-- Fine-tune embedding model tu bo Q/A trong `data/train`, danh gia bang `data/test`.
+Du an hien tai chua co frontend va chua mo API web. He thong chay tren server Linux bang script/CLI de:
+- Chuyen van ban phap luat `.doc/.docx/.txt/anh scan` thanh `.txt`.
+- Tao vector store tu `data/processed`.
+- Fine-tune embedding model tu bo Q/A trong `data/train`.
+- Danh gia model bang `data/test`.
+- Truy van thu bang CLI.
+- Goi Gemini API chi trong truong hop fallback: khong tim thay can cu noi bo, score qua thap, sai linh vuc, hoac tai lieu lien quan bi danh dau het hieu luc.
 
-## 2.3.1 Yeu cau bai toan
+Mac dinh local RAG luon co uu tien cao nhat. Gemini co trong so thap nhat va chi chay khi bat `--gemini-fallback` hoac `GEMINI_FALLBACK_ENABLED=true`. Model embedding chinh la `dangvantuan/vietnamese-embedding` qua `sentence-transformers`.
 
-Khi nguoi dung nhap mot cau hoi, he thong can tra ve cau tra loi chinh xac va tu nhien dua tren du lieu da tai len:
-- Hieu ngon ngu tu nhien tu cau hoi nguoi dung.
-- Tim kiem trong co so du lieu vector nhung doan van ban gan nhat ve ngu nghia.
-- Ket hop du lieu tim duoc voi mo hinh ngon ngu lon local neu can sinh cau tra loi tu nhien.
-- Dam bao cau tra loi khong bia dat, ma gan lien voi du lieu co that trong tai lieu.
+## 1. Kien truc RAG
 
-## 2.3.2 Giai phap
+Khi nguoi dung nhap cau hoi, luong xu ly dung Retrieval-Augmented Generation:
+- Query embedding: cau hoi duoc chuyen thanh vector.
+- Vector search: tim cac chunk gan nghia nhat trong FAISS hoac numpy index.
+- Retrieval output: tra ve doan van ban, domain, source file, chunk id va score.
+- Expiry check: loai bo chunk thuoc van ban bi danh dau het hieu luc trong `metadata/legal_documents_metadata.csv`.
+- Fallback decision: neu khong co can cu noi bo hop le thi in ly do truoc, sau do moi goi Gemini neu duoc bat.
+- Answer generation: Gemini chi sinh cau tra loi fallback, khong duoc xem la can cu tu `data/processed`.
 
-He thong ap dung kien truc Retrieval-Augmented Generation (RAG):
-- Query embedding: chuyen cau hoi thanh vector embedding.
-- Vector search: tim `k` doan van ban gan nhat trong FAISS/numpy index.
-- Answer generation: dua cac doan van ban va cau hoi vao LLM local neu can sinh cau tra loi.
-- Post-processing: dinh dang cau tra loi va bo sung trich dan nguon du lieu.
+Trong du an nay:
+- "Kien thuc" nam trong `data/processed` va `data/vector_store`.
+- Fine-tune data trong `data/train` giup model embedding tim dung doan phap ly hon.
+- Sau moi lan fine-tune, bat buoc build lai vector store bang model moi.
+- Trang thai hieu luc van ban nam trong `metadata/legal_documents_metadata.csv`.
 
-Phien ban hien tai da hoan thien cac phan offline: convert/OCR du lieu, chunking, build vector store, fine-tune embedding, retrieval evaluation va query CLI. Phan sinh cau tra loi tu nhien bang LLM nen dung model local neu van giu yeu cau khong API.
-
-## Cau truc chinh
+## 2. Cau truc thu muc
 
 ```text
 Multi-Agent/
@@ -35,153 +37,179 @@ Multi-Agent/
   Thue/
 
 data/
-  processed/      # txt da chuan hoa tu .doc/.docx/.txt/.png/.jpg...
+  processed/      # File .txt da chuan hoa theo tung linh vuc
   train/          # questions.txt + reference_answers.txt de fine-tune
   test/           # questons.txt/questions.txt + reference_answers.txt de danh gia
-  finetune/       # train/valid/test jsonl + bao cao danh gia
-  vector_store/   # faiss.index hoac embeddings.npy + metadata + manifest
-  models/         # model fine-tuned local, khong commit len Git
+  finetune/       # JSONL sinh ra tu data/train va data/test
+  vector_store/   # faiss.index hoac embeddings.npy + metadata.jsonl + manifest.json
+  models/         # Model fine-tuned local, khong commit Git
 
 scripts/
   convert_docs_to_txt.py
   convert_images_to_txt_ocr.py
   prepare_qa_finetune_data.py
-  bootstrap_finetune_data.py
-  train_embedding.py
   validate_finetune_data.py
   evaluate_retrieval.py
+  train_embedding.py
   build_vector_store.py
   update_vector_store.py
   query_cli.py
+
+metadata/
+  legal_documents_metadata.csv
+
+Dockerfile
+docker-compose.yml
+.dockerignore
+.env.example
+requirements.txt
+config.py
 ```
 
-## Cai dat local Windows
+## 3. Chay bang Docker tren Linux server
+
+Day la cach khuyen nghi de chay tren server. Khong can frontend.
+
+### 3.1. Yeu cau server
+
+Can co:
+- Linux server.
+- Docker Engine.
+- Docker Compose plugin: `docker compose`.
+- Internet lan dau de tai Python packages va model Hugging Face.
+
+Neu muon train bang GPU:
+- Server co NVIDIA GPU.
+- Driver NVIDIA hoat dong: `nvidia-smi`.
+- NVIDIA Container Toolkit da duoc cai.
+- Kiem tra Docker GPU:
 
 ```bash
-python -m venv .venv
-.venv\Scripts\activate
-python -m pip install -U pip wheel setuptools
-pip install -r requirements.txt
+docker run --rm --gpus all nvidia/cuda:12.1.0-base-ubuntu22.04 nvidia-smi
 ```
 
-Neu xu ly file `.doc` cu:
-- Linux: cai `antiword` hoac `catdoc`.
-- Windows: cai `antiword`/`catdoc` vao PATH.
-- Windows co Microsoft Word: `pywin32` co the dung COM fallback.
+Neu lenh tren loi, sua Docker GPU truoc khi chay service `gpu`.
 
-## OCR anh van ban phap luat
+### 3.2. Clone project
 
-Cai Tesseract OCR:
-```bash
-sudo apt-get update
-sudo apt-get install -y tesseract-ocr tesseract-ocr-vie
-```
-
-Quet tat ca anh trong `Multi-Agent/`:
-```bash
-python scripts/convert_images_to_txt_ocr.py --overwrite --lang vie+eng --preprocess adaptive
-```
-
-OCR theo mot domain:
-```bash
-python scripts/convert_images_to_txt_ocr.py --domain DatDai --overwrite --lang vie+eng
-```
-
-Windows neu `tesseract` khong nam trong PATH:
-```bash
-python scripts/convert_images_to_txt_ocr.py --tesseract-cmd "C:\Program Files\Tesseract-OCR\tesseract.exe"
-```
-
-Sau OCR, file txt duoc luu vao `data/processed/<domain>/...`.
-
-## Convert doc/docx sang txt
-
-```bash
-python scripts/convert_docs_to_txt.py --clean-output
-python scripts/convert_docs_to_txt.py --domain Thue --overwrite
-```
-
-## Build / Update vector store
-
-Build moi bang model mac dinh trong `config.py`:
-```bash
-python scripts/build_vector_store.py
-```
-
-Build bang model goc:
-```bash
-python scripts/build_vector_store.py --embedding-model dangvantuan/vietnamese-embedding
-```
-
-Build lai bang model da fine-tune:
-```bash
-python scripts/build_vector_store.py --embedding-model data/models/vietnamese-embedding-legal
-```
-
-Cap nhat lai sau khi them/xoa van ban:
-```bash
-python scripts/update_vector_store.py --scope full --clean-output
-python scripts/update_vector_store.py --domain DatDai --scope domain --overwrite
-```
-
-## Query CLI (khong API)
-
-```bash
-python scripts/query_cli.py --top-k 5
-python scripts/query_cli.py --query "Ho so dang ky doanh nghiep gom gi?" --domain DoanhNghiep
-```
-
-`query_cli.py` uu tien model ghi trong `data/vector_store/manifest.json`, vi vay sau khi fine-tune phai build vector store lai bang model fine-tuned.
-
-## Chay tren Linux server (khong API)
-
-Quy trinh nay dam bao model hoc tu `data/train` va test tren `data/test`. Lan dau co the can internet de tai model tu Hugging Face; day khong phai API inference. Neu server offline hoan toan, hay copy san model vao `model/` hoac `data/models/...`.
-
-### 1. Cai system packages
-
-Khuyen nghi Python 3.10 hoac 3.11 de cai FAISS on dinh:
-```bash
-sudo apt-get update
-sudo apt-get install -y git python3.10 python3.10-venv python3.10-dev \
-  build-essential antiword catdoc tesseract-ocr tesseract-ocr-vie
-```
-
-Clone repo:
 ```bash
 git clone https://github.com/sinh2206/Chatbot_law_vn.git
 cd Chatbot_law_vn
 ```
 
-Tao virtual environment:
+Tao file `.env` tu mau:
+
 ```bash
-python3.10 -m venv .venv
-source .venv/bin/activate
-python -m pip install -U pip wheel setuptools
+cp .env.example .env
 ```
 
-Neu server co NVIDIA GPU, cai PyTorch CUDA truoc:
-```bash
-pip install torch --index-url https://download.pytorch.org/whl/cu121
+Neu muon dung Gemini fallback, sua `.env`:
+
+```text
+GEMINI_API_KEY=your_real_key
+GEMINI_MODEL=gemini-2.5-flash-lite
+GEMINI_FALLBACK_ENABLED=true
+MIN_RETRIEVAL_SCORE=0.45
 ```
 
-Cai dependencies:
-```bash
-pip install -r requirements.txt
+Neu chua muon goi API, giu:
+
+```text
+GEMINI_FALLBACK_ENABLED=false
 ```
 
-Kiem tra GPU:
+### 3.3. Build Docker image CPU
+
+Dung de convert data, validate, evaluate, build vector store CPU hoac query CLI:
+
 ```bash
-python - <<'PY'
+docker compose build app
+```
+
+Kiem tra container:
+
+```bash
+docker compose run --rm app python --version
+docker compose run --rm app python -c "import sentence_transformers, numpy; print('ok')"
+```
+
+### 3.4. Build Docker image GPU
+
+Chi can neu fine-tune tren GPU:
+
+```bash
+docker compose --profile gpu build gpu
+```
+
+Kiem tra PyTorch thay GPU:
+
+```bash
+docker compose --profile gpu run --rm -T gpu python - <<'PY'
 import torch
 print("cuda_available=", torch.cuda.is_available())
 print("device=", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu")
 PY
 ```
 
-### 2. Kiem tra model `dangvantuan/vietnamese-embedding`
+Neu `cuda_available=False`, container chua truy cap duoc GPU.
+
+## 4. Chuan bi du lieu van ban
+
+Neu `data/processed` da co `.txt` dung tieng Viet, co the bo qua buoc convert/OCR.
+
+### 4.1. Convert `.doc/.docx/.txt` tu `Multi-Agent`
+
+Chuyen toan bo raw documents:
 
 ```bash
-python - <<'PY'
+docker compose run --rm app python scripts/convert_docs_to_txt.py --clean-output
+```
+
+Chuyen rieng mot linh vuc:
+
+```bash
+docker compose run --rm app python scripts/convert_docs_to_txt.py --domain Thue --overwrite
+```
+
+### 4.2. OCR anh scan van ban phap luat
+
+Neu trong `Multi-Agent` co anh chup/scan:
+
+```bash
+docker compose run --rm app python scripts/convert_images_to_txt_ocr.py \
+  --overwrite \
+  --lang vie+eng \
+  --preprocess adaptive
+```
+
+OCR rieng mot linh vuc:
+
+```bash
+docker compose run --rm app python scripts/convert_images_to_txt_ocr.py \
+  --domain DatDai \
+  --overwrite \
+  --lang vie+eng
+```
+
+Sau buoc nay, kiem tra:
+
+```bash
+find data/processed -type f -name "*.txt" | wc -l
+find data/processed -maxdepth 2 -type f -name "*.txt"
+```
+
+## 5. Tai/kiem tra model embedding goc
+
+Model goc:
+
+```text
+dangvantuan/vietnamese-embedding
+```
+
+Kiem tra model load duoc:
+
+```bash
+docker compose run --rm -T app python - <<'PY'
 from sentence_transformers import SentenceTransformer
 m = SentenceTransformer("dangvantuan/vietnamese-embedding")
 print("embedding_dim=", m.get_sentence_embedding_dimension())
@@ -189,30 +217,46 @@ print("max_seq_length=", m.max_seq_length)
 PY
 ```
 
-Neu muon chay offline sau khi tai xong, luu model vao `model/`:
+Neu server can chay offline sau khi tai xong, luu model vao `model/`:
+
 ```bash
-python - <<'PY'
+docker compose run --rm -T app python - <<'PY'
 from sentence_transformers import SentenceTransformer
 m = SentenceTransformer("dangvantuan/vietnamese-embedding")
 m.save("model")
 PY
-export EMBEDDING_MODEL_NAME="$PWD/model"
 ```
 
-### 3. Tao fine-tune JSONL tu `data/train` va `data/test`
+Sau do co the ep project dung model local:
 
-Lenh nay doc:
+```bash
+export EMBEDDING_MODEL_NAME=/app/model
+```
+
+Khi dung Docker Compose, bien nay co the truyen truc tiep:
+
+```bash
+EMBEDDING_MODEL_NAME=/app/model docker compose run --rm app python scripts/build_vector_store.py
+```
+
+## 6. Tao fine-tune dataset tu `data/train` va `data/test`
+
+Script nay doc:
 - `data/train/questions.txt`
 - `data/train/reference_answers.txt`
 - `data/test/questons.txt` hoac `data/test/questions.txt`
 - `data/test/reference_answers.txt`
 
-Va ghi ra `data/finetune/*.jsonl`:
+Chay:
+
 ```bash
-python scripts/prepare_qa_finetune_data.py --valid-ratio 0.1 --seed 42
+docker compose run --rm app python scripts/prepare_qa_finetune_data.py \
+  --valid-ratio 0.1 \
+  --seed 42
 ```
 
 Ket qua mong doi voi bo hien tai:
+
 ```text
 manual_train_pairs_total: 1000
 train_pairs: 900
@@ -220,30 +264,55 @@ valid_pairs: 100
 test_pairs: 250
 ```
 
-Neu muon dung ca 1000 cau train de train va khong tach validation:
-```bash
-python scripts/prepare_qa_finetune_data.py --valid-ratio 0 --seed 42
+File sinh ra:
+
+```text
+data/finetune/train_pairs.jsonl
+data/finetune/valid_pairs.jsonl
+data/finetune/test_pairs.jsonl
+data/finetune/train_triplets.jsonl
+data/finetune/valid_triplets.jsonl
+data/finetune/test_triplets.jsonl
+data/finetune/summary.json
 ```
 
-### 4. Validate data truoc khi train
+Neu muon dung ca 1000 cau train de train va khong tach validation:
 
 ```bash
-python scripts/validate_finetune_data.py \
+docker compose run --rm app python scripts/prepare_qa_finetune_data.py \
+  --valid-ratio 0 \
+  --seed 42
+```
+
+Khuyen nghi van giu `--valid-ratio 0.1` de co diem validation trong luc train.
+
+## 7. Validate fine-tune dataset
+
+```bash
+docker compose run --rm app python scripts/validate_finetune_data.py \
   --model-name dangvantuan/vietnamese-embedding \
   --max-seq-length 256 \
   --output-json data/finetune/validation_report.json
 ```
 
-Can xem trong `data/finetune/validation_report.json`:
+Mo file:
+
+```bash
+cat data/finetune/validation_report.json
+```
+
+Can xem:
 - `duplicate_pairs_pct` nen gan `0`.
 - `suspicious_questionmark_rows` nen bang `0`.
 - `positive_truncated_pct` nen thap, tot nhat duoi `10%`.
 - `overlap_source_count` giua train/valid/test nen bang `0`.
 
-### 5. Chay baseline truoc fine-tune
+## 8. Danh gia baseline truoc fine-tune
+
+Chay model goc tren test set:
 
 ```bash
-python scripts/evaluate_retrieval.py \
+docker compose run --rm app python scripts/evaluate_retrieval.py \
   --model-name dangvantuan/vietnamese-embedding \
   --test-file data/finetune/test_pairs.jsonl \
   --train-file data/finetune/train_pairs.jsonl \
@@ -251,12 +320,272 @@ python scripts/evaluate_retrieval.py \
   --output-json data/finetune/retrieval_eval_baseline.json
 ```
 
-File diem baseline: `data/finetune/retrieval_eval_baseline.json`.
+Xem diem:
 
-### 6. Fine-tune embedding model
-
-Lenh khuyen nghi cho GPU T4/16GB:
 ```bash
+cat data/finetune/retrieval_eval_baseline.json
+```
+
+Chi so can quan tam:
+- `recall_at_1`: cau dung nam top 1.
+- `recall_at_5`: cau dung nam trong top 5.
+- `recall_at_10`: cau dung nam trong top 10.
+- `mrr_at_10`: rank trung binh co trong so.
+- `ndcg_at_10`: chat luong thu hang top 10.
+
+## 9. Fine-tune model embedding
+
+### 9.1. Fine-tune bang GPU
+
+Khuyen nghi dung service `gpu`:
+
+```bash
+docker compose --profile gpu run --rm gpu python scripts/train_embedding.py \
+  --model-name dangvantuan/vietnamese-embedding \
+  --train-file data/finetune/train_pairs.jsonl \
+  --valid-file data/finetune/valid_pairs.jsonl \
+  --output-dir data/models/vietnamese-embedding-legal \
+  --epochs 3 \
+  --batch-size 16 \
+  --lr 2e-5 \
+  --warmup-ratio 0.1 \
+  --max-seq-length 256 \
+  --use-amp
+```
+
+Neu GPU out-of-memory:
+- Giam `--batch-size 16` xuong `12` hoac `8`.
+- Giu `--max-seq-length 256` truoc, chi tang len khi can va GPU con du VRAM.
+
+### 9.2. Fine-tune bang CPU
+
+Chi nen dung de smoke test vi rat cham:
+
+```bash
+docker compose run --rm app python scripts/train_embedding.py \
+  --model-name dangvantuan/vietnamese-embedding \
+  --train-file data/finetune/train_pairs.jsonl \
+  --valid-file data/finetune/valid_pairs.jsonl \
+  --output-dir data/models/vietnamese-embedding-legal \
+  --epochs 1 \
+  --batch-size 4 \
+  --lr 2e-5 \
+  --warmup-ratio 0.1 \
+  --max-seq-length 256
+```
+
+Model sau train nam tai:
+
+```text
+data/models/vietnamese-embedding-legal/
+```
+
+## 10. Danh gia model sau fine-tune
+
+```bash
+docker compose run --rm app python scripts/evaluate_retrieval.py \
+  --model-name data/models/vietnamese-embedding-legal \
+  --test-file data/finetune/test_pairs.jsonl \
+  --train-file data/finetune/train_pairs.jsonl \
+  --valid-file data/finetune/valid_pairs.jsonl \
+  --output-json data/finetune/retrieval_eval_finetuned.json
+```
+
+So sanh baseline va fine-tuned:
+
+```bash
+docker compose run --rm -T app python - <<'PY'
+import json
+from pathlib import Path
+
+for name in ["baseline", "finetuned"]:
+    path = Path(f"data/finetune/retrieval_eval_{name}.json")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    print(name)
+    for key in ["recall_at_1", "recall_at_3", "recall_at_5", "recall_at_10", "mrr_at_10", "ndcg_at_10"]:
+        print(f"  {key}: {data.get(key)}")
+PY
+```
+
+Model fine-tuned tot hon khi cac chi so tren tang so voi baseline.
+
+Ngoai ra xem file validation trong qua trinh train:
+
+```text
+data/models/vietnamese-embedding-legal/eval/binary_classification_evaluation_valid_binary_results.csv
+data/models/vietnamese-embedding-legal/train_summary.json
+```
+
+## 11. Build vector store cho chatbot/retrieval
+
+Sau fine-tune, bat buoc build lai vector store bang model moi:
+
+```bash
+docker compose run --rm app python scripts/build_vector_store.py \
+  --embedding-model data/models/vietnamese-embedding-legal \
+  --batch-size 64
+```
+
+Neu chua fine-tune va muon build bang model goc:
+
+```bash
+docker compose run --rm app python scripts/build_vector_store.py \
+  --embedding-model dangvantuan/vietnamese-embedding \
+  --batch-size 64
+```
+
+Neu server co GPU va muon build nhanh hon:
+
+```bash
+docker compose --profile gpu run --rm gpu python scripts/build_vector_store.py \
+  --embedding-model data/models/vietnamese-embedding-legal \
+  --batch-size 128
+```
+
+Kiem tra manifest:
+
+```bash
+cat data/vector_store/manifest.json
+```
+
+Can thay:
+- `embedding_model` dung model vua build.
+- `total_chunks` > 0.
+- `index_backend` la `faiss` neu `faiss-cpu` cai duoc, hoac `numpy` neu fallback.
+
+## 12. Khai bao hieu luc van ban
+
+File:
+
+```text
+metadata/legal_documents_metadata.csv
+```
+
+Cot quan trong:
+- `source_file`: phai trung voi duong dan trong `data/processed`, vi du `DatDai/Luat_45_2013_QH13.txt`.
+- `domain`: linh vuc.
+- `expiry_date`: ngay het hieu luc, chap nhan `YYYY-MM-DD`, `DD/MM/YYYY`, `DD-MM-YYYY`.
+- `status`: neu dat `expired`, `het_hieu_luc`, `inactive` thi he thong luon coi van ban da het hieu luc.
+- `replaced_by`: van ban thay the neu biet.
+
+Vi du danh dau mot van ban het hieu luc:
+
+```csv
+source_file,domain,document_title,document_number,issued_date,effective_date,expiry_date,status,replaced_by
+DatDai/Luat_45_2013_QH13.txt,DatDai,Luat Dat dai,45/2013/QH13,2013-11-29,2014-07-01,2024-08-01,expired,Luat 31/2024/QH15
+```
+
+Khi query:
+- Neu tat ca ket qua phu hop deu thuoc van ban het hieu luc, CLI se khong dung cac chunk do.
+- CLI in ly do `FALLBACK REQUIRED`.
+- Neu Gemini fallback duoc bat, sau do moi goi Gemini.
+- Neu Gemini fallback tat, CLI chi thong bao ly do va dung lai.
+
+## 13. Query CLI
+
+Truy van nhanh:
+
+```bash
+docker compose run --rm app python scripts/query_cli.py \
+  --query "Cong dan can cap doi the can cuoc khi nao?" \
+  --domain CCCD \
+  --top-k 5
+```
+
+Bat Gemini fallback cho mot lan query:
+
+```bash
+docker compose run --rm app python scripts/query_cli.py \
+  --query "Quy dinh moi nhat ve tach thua dat la gi?" \
+  --domain DatDai \
+  --top-k 5 \
+  --gemini-fallback
+```
+
+Neu khong co can cu noi bo hop le, output se co dang:
+
+```text
+[FALLBACK REQUIRED]
+Khong truy xuat duoc doan tai lieu phu hop...
+
+[GEMINI FALLBACK] Dang goi Gemini vi khong co can cu noi bo hop le.
+```
+
+Chay che do hoi-dap terminal:
+
+```bash
+docker compose run --rm app python scripts/query_cli.py --top-k 5
+```
+
+Hien day du chunk:
+
+```bash
+docker compose run --rm app python scripts/query_cli.py \
+  --query "Ho so dang ky doanh nghiep gom nhung gi?" \
+  --domain DoanhNghiep \
+  --top-k 5 \
+  --show-full
+```
+
+Dieu chinh nguong score noi bo:
+
+```bash
+docker compose run --rm app python scripts/query_cli.py \
+  --query "Cau hoi can kiem tra" \
+  --min-score 0.50 \
+  --gemini-fallback
+```
+
+Nguyen tac uu tien:
+- Neu co ket qua noi bo hop le voi score >= `--min-score` va khong het hieu luc: dung local RAG, khong goi Gemini.
+- Neu domain khong ton tai, khong co ket qua, score thap, hoac ket qua deu het hieu luc: moi fallback.
+- Gemini khong duoc xem la nguon can cu trong kho noi bo.
+
+## 14. Cap nhat tai lieu moi
+
+Khi them/xoa van ban trong `Multi-Agent`:
+
+```bash
+docker compose run --rm app python scripts/convert_docs_to_txt.py --clean-output
+docker compose run --rm app python scripts/build_vector_store.py \
+  --embedding-model data/models/vietnamese-embedding-legal \
+  --batch-size 64
+```
+
+Neu chi cap nhat mot linh vuc:
+
+```bash
+docker compose run --rm app python scripts/convert_docs_to_txt.py --domain Thue --overwrite
+docker compose run --rm app python scripts/update_vector_store.py \
+  --domain Thue \
+  --scope domain \
+  --overwrite \
+  --embedding-model data/models/vietnamese-embedding-legal
+```
+
+## 15. Chay khong Docker bang virtualenv
+
+Dung khi can debug truc tiep tren server:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y git python3.10 python3.10-venv python3.10-dev \
+  build-essential antiword catdoc tesseract-ocr tesseract-ocr-vie
+
+python3.10 -m venv .venv
+source .venv/bin/activate
+python -m pip install -U pip wheel setuptools
+pip install torch --index-url https://download.pytorch.org/whl/cu121
+pip install -r requirements.txt
+```
+
+Sau do chay cac script giong Docker, bo tien to `docker compose run --rm app`.
+
+Vi du:
+
+```bash
+python scripts/prepare_qa_finetune_data.py --valid-ratio 0.1 --seed 42
+python scripts/validate_finetune_data.py --model-name dangvantuan/vietnamese-embedding --max-seq-length 256
 python scripts/train_embedding.py \
   --model-name dangvantuan/vietnamese-embedding \
   --train-file data/finetune/train_pairs.jsonl \
@@ -270,113 +599,37 @@ python scripts/train_embedding.py \
   --use-amp
 ```
 
-Neu GPU out-of-memory, giam `--batch-size` xuong `8` hoac `12`. Neu train tren CPU qua cham, nen chuyen sang GPU.
+## 16. Files diem va bao cao
 
-### 7. Test model sau fine-tune
+Sau khi chay day du, xem cac file:
 
-```bash
-python scripts/evaluate_retrieval.py \
-  --model-name data/models/vietnamese-embedding-legal \
-  --test-file data/finetune/test_pairs.jsonl \
-  --train-file data/finetune/train_pairs.jsonl \
-  --valid-file data/finetune/valid_pairs.jsonl \
-  --output-json data/finetune/retrieval_eval_finetuned.json
+```text
+data/finetune/summary.json
+data/finetune/validation_report.json
+data/finetune/retrieval_eval_baseline.json
+data/finetune/retrieval_eval_finetuned.json
+data/models/vietnamese-embedding-legal/train_summary.json
+data/models/vietnamese-embedding-legal/eval/binary_classification_evaluation_valid_binary_results.csv
+data/vector_store/manifest.json
 ```
 
-So sanh baseline va fine-tuned:
-```bash
-python - <<'PY'
-import json
-from pathlib import Path
+Y nghia:
+- `validation_report.json`: data co bi duplicate, loi encoding, truncate, leakage khong.
+- `retrieval_eval_baseline.json`: diem model goc.
+- `retrieval_eval_finetuned.json`: diem model sau fine-tune.
+- `train_summary.json`: thong tin train.
+- `manifest.json`: vector store dang dung model nao, bao nhieu chunk, backend nao.
 
-for name in ["baseline", "finetuned"]:
-    path = Path(f"data/finetune/retrieval_eval_{name}.json")
-    data = json.loads(path.read_text(encoding="utf-8"))
-    print(name)
-    for key in ["recall_at_1", "recall_at_3", "recall_at_5", "recall_at_10", "mrr_at_10", "ndcg_at_10"]:
-        print(f"  {key}: {data.get(key)}")
-PY
+## 17. Luu y Git va artifact lon
+
+Nhung thu muc sau khong nen commit:
+
+```text
+model/
+data/models/
+checkpoints/
+data/vector_store/
+data/finetune/
 ```
 
-Model fine-tuned tot hon khi `recall_at_k`, `mrr_at_10`, `ndcg_at_10` tang so voi baseline.
-
-### 8. Build lai vector store bang model fine-tuned
-
-Vector store cu khong tu cap nhat sau fine-tune. Phai build lai de query embedding va document embedding cung dimension/cung khong gian vector:
-```bash
-python scripts/build_vector_store.py \
-  --embedding-model data/models/vietnamese-embedding-legal \
-  --batch-size 64
-```
-
-Kiem tra manifest:
-```bash
-cat data/vector_store/manifest.json
-```
-
-Can thay:
-- `embedding_model` la `data/models/vietnamese-embedding-legal`.
-- `total_chunks` khop so chunk trong kho tai lieu.
-- `index_backend` nen la `faiss` tren Linux/Python 3.10 neu `faiss-cpu` cai thanh cong.
-
-### 9. Chay truy van thu
-
-```bash
-python scripts/query_cli.py --top-k 5
-python scripts/query_cli.py --query "Cong dan can cap doi the can cuoc khi nao?" --domain CCCD
-```
-
-## Google Colab GPU T4
-
-Neu chay tren Colab:
-```python
-REPO_URL = "https://github.com/sinh2206/Chatbot_law_vn.git"
-REPO_DIR = "/content/Chatbot_law_vn"
-
-import os
-if not os.path.exists(REPO_DIR):
-    !git clone $REPO_URL $REPO_DIR
-else:
-    !git -C $REPO_DIR pull --ff-only
-
-%cd $REPO_DIR
-```
-
-Cai dependencies:
-```bash
-!apt-get update
-!apt-get install -y tesseract-ocr tesseract-ocr-vie
-!python -m pip install -U pip wheel setuptools
-!pip install torch --index-url https://download.pytorch.org/whl/cu121
-!pip install -r requirements.txt
-```
-
-Sau do chay tu buoc `3` den buoc `8` trong phan Linux server, them dau `!` truoc moi command shell.
-
-## Nhin vao dau de xac dinh diem model
-
-Retrieval metrics quan trong nhat cho RAG:
-- `data/finetune/retrieval_eval_baseline.json`
-- `data/finetune/retrieval_eval_finetuned.json`
-
-Chi so can so sanh:
-- `recall_at_1`, `recall_at_3`, `recall_at_5`, `recall_at_10`
-- `mrr_at_10`
-- `ndcg_at_10`
-
-Eval trong qua trinh train:
-- `data/models/vietnamese-embedding-legal/eval/binary_classification_evaluation_valid_binary_results.csv`
-
-Cac cot chinh:
-- `cosine_ap`, `cosine_f1`, `cosine_accuracy`, `cosine_mcc`
-
-Tong ket train:
-- `data/models/vietnamese-embedding-legal/train_summary.json`
-
-## Luu y ky thuat
-
-- `data/models/`, `model/`, `checkpoints/` la artifact lon va da duoc ignore trong Git.
-- Model thu nghiem `data/models/smoke-vietnamese-embedding*` khong con can thiet va nen xoa khoi repository.
-- Tren Windows/Python 3.12, `faiss-cpu` co the khong cai duoc; script se fallback sang numpy index.
-- Tren Linux server nen dung Python 3.10/3.11 de co `faiss-cpu`.
-- Sau moi lan thay doi model embedding, phai build lai vector store.
+Model va vector store co the tao lai tren server bang cac buoc trong README.

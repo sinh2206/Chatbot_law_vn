@@ -1,8 +1,12 @@
 numpy>=1.26.0
 faiss-cpu>=1.7.4; python_version < "3.12"
-sentence-transformers>=3.0.1
-datasets>=2.20.0
-accelerate>=1.1.0
+# Keep the training stack on mutually compatible 4.x/3.x releases.
+# Newer transformers 5.x imports torch.float8_e8m0fnu, which is not available
+# in the cu121 torch build used by this Dockerfile.
+sentence-transformers==3.0.1
+transformers==4.44.2
+datasets==2.20.0
+accelerate==0.33.0
 python-docx>=1.1.2
 pytesseract>=0.3.10
 opencv-python>=4.10.0.84

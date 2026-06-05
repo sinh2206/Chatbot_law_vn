@@ -20,13 +20,13 @@
 
         <button class="new-chat-button" id="newChatButton" type="button">
           <span aria-hidden="true">+</span>
-          <span>New chat</span>
+          <span>Cuộc trò chuyện mới</span>
         </button>
 
         <nav class="chat-list" aria-label="Saved chats">
-          <button class="chat-list-item active" type="button">Tu van hien tai</button>
-          <button class="chat-list-item" type="button">Kiem tra can cuoc</button>
-          <button class="chat-list-item" type="button">Thue va hoa don</button>
+          <button class="chat-list-item active" type="button">Tư vấn hiện tại</button>
+          <button class="chat-list-item" type="button">Kiểm tra căn cước</button>
+          <button class="chat-list-item" type="button">Thuế và hóa đơn</button>
         </nav>
       </aside>
 
@@ -34,27 +34,19 @@
         <header class="topbar">
           <div class="model-title">
             <span class="status-dot" aria-hidden="true"></span>
-            <span>vietnamese-embedding-legal</span>
+            <span>Chatbot Luật VN</span>
           </div>
           <div class="toolbar">
             <label>
               <span>Domain</span>
               <select id="domainSelect">
-                <option value="">Auto</option>
+                <option value="">Tự động</option>
                 <option value="CCCD">CCCD</option>
-                <option value="DatDai">DatDai</option>
-                <option value="DoanhNghiep">DoanhNghiep</option>
-                <option value="HoTich">HoTich</option>
-                <option value="Thue">Thue</option>
+                <option value="DatDai">Đất đai</option>
+                <option value="DoanhNghiep">Doanh nghiệp</option>
+                <option value="HoTich">Hộ tịch</option>
+                <option value="Thue">Thuế</option>
               </select>
-            </label>
-            <label>
-              <span>Top K</span>
-              <input id="topKInput" type="number" min="1" max="20" value="5" />
-            </label>
-            <label class="toggle-row">
-              <input id="fallbackToggle" type="checkbox" checked />
-              <span>Gemini fallback</span>
             </label>
           </div>
         </header>
@@ -63,25 +55,13 @@
           <article class="message assistant">
             <div class="avatar">L</div>
             <div class="bubble">
-              <p>Chao ban. Hay nhap cau hoi phap luat, minh se uu tien can cu noi bo truoc.</p>
+              <p>Chatbot Luật VN xin chào, rất vui được giúp đỡ bạn.</p>
             </div>
           </article>
         </section>
 
-        <section class="settings-bar" aria-label="API settings">
-          <label>
-            <span>Endpoint</span>
-            <input id="endpointInput" type="text" value="/chat" />
-          </label>
-          <button id="saveEndpointButton" class="icon-button" type="button" title="Save endpoint" aria-label="Save endpoint">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 4h12l2 2v14H5zM8 4v6h8V4M8 18h8" />
-            </svg>
-          </button>
-        </section>
-
         <form class="composer" id="chatForm">
-          <textarea id="promptInput" rows="1" placeholder="Hoi ve CCCD, dat dai, thue, ho tich..." autocomplete="off"></textarea>
+          <textarea id="promptInput" rows="1" placeholder="Hỏi về CCCD, đất đai, thuế, hộ tịch..." autocomplete="off"></textarea>
           <button class="send-button" type="submit" title="Send" aria-label="Send">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" />

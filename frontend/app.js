@@ -1,19 +1,10 @@
 const messagesEl = document.querySelector("#messages");
 const formEl = document.querySelector("#chatForm");
 const promptEl = document.querySelector("#promptInput");
-const endpointEl = document.querySelector("#endpointInput");
-const saveEndpointButton = document.querySelector("#saveEndpointButton");
 const domainEl = document.querySelector("#domainSelect");
-const topKEl = document.querySelector("#topKInput");
-const fallbackEl = document.querySelector("#fallbackToggle");
 const newChatButton = document.querySelector("#newChatButton");
 
-const endpointKey = "chatbot-law-vn-endpoint";
-const savedEndpoint = localStorage.getItem(endpointKey);
-
-if (savedEndpoint) {
-  endpointEl.value = savedEndpoint;
-}
+const chatEndpoint = "/chat";
 
 function escapeHtml(value) {
   return value
@@ -28,7 +19,7 @@ function scrollToBottom() {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-function addMessage(role, text, sources = []) {
+function addMessage(role, text, sources = [], meta = {}) {
   const article = document.createElement("article");
   article.className = `message ${role}`;
 
@@ -38,7 +29,10 @@ function addMessage(role, text, sources = []) {
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.innerHTML = `<p>${escapeHtml(text).replaceAll("\n", "<br>")}</p>`;
+
+  const paragraph = document.createElement("p");
+  paragraph.innerHTML = escapeHtml(text).replaceAll("\n", "<br>");
+  bubble.appendChild(paragraph);
 
   if (sources.length) {
     const list = document.createElement("div");
@@ -47,13 +41,20 @@ function addMessage(role, text, sources = []) {
       const chip = document.createElement("div");
       chip.className = "source-chip";
       const sourceText = [
-        source.source_file || source.source || "source",
-        source.domain ? `domain=${source.domain}` : "",
-        Number.isFinite(source.score) ? `score=${source.score.toFixed(4)}` : "",
+        source.citation || source.title || source.source || source.source_file || "source",
       ]
         .filter(Boolean)
         .join(" | ");
-      chip.textContent = sourceText;
+      if (source.url) {
+        const link = document.createElement("a");
+        link.href = source.url;
+        link.target = "_blank";
+        link.rel = "noreferrer";
+        link.textContent = sourceText;
+        chip.appendChild(link);
+      } else {
+        chip.textContent = sourceText;
+      }
       list.appendChild(chip);
     }
     bubble.appendChild(list);
@@ -81,24 +82,29 @@ function normalizeResponse(data) {
       data.response ||
       data.message ||
       data.text ||
-      "Khong co noi dung tra loi trong response.",
+      "Không có nội dung trả lời trong response.",
     sources: data.sources || data.results || data.context || [],
+    mode: data.mode || "",
+    reason: data.reason || "",
+    localUsed: Boolean(data.local_used),
+    geminiUsed: Boolean(data.gemini_used),
   };
 }
 
-function buildDemoAnswer(question) {
+function buildErrorAnswer(question, error) {
   return [
-    "Chua ket noi duoc endpoint web API.",
+    "Chưa kết nối được backend API.",
     "",
-    `Cau hoi vua nhap: ${question}`,
+    `Câu hỏi vừa nhập: ${question}`,
     "",
-    "Frontend da san sang gui POST den endpoint da cau hinh. Local RAG/Gemini fallback van can duoc expose qua mot API web rieng neu muon chat truc tiep tren trinh duyet.",
+    `Lỗi: ${error.message || error}`,
+    "",
+    "Hãy kiểm tra backend đang chạy tại http://localhost:8000.",
   ].join("\n");
 }
 
 async function callChatApi(payload) {
-  const endpoint = endpointEl.value.trim();
-  const response = await fetch(endpoint, {
+  const response = await fetch(chatEndpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -123,14 +129,9 @@ function resizePrompt() {
   promptEl.style.height = `${Math.min(promptEl.scrollHeight, 180)}px`;
 }
 
-saveEndpointButton.addEventListener("click", () => {
-  localStorage.setItem(endpointKey, endpointEl.value.trim());
-  saveEndpointButton.blur();
-});
-
 newChatButton.addEventListener("click", () => {
   messagesEl.innerHTML = "";
-  addMessage("assistant", "Chao ban. Hay nhap cau hoi phap luat, minh se uu tien can cu noi bo truoc.");
+  addMessage("assistant", "Chatbot Luật VN xin chào, rất vui được giúp đỡ bạn.");
   promptEl.focus();
 });
 
@@ -154,8 +155,8 @@ formEl.addEventListener("submit", async (event) => {
     message: question,
     query: question,
     domain: domainEl.value,
-    top_k: Number(topKEl.value || 5),
-    gemini_fallback: fallbackEl.checked,
+    top_k: 5,
+    gemini_fallback: true,
   };
 
   addMessage("user", question);
@@ -163,14 +164,19 @@ formEl.addEventListener("submit", async (event) => {
   resizePrompt();
   setLoading(true);
 
-  const pending = addMessage("assistant", "Dang xu ly...");
+  const pending = addMessage("assistant", "Đang xử lý...");
   try {
     const result = await callChatApi(payload);
     pending.remove();
-    addMessage("assistant", result.answer, result.sources);
+    addMessage("assistant", result.answer, result.sources, {
+      mode: result.mode,
+      reason: result.reason,
+      localUsed: result.localUsed,
+      geminiUsed: result.geminiUsed,
+    });
   } catch (error) {
     pending.remove();
-    addMessage("assistant", buildDemoAnswer(question));
+    addMessage("assistant", buildErrorAnswer(question, error), [], { mode: "gemini_error" });
   } finally {
     setLoading(false);
     promptEl.focus();

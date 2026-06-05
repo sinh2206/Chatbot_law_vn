@@ -9,3 +9,4 @@ reports/
 model/
 data/models/
 checkpoints/
+data/*.sqlite3

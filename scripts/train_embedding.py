@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import gc
+from importlib import metadata as importlib_metadata
 import json
 import os
 import random
@@ -51,6 +52,71 @@ def clear_cuda_cache() -> None:
             torch.cuda.ipc_collect()
         except Exception:
             pass
+
+
+def parse_version_prefix(version: str) -> tuple[int, int, int]:
+    parts: list[int] = []
+    for raw_part in version.replace("-", ".").split("."):
+        digits = "".join(ch for ch in raw_part if ch.isdigit())
+        if not digits:
+            break
+        parts.append(int(digits))
+        if len(parts) == 3:
+            break
+    while len(parts) < 3:
+        parts.append(0)
+    return parts[0], parts[1], parts[2]
+
+
+def installed_version(package_name: str) -> str:
+    try:
+        return importlib_metadata.version(package_name)
+    except importlib_metadata.PackageNotFoundError:
+        return "not-installed"
+
+
+def check_training_dependency_compatibility() -> None:
+    torch_version = installed_version("torch")
+    transformers_version = installed_version("transformers")
+    sentence_transformers_version = installed_version("sentence-transformers")
+
+    if torch_version == "not-installed":
+        raise RuntimeError(
+            "Missing dependency: torch. Rebuild the Docker image:\n"
+            "  docker compose --profile gpu build --no-cache gpu"
+        )
+    if transformers_version == "not-installed":
+        raise RuntimeError(
+            "Missing dependency: transformers. Rebuild the Docker image:\n"
+            "  docker compose --profile gpu build --no-cache gpu"
+        )
+    if sentence_transformers_version == "not-installed":
+        raise RuntimeError(
+            "Missing dependency: sentence-transformers. Rebuild the Docker image:\n"
+            "  docker compose --profile gpu build --no-cache gpu"
+        )
+
+    try:
+        import torch
+    except ImportError as exc:
+        raise RuntimeError(
+            "Cannot import torch. Rebuild the Docker image:\n"
+            "  docker compose --profile gpu build --no-cache gpu"
+        ) from exc
+
+    transformers_major, _, _ = parse_version_prefix(transformers_version)
+    if transformers_major >= 5 and not hasattr(torch, "float8_e8m0fnu"):
+        raise RuntimeError(
+            "Incompatible training dependencies detected:\n"
+            f"  torch={torch_version}\n"
+            f"  transformers={transformers_version}\n"
+            f"  sentence-transformers={sentence_transformers_version}\n"
+            "This transformers release expects torch.float8_e8m0fnu, but the "
+            "current torch build does not provide it.\n"
+            "Fix by rebuilding with the pinned requirements in this project:\n"
+            "  docker compose --profile gpu build --no-cache gpu\n"
+            "  docker compose build --no-cache app backend"
+        )
 
 
 def load_jsonl(path: Path) -> list[dict[str, object]]:
@@ -121,19 +187,17 @@ def _train_once(
     use_amp: bool,
     seed: int,
 ) -> dict[str, object]:
+    check_training_dependency_compatibility()
     try:
         import torch
-        from sentence_transformers import InputExample, SentenceTransformer
-        from sentence_transformers.sentence_transformer.evaluation import (
-            BinaryClassificationEvaluator,
-        )
-        from sentence_transformers.sentence_transformer.losses import (
-            MultipleNegativesRankingLoss,
-        )
+        from sentence_transformers import InputExample, SentenceTransformer, losses
+        from sentence_transformers.evaluation import BinaryClassificationEvaluator
         from torch.utils.data import DataLoader
     except ImportError as exc:
         raise RuntimeError(
-            "Missing dependencies for training. Install requirements first:\n"
+            "Missing or incompatible dependencies for training. Rebuild the Docker image:\n"
+            "  docker compose --profile gpu build --no-cache gpu\n"
+            "Or reinstall locally:\n"
             f'  "{sys.executable}" -m pip install -r requirements.txt'
         ) from exc
 
@@ -174,7 +238,7 @@ def _train_once(
         raise RuntimeError("Training rows are invalid after filtering empty query/positive.")
 
     train_loader = DataLoader(train_examples, shuffle=True, batch_size=batch_size, drop_last=False)
-    train_loss = MultipleNegativesRankingLoss(model=model)
+    train_loss = losses.MultipleNegativesRankingLoss(model=model)
     warmup_steps = int(len(train_loader) * max(1, epochs) * warmup_ratio)
 
     evaluator = None

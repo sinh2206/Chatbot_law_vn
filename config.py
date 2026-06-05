@@ -22,6 +22,7 @@ PROCESSED_DIR = DATA_DIR / "processed"
 VECTOR_STORE_DIR = DATA_DIR / "vector_store"
 FINETUNE_DIR = DATA_DIR / "finetune"
 MODELS_DIR = DATA_DIR / "models"
+CHAT_DB_PATH = Path(os.getenv("CHAT_DB_PATH", str(DATA_DIR / "chat_history.sqlite3")))
 
 # Local embedding model directory (offline first).
 LOCAL_MODEL_DIR = BASE_DIR / "model"
@@ -73,7 +74,7 @@ GEMINI_FALLBACK_ENABLED = os.getenv("GEMINI_FALLBACK_ENABLED", "false").lower() 
     "yes",
     "on",
 }
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
 
 
@@ -83,3 +84,4 @@ def ensure_directories() -> None:
     VECTOR_STORE_DIR.mkdir(parents=True, exist_ok=True)
     FINETUNE_DIR.mkdir(parents=True, exist_ok=True)
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    CHAT_DB_PATH.parent.mkdir(parents=True, exist_ok=True)

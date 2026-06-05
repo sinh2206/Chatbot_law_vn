@@ -125,7 +125,7 @@ textarea {
 
 .chat-area {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   min-width: 0;
   min-height: 100vh;
 }
@@ -157,8 +157,7 @@ textarea {
   box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.14);
 }
 
-.toolbar,
-.settings-bar {
+.toolbar {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -189,24 +188,6 @@ select,
 input {
   min-height: 36px;
   padding: 0 10px;
-}
-
-#topKInput {
-  width: 72px;
-}
-
-.toggle-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  padding-top: 18px;
-}
-
-.toggle-row input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--primary);
 }
 
 .messages {
@@ -293,18 +274,13 @@ input {
   font-size: 13px;
 }
 
-.settings-bar {
-  padding: 12px 24px;
-  border-top: 1px solid var(--border);
-  background: var(--panel);
+.source-chip a {
+  color: var(--accent);
+  text-decoration: none;
 }
 
-.settings-bar label {
-  flex: 1 1 320px;
-}
-
-.settings-bar input {
-  width: 100%;
+.source-chip a:hover {
+  text-decoration: underline;
 }
 
 .icon-button,
@@ -383,8 +359,7 @@ svg {
     padding: 14px 16px;
   }
 
-  .toolbar,
-  .settings-bar {
+  .toolbar {
     width: 100%;
   }
 
@@ -410,7 +385,6 @@ svg {
     height: 32px;
   }
 
-  .settings-bar,
   .composer {
     padding-left: 14px;
     padding-right: 14px;

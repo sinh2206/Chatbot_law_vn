@@ -8,7 +8,85 @@ Du an xay chatbot hoi dap phap luat Viet Nam bang RAG local:
 - Model fine-tuned local: `data/models/vietnamese-embedding-legal`.
 - Vector store nam trong `data/vector_store/`.
 - Gemini chi la fallback, chi goi khi local RAG khong co can cu hop le.
+- Lich su chat va cache Gemini nam trong `data/chat_history.sqlite3`.
 - Frontend tinh nam trong `frontend/`.
+
+## Chay web nhanh
+
+Dung luong nay khi da co:
+
+- `data/models/vietnamese-embedding-legal/`
+- `data/vector_store/manifest.json`
+- `data/vector_store/faiss.index` hoac `data/vector_store/embeddings.npy`
+
+Chuan bi `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Neu chi muon hoi dap bang kho noi bo, giu Gemini tat:
+
+```env
+GEMINI_API_KEY=
+GEMINI_FALLBACK_ENABLED=false
+EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
+MIN_RETRIEVAL_SCORE=0.45
+CHAT_DB_PATH=data/chat_history.sqlite3
+```
+
+Neu muon cho web goi Gemini khi local RAG khong co can cu du tin cay:
+
+```env
+GEMINI_API_KEY=your_real_gemini_key
+GEMINI_FALLBACK_ENABLED=true
+GEMINI_MODEL=gemini-2.5-flash
+EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
+MIN_RETRIEVAL_SCORE=0.45
+CHAT_DB_PATH=data/chat_history.sqlite3
+```
+
+Build va chay web:
+
+```bash
+docker compose build backend
+docker compose up -d backend
+```
+
+Service `backend` co `restart: unless-stopped`, nen se tu khoi dong lai neu container dung ngoai y muon.
+
+Mo trinh duyet:
+
+```text
+http://localhost:8000
+```
+
+Neu chay tren server va cho may khac truy cap, mo:
+
+```text
+http://<IP_SERVER>:8000
+```
+
+Kiem tra backend:
+
+```bash
+curl http://localhost:8000/health
+```
+
+Test chat API:
+
+```bash
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Công dân cần cấp đổi thẻ căn cước khi nào?","domain":"CCCD","top_k":5,"gemini_fallback":true}'
+```
+
+Dung hoac restart web:
+
+```bash
+docker compose down
+docker compose restart backend
+```
 
 ## 1. Thu muc chinh
 
@@ -20,6 +98,7 @@ data/test/            # questons.txt + reference_answers.txt
 data/finetune/        # JSONL sinh tu train/test
 data/models/          # Model fine-tuned local, khong commit Git
 data/vector_store/    # faiss.index/embeddings.npy + metadata + manifest
+data/chat_history.sqlite3 # Lich su chat va cache cau tra loi Gemini
 metadata/             # Metadata hieu luc van ban
 scripts/              # Script convert, train, evaluate, query
 backend/              # FastAPI backend cho frontend va API /chat
@@ -50,11 +129,19 @@ docker compose build app backend
 docker compose --profile gpu build gpu
 ```
 
+Neu vua sua `requirements.txt` hoac gap loi version `torch/transformers`, build lai khong dung cache:
+
+```bash
+docker compose build --no-cache app backend
+docker compose --profile gpu build --no-cache gpu
+```
+
 Kiem tra Python packages:
 
 ```bash
 docker compose run --rm app python --version
 docker compose run --rm app python -c "import sentence_transformers, numpy; print('ok')"
+docker compose --profile gpu run --rm gpu python -c "import torch, transformers, sentence_transformers; print(torch.__version__, transformers.__version__, sentence_transformers.__version__)"
 ```
 
 ## 3. Cau hinh `.env`
@@ -69,7 +156,7 @@ Neu muon danh gia/fine-tune khach quan, tat Gemini:
 
 ```env
 GEMINI_API_KEY=
-GEMINI_MODEL=gemini-2.5-flash-lite
+GEMINI_MODEL=gemini-2.5-flash
 GEMINI_FALLBACK_ENABLED=false
 MIN_RETRIEVAL_SCORE=0.45
 EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
@@ -79,7 +166,7 @@ Neu muon chatbot goi Gemini fallback khi local RAG khong tra loi duoc:
 
 ```env
 GEMINI_API_KEY=your_real_gemini_key
-GEMINI_MODEL=gemini-2.5-flash-lite
+GEMINI_MODEL=gemini-2.5-flash
 GEMINI_FALLBACK_ENABLED=true
 MIN_RETRIEVAL_SCORE=0.45
 EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
@@ -441,6 +528,7 @@ Endpoint:
 
 ```text
 GET  /health
+GET  /history
 POST /chat
 POST /reload
 GET  /              # serve frontend/
@@ -462,12 +550,26 @@ Nguyen tac fallback:
 
 - Backend luon search local vector store truoc.
 - Neu local co can cu hop le, response co `mode="local_rag"` va `gemini_used=false`.
-- Neu local khong du tin cay va `gemini_fallback=true`, backend moi goi Gemini.
+- Neu local khong tim thay tai lieu du tin cay va `gemini_fallback=true`, backend moi goi Gemini.
+- Gemini mac dinh dung model `gemini-2.5-flash` qua `google-genai`.
+- Neu mot cau hoi fallback da co trong `data/chat_history.sqlite3`, backend tra lai ban luu va khong goi Gemini them lan nua.
+- Truoc khi tra loi fallback, response luon mo dau bang mot trong hai dong:
+  - `không tìm thấy tài liệu làm căn cứ cho câu hỏi trong kho nội bộ`
+  - `tài liệu <ten/so hieu/file> hết hạn, cần cập nhật`
+- Sau dong canh bao, Gemini moi tim cau tra loi bang Google Search grounding.
+- Response fallback co `mode="gemini_fallback"`, `gemini_used=true`, va `sources` chua cac tai lieu/trang tham khao neu Gemini tra ve grounding.
 - Neu Gemini tat hoac thieu key, response co `mode="fallback_required"` hoac `mode="gemini_error"`.
+- Tat ca cau hoi/cau tra loi duoc luu vao bang SQLite `chat_messages`.
+- Xem lich su gan nhat:
+
+```bash
+curl "http://localhost:8000/history?limit=20"
+```
 
 ## 14. Frontend
 
 Frontend nam trong `frontend/`. Day la giao dien chat tinh, kieu ChatGPT don gian.
+Giao dien chi hien phan hoi dap va chon linh vuc; khong hien cac tuy chon ky thuat nhu Endpoint, Top K hay Gemini fallback.
 
 Chay cung backend:
 
@@ -494,13 +596,13 @@ Mo:
 http://localhost:8088
 ```
 
-Khi chay chung qua backend, mac dinh frontend goi endpoint:
+Khi chay chung qua backend, frontend mac dinh goi:
 
 ```text
 /chat
 ```
 
-Neu serve rieng frontend bang `python3 -m http.server`, nhap endpoint `http://localhost:8000/chat` tren giao dien.
+Neu serve rieng frontend bang `python3 -m http.server`, can chinh hang `chatEndpoint` trong `frontend/app.js` thanh `http://localhost:8000/chat` hoac serve frontend truc tiep bang backend de tranh loi CORS/duong dan.
 
 Payload frontend gui:
 
@@ -512,8 +614,6 @@ Payload frontend gui:
   "gemini_fallback": true
 }
 ```
-
-Neu backend nam o host/port khac, sua o Endpoint tren giao dien roi bam nut luu.
 
 ## 15. Bao cao can xem
 

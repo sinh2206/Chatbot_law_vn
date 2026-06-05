@@ -1,250 +1,250 @@
-Câu 001: Quy trình cơ bản để người nộp thuế đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC gồm những bước nào?
-Câu 002: Công ty Bình Minh thành lập tại TP. Hồ Chí Minh, đã có mã số doanh nghiệp nhưng kế toán vẫn muốn nộp hồ sơ xin mã số thuế riêng theo Thông tư 86/2024/TT-BTC. Cách xử lý đúng là gì?
-Câu 003: Cấu trúc mã số thuế 10 chữ số và 13 chữ số được hiểu thế nào?
-Câu 004: Công ty Đại Nam bị mất Thông báo mã số thuế và muốn xin cấp lại để hoàn thiện hồ sơ giao dịch. Theo quy định đăng ký thuế, công ty cần làm gì?
-Câu 005: Cơ quan thuế cấp giấy chứng nhận đăng ký thuế trong thời hạn nào?
-Câu 006: Quy trình cơ bản để người nộp thuế đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC gồm những bước nào trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 007: Bị mất giấy chứng nhận đăng ký thuế thì có được cấp lại không?
-Câu 008: Quy trình cơ bản để người nộp thuế đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC gồm những bước nào trong trường hợp hồ sơ bị yêu cầu bổ sung?
-Câu 009: Quy trình cơ bản để người nộp thuế đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC gồm những bước nào trong trường hợp người nộp thuế nhận kết quả qua bưu chính?
-Câu 010: Doanh nghiệp đã được cấp mã số doanh nghiệp có phải nộp thêm hồ sơ đăng ký thuế lần đầu không?
-Câu 011: Một cá nhân hỏi có cần đăng ký mã số thuế không nhưng chỉ nói 'có thu nhập online'. Dữ kiện nào còn thiếu để xác định nghĩa vụ đăng ký thuế?
-Câu 012: Công ty Tân Tiến bị mất Thông báo mã số thuế và muốn xin cấp lại để hoàn thiện hồ sơ giao dịch. Theo quy định đăng ký thuế, công ty cần làm gì?
-Câu 013: Cấu trúc mã số thuế 10 chữ số và 13 chữ số được hiểu thế nào trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 014: Quy trình cơ bản để người nộp thuế đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC gồm những bước nào trong trường hợp phát sinh nghĩa vụ lần đầu trong năm?
-Câu 015: Công ty Xuân Mai hỏi mã số thuế bị khóa có dùng để xuất hóa đơn được không nhưng không cung cấp trạng thái mã số và lý do bị khóa. Trả lời chuẩn nên nêu giới hạn nào?
-Câu 016: Công ty An Phát bị mất Thông báo mã số thuế và muốn xin cấp lại để hoàn thiện hồ sơ giao dịch. Theo quy định đăng ký thuế, công ty cần làm gì?
-Câu 017: Công ty Bình Minh bị mất Thông báo mã số thuế và muốn xin cấp lại để hoàn thiện hồ sơ giao dịch. Theo quy định đăng ký thuế, công ty cần làm gì?
-Câu 018: Công ty Cửu Long hỏi mã số thuế bị khóa có dùng để xuất hóa đơn được không nhưng không cung cấp trạng thái mã số và lý do bị khóa. Trả lời chuẩn nên nêu giới hạn nào?
-Câu 019: Hộ kinh doanh đổi địa chỉ thì làm thủ tục thay đổi thông tin đăng ký thuế ở đâu?
-Câu 020: Doanh nghiệp đã được cấp mã số doanh nghiệp có phải nộp thêm hồ sơ đăng ký thuế lần đầu không đối với công ty trách nhiệm hữu hạn mới thành lập?
-Câu 021: Mã số doanh nghiệp có đồng thời là mã số thuế không?
-Câu 022: Quy trình cơ bản để người nộp thuế đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC gồm những bước nào trong trường hợp cần đối chiếu với cơ quan thuế quản lý trực tiếp?
-Câu 023: Quy trình cơ bản để người nộp thuế đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC gồm những bước nào trong trường hợp hồ sơ phát sinh sau ngày văn bản mới có hiệu lực?
-Câu 024: Thời hạn đăng ký thuế lần đầu với người nộp thuế đăng ký trực tiếp là bao lâu?
-Câu 025: Công ty Phú An bị mất Thông báo mã số thuế và muốn xin cấp lại để hoàn thiện hồ sơ giao dịch. Theo quy định đăng ký thuế, công ty cần làm gì?
-Câu 026: Khi thay đổi thông tin đăng ký thuế, người nộp thuế phải thông báo trong thời hạn nào?
-Câu 027: Bị mất giấy chứng nhận đăng ký thuế thì có được cấp lại không trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 028: Mã số thuế có được cấp lại cho tổ chức, cá nhân khác sau khi chấm dứt hiệu lực không?
-Câu 029: Hộ kinh doanh đổi địa chỉ thì làm thủ tục thay đổi thông tin đăng ký thuế ở đâu đối với hộ kinh doanh đăng ký theo cơ chế một cửa?
-Câu 030: Quy trình cơ bản để người nộp thuế đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC gồm những bước nào trong trường hợp hồ sơ phát sinh trước ngày văn bản mới có hiệu lực?
-Câu 031: Công ty An Phát thành lập tại Cần Thơ, đã có mã số doanh nghiệp nhưng kế toán vẫn muốn nộp hồ sơ xin mã số thuế riêng theo Thông tư 86/2024/TT-BTC. Cách xử lý đúng là gì?
-Câu 032: Những đối tượng nào phải đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC?
-Câu 033: Cấu trúc mã số thuế 10 chữ số và 13 chữ số được hiểu thế nào trong trường hợp hồ sơ bị yêu cầu bổ sung?
-Câu 034: Quy trình cơ bản để người nộp thuế đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC gồm những bước nào trong trường hợp cần xử lý trên cổng thuế điện tử?
-Câu 035: Quy trình cơ bản để người nộp thuế đăng ký thuế trực tiếp với cơ quan thuế theo Thông tư 86/2024/TT-BTC gồm những bước nào trong trường hợp người nộp thuế thay đổi thông tin sau đăng ký?
-Câu 036: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào?
-Câu 037: Công ty Bình Minh phát hiện tờ khai thuế quý trước kê khai thiếu doanh thu nhưng cơ quan thuế chưa công bố quyết định kiểm tra tại trụ sở. Công ty có được khai bổ sung không?
-Câu 038: Thời hạn nộp hồ sơ quyết toán thuế năm của doanh nghiệp là khi nào?
-Câu 039: Người nộp thuế được khai bổ sung hồ sơ khai thuế trong trường hợp nào?
-Câu 040: Công ty Đông Á phát hiện tờ khai thuế quý trước kê khai thiếu doanh thu nhưng cơ quan thuế chưa công bố quyết định kiểm tra tại trụ sở. Công ty có được khai bổ sung không?
-Câu 041: Công ty Gia Hưng hỏi 'hạn nộp tờ khai thuế của tôi là ngày nào' nhưng không nói sắc thuế, kỳ khai tháng/quý/năm và năm tài chính. Trả lời chuẩn phải xử lý thế nào?
-Câu 042: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 043: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp hồ sơ bị yêu cầu bổ sung?
-Câu 044: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp người nộp thuế nhận kết quả qua bưu chính?
-Câu 045: Công ty Phú An có trụ sở tại Nghệ An và phát sinh đại lý bảo hiểm ở tỉnh khác. Khi nộp hồ sơ khai thuế, cần kiểm tra những quy định nào để tránh nộp sai nơi?
-Câu 046: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp phát sinh nghĩa vụ lần đầu trong năm?
-Câu 047: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp cần đối chiếu với cơ quan thuế quản lý trực tiếp?
-Câu 048: Thời hạn nộp hồ sơ quyết toán thuế năm của doanh nghiệp là khi nào trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 049: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp hồ sơ phát sinh sau ngày văn bản mới có hiệu lực?
-Câu 050: Có được xin gia hạn nộp hồ sơ khai thuế không?
-Câu 051: Nộp tiền thuế theo hồ sơ khai thuế phải thực hiện vào thời điểm nào?
-Câu 052: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp hồ sơ phát sinh trước ngày văn bản mới có hiệu lực?
-Câu 053: Công ty Cửu Long phát hiện tờ khai thuế quý trước kê khai thiếu doanh thu nhưng cơ quan thuế chưa công bố quyết định kiểm tra tại trụ sở. Công ty có được khai bổ sung không?
-Câu 054: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp cần xử lý trên cổng thuế điện tử?
-Câu 055: Công ty Đông Á hỏi 'hạn nộp tờ khai thuế của tôi là ngày nào' nhưng không nói sắc thuế, kỳ khai tháng/quý/năm và năm tài chính. Trả lời chuẩn phải xử lý thế nào?
-Câu 056: Công ty Gia Hưng phát hiện tờ khai thuế quý trước kê khai thiếu doanh thu nhưng cơ quan thuế chưa công bố quyết định kiểm tra tại trụ sở. Công ty có được khai bổ sung không?
-Câu 057: Công ty Hải Vân phát hiện tờ khai thuế quý trước kê khai thiếu doanh thu nhưng cơ quan thuế chưa công bố quyết định kiểm tra tại trụ sở. Công ty có được khai bổ sung không?
-Câu 058: Công ty Minh Khang hỏi 'hạn nộp tờ khai thuế của tôi là ngày nào' nhưng không nói sắc thuế, kỳ khai tháng/quý/năm và năm tài chính. Trả lời chuẩn phải xử lý thế nào?
-Câu 059: Công ty Nam Việt phát hiện tờ khai thuế quý trước kê khai thiếu doanh thu nhưng cơ quan thuế chưa công bố quyết định kiểm tra tại trụ sở. Công ty có được khai bổ sung không?
-Câu 060: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp người nộp thuế thay đổi thông tin sau đăng ký?
-Câu 061: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp nộp hồ sơ điện tử qua cổng thuế (tình huống kiểm thử bổ sung 2)?
-Câu 062: Doanh nghiệp mới thành lập có được khai thuế GTGT theo quý không?
-Câu 063: Công ty Thiên Long hỏi 'hạn nộp tờ khai thuế của tôi là ngày nào' nhưng không nói sắc thuế, kỳ khai tháng/quý/năm và năm tài chính. Trả lời chuẩn phải xử lý thế nào?
-Câu 064: Khi nào hồ sơ khai thuế được coi là nộp đúng hạn qua phương thức điện tử?
-Câu 065: Công ty Xuân Mai có trụ sở tại Hải Phòng và phát sinh đại lý bảo hiểm ở tỉnh khác. Khi nộp hồ sơ khai thuế, cần kiểm tra những quy định nào để tránh nộp sai nơi?
-Câu 066: Công ty An Phát có trụ sở tại Cần Thơ và phát sinh sản xuất hàng hóa ở tỉnh khác. Khi nộp hồ sơ khai thuế, cần kiểm tra những quy định nào để tránh nộp sai nơi?
-Câu 067: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp hồ sơ bị yêu cầu bổ sung (tình huống kiểm thử bổ sung 2)?
-Câu 068: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp người nộp thuế nhận kết quả qua bưu chính (tình huống kiểm thử bổ sung 2)?
-Câu 069: Công ty Đại Nam hỏi 'hạn nộp tờ khai thuế của tôi là ngày nào' nhưng không nói sắc thuế, kỳ khai tháng/quý/năm và năm tài chính. Trả lời chuẩn phải xử lý thế nào?
-Câu 070: Có được xin gia hạn nộp hồ sơ khai thuế không trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 071: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp phát sinh nghĩa vụ lần đầu trong năm (tình huống kiểm thử bổ sung 2)?
-Câu 072: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp cần đối chiếu với cơ quan thuế quản lý trực tiếp (tình huống kiểm thử bổ sung 2)?
-Câu 073: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp hồ sơ phát sinh sau ngày văn bản mới có hiệu lực (tình huống kiểm thử bổ sung 2)?
-Câu 074: Công ty Nam Việt phát hiện tờ khai thuế quý trước kê khai thiếu doanh thu nhưng cơ quan thuế chưa công bố quyết định kiểm tra tại trụ sở. Công ty có được khai bổ sung không đối với công ty trách nhiệm hữu hạn mới thành lập?
-Câu 075: Công ty Phú An có trụ sở tại Bình Dương và phát sinh đại lý bảo hiểm ở tỉnh khác. Khi nộp hồ sơ khai thuế, cần kiểm tra những quy định nào để tránh nộp sai nơi?
-Câu 076: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp hồ sơ phát sinh trước ngày văn bản mới có hiệu lực (tình huống kiểm thử bổ sung 2)?
-Câu 077: Thời hạn nộp hồ sơ khai thuế theo quý là ngày nào?
-Câu 078: Công ty Thiên Long phát hiện tờ khai thuế quý trước kê khai thiếu doanh thu nhưng cơ quan thuế chưa công bố quyết định kiểm tra tại trụ sở. Công ty có được khai bổ sung không?
-Câu 079: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp cần xử lý trên cổng thuế điện tử (tình huống kiểm thử bổ sung 2)?
-Câu 080: Công ty Xuân Mai phát hiện tờ khai thuế quý trước kê khai thiếu doanh thu nhưng cơ quan thuế chưa công bố quyết định kiểm tra tại trụ sở. Công ty có được khai bổ sung không?
-Câu 081: Nộp tiền thuế theo hồ sơ khai thuế phải thực hiện vào thời điểm nào trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 082: Công ty Bình Minh phát hiện tờ khai thuế quý trước kê khai thiếu doanh thu nhưng cơ quan thuế chưa công bố quyết định kiểm tra tại trụ sở. Công ty có được khai bổ sung không đối với công ty trách nhiệm hữu hạn mới thành lập?
-Câu 083: Nơi nộp hồ sơ khai thuế được xác định theo nguyên tắc nào?
-Câu 084: Khi nào hồ sơ khai thuế được coi là nộp đúng hạn qua phương thức điện tử trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 085: Hồ sơ khai thuế gồm những gì theo nguyên tắc chung?
-Câu 086: Công ty Gia Hưng có trụ sở tại Đà Nẵng và phát sinh sản xuất hàng hóa ở tỉnh khác. Khi nộp hồ sơ khai thuế, cần kiểm tra những quy định nào để tránh nộp sai nơi?
-Câu 087: Thời hạn nộp hồ sơ khai thuế theo quý là ngày nào trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 088: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp người nộp thuế thay đổi thông tin sau đăng ký (tình huống kiểm thử bổ sung 2)?
-Câu 089: Quy trình xin gia hạn nộp hồ sơ khai thuế khi gặp sự kiện bất khả kháng được thực hiện như thế nào trong trường hợp nộp hồ sơ điện tử qua cổng thuế (tình huống kiểm thử bổ sung 3)?
-Câu 090: Có được xin gia hạn nộp hồ sơ khai thuế không trong trường hợp hồ sơ bị yêu cầu bổ sung?
-Câu 091: Một hộ khoán tại Hà Nội có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không?
-Câu 092: Một hộ kê khai tại TP. Hồ Chí Minh có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không?
-Câu 093: Một cá nhân cho thuê tài sản tại Đà Nẵng có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không?
-Câu 094: Phương pháp khoán áp dụng cho đối tượng nào?
-Câu 095: Phương pháp kê khai áp dụng cho hộ kinh doanh nào?
-Câu 096: Một hộ kinh doanh nhà hàng hỏi có phải nộp thuế không nhưng chỉ nói 'doanh thu ít' và không nêu doanh thu năm, ngành nghề, phương pháp tính thuế. Cần trả lời thế nào?
-Câu 097: Tổ chức có được khai thuế thay, nộp thuế thay cho cá nhân kinh doanh không?
-Câu 098: Một hộ kê khai hỏi có phải nộp thuế không nhưng chỉ nói 'doanh thu ít' và không nêu doanh thu năm, ngành nghề, phương pháp tính thuế. Cần trả lời thế nào?
-Câu 099: Quy trình xác định số thuế GTGT/TNCN phải nộp của hộ kinh doanh theo Thông tư 40/2021/TT-BTC gồm các bước nào?
-Câu 100: Căn cứ tính thuế GTGT và TNCN của hộ kinh doanh, cá nhân kinh doanh là gì?
-Câu 101: Quy trình xác định số thuế GTGT/TNCN phải nộp của hộ kinh doanh theo Thông tư 40/2021/TT-BTC gồm các bước nào đối với hộ kinh doanh đăng ký theo cơ chế một cửa?
-Câu 102: Phương pháp khoán áp dụng cho đối tượng nào trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 103: Quy trình xác định số thuế GTGT/TNCN phải nộp của hộ kinh doanh theo Thông tư 40/2021/TT-BTC gồm các bước nào đối với hộ kinh doanh đăng ký trực tiếp với cơ quan thuế?
-Câu 104: Một hộ kê khai tại TP. Hồ Chí Minh có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 105: Một cá nhân cho thuê tài sản tại Đà Nẵng có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không đối với hộ kinh doanh đăng ký theo cơ chế một cửa?
-Câu 106: Một cá nhân bán hàng online tại Bình Dương có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không?
-Câu 107: Quy trình xác định số thuế GTGT/TNCN phải nộp của hộ kinh doanh theo Thông tư 40/2021/TT-BTC gồm các bước nào đối với cá nhân kinh doanh không có địa điểm cố định?
-Câu 108: Một hộ kinh doanh nhà hàng hỏi có phải nộp thuế không nhưng chỉ nói 'doanh thu ít' và không nêu doanh thu năm, ngành nghề, phương pháp tính thuế. Cần trả lời thế nào đối với hộ kinh doanh đăng ký theo cơ chế một cửa?
-Câu 109: Một hộ khoán tại Cần Thơ có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không?
-Câu 110: Phương pháp khoán áp dụng cho đối tượng nào trong trường hợp hồ sơ bị yêu cầu bổ sung?
-Câu 111: Một cá nhân tại Khánh Hòa bán hàng qua sàn thương mại điện tử và hỏi sàn có bắt buộc khai, nộp thuế thay mình không. Cần đối chiếu văn bản nào?
-Câu 112: Quy trình xác định số thuế GTGT/TNCN phải nộp của hộ kinh doanh theo Thông tư 40/2021/TT-BTC gồm các bước nào đối với cá nhân bán hàng online?
-Câu 113: Một cá nhân kinh doanh lưu động tại Long An có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không?
-Câu 114: Hộ khoán ngừng, tạm ngừng kinh doanh thì xử lý thuế thế nào?
-Câu 115: Một cá nhân tại Hà Nội bán hàng qua sàn thương mại điện tử và hỏi sàn có bắt buộc khai, nộp thuế thay mình không. Cần đối chiếu văn bản nào?
-Câu 116: Một hộ kê khai tại TP. Hồ Chí Minh có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không trong trường hợp hồ sơ bị yêu cầu bổ sung?
-Câu 117: Một cá nhân cho thuê tài sản tại Đà Nẵng có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không đối với hộ kinh doanh đăng ký trực tiếp với cơ quan thuế?
-Câu 118: Một cá nhân bán hàng online tại Bình Dương có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không đối với hộ kinh doanh đăng ký theo cơ chế một cửa?
-Câu 119: Một cá nhân kinh doanh lưu động hỏi có phải nộp thuế không nhưng chỉ nói 'doanh thu ít' và không nêu doanh thu năm, ngành nghề, phương pháp tính thuế. Cần trả lời thế nào?
-Câu 120: Một cá nhân tại Hải Phòng bán hàng qua sàn thương mại điện tử và hỏi sàn có bắt buộc khai, nộp thuế thay mình không. Cần đối chiếu văn bản nào?
-Câu 121: Tổ chức có được khai thuế thay, nộp thuế thay cho cá nhân kinh doanh không đối với hộ kinh doanh đăng ký theo cơ chế một cửa?
-Câu 122: Một cá nhân tại Quảng Ninh bán hàng qua sàn thương mại điện tử và hỏi sàn có bắt buộc khai, nộp thuế thay mình không. Cần đối chiếu văn bản nào?
-Câu 123: Quy trình xác định số thuế GTGT/TNCN phải nộp của hộ kinh doanh theo Thông tư 40/2021/TT-BTC gồm các bước nào đối với cá nhân cho thuê tài sản?
-Câu 124: Quy trình xác định số thuế GTGT/TNCN phải nộp của hộ kinh doanh theo Thông tư 40/2021/TT-BTC gồm các bước nào đối với hộ kinh doanh đăng ký theo cơ chế một cửa (tình huống kiểm thử bổ sung 2)?
-Câu 125: Một cá nhân tại Long An bán hàng qua sàn thương mại điện tử và hỏi sàn có bắt buộc khai, nộp thuế thay mình không. Cần đối chiếu văn bản nào?
-Câu 126: Một hộ kinh doanh nhà hàng hỏi có phải nộp thuế không nhưng chỉ nói 'doanh thu ít' và không nêu doanh thu năm, ngành nghề, phương pháp tính thuế. Cần trả lời thế nào đối với hộ kinh doanh đăng ký trực tiếp với cơ quan thuế?
-Câu 127: Một hộ khoán tại Hà Nội có doanh thu dự kiến 90 triệu đồng/năm. Theo Thông tư 40/2021/TT-BTC, có phải nộp thuế GTGT và TNCN không đối với hộ kinh doanh đăng ký theo cơ chế một cửa?
-Câu 128: Cá nhân cho thuê tài sản khai thuế theo nguyên tắc nào?
-Câu 129: Tổ chức có được khai thuế thay, nộp thuế thay cho cá nhân kinh doanh không đối với hộ kinh doanh đăng ký trực tiếp với cơ quan thuế?
-Câu 130: Quy trình xác định số thuế GTGT/TNCN phải nộp của hộ kinh doanh theo Thông tư 40/2021/TT-BTC gồm các bước nào đối với hộ kinh doanh đăng ký trực tiếp với cơ quan thuế (tình huống kiểm thử bổ sung 2)?
-Câu 131: Doanh nghiệp tạm nộp thuế TNDN trong năm theo nguyên tắc nào để tránh tiền chậm nộp?
-Câu 132: Nguyên tắc phân bổ nghĩa vụ thuế khi doanh nghiệp hoạt động nhiều địa bàn là gì?
-Câu 133: Công ty Cửu Long hỏi có phải phân bổ thuế cho Hải Phòng không nhưng chỉ nói có chi nhánh ở đó, không nêu chi nhánh hạch toán độc lập hay phụ thuộc và phát sinh sắc thuế nào. Cần trả lời ra sao?
-Câu 134: Công ty Đại Nam đến quý IV mới phát hiện số thuế TNDN tạm nộp cả năm có thể thấp hơn 80% số quyết toán. Theo Nghị định 91/2022/NĐ-CP, rủi ro là gì?
-Câu 135: Công ty Đông Á đến quý IV mới phát hiện số thuế TNDN tạm nộp cả năm có thể thấp hơn 80% số quyết toán. Theo Nghị định 91/2022/NĐ-CP, rủi ro là gì?
-Câu 136: Quy trình lập phụ lục phân bổ thuế cho doanh nghiệp có hoạt động nhiều tỉnh theo Thông tư 80/2021/TT-BTC gồm những bước nào?
-Câu 137: Công ty Hải Vân đến quý IV mới phát hiện số thuế TNDN tạm nộp cả năm có thể thấp hơn 80% số quyết toán. Theo Nghị định 91/2022/NĐ-CP, rủi ro là gì?
-Câu 138: Công ty Minh Khang hỏi có phải phân bổ thuế cho Long An không nhưng chỉ nói có chi nhánh ở đó, không nêu chi nhánh hạch toán độc lập hay phụ thuộc và phát sinh sắc thuế nào. Cần trả lời ra sao?
-Câu 139: Doanh nghiệp tạm nộp thuế TNDN trong năm theo nguyên tắc nào để tránh tiền chậm nộp đối với hồ sơ hoàn trước kiểm tra sau?
-Câu 140: Công ty Phú An có trụ sở tại Nghệ An, công trình xây dựng tại Hà Nội và nhân sự làm việc tại cả hai nơi. Công ty phải kiểm tra những nghĩa vụ khai, nộp thuế nào?
-Câu 141: Quy trình lập phụ lục phân bổ thuế cho doanh nghiệp có hoạt động nhiều tỉnh theo Thông tư 80/2021/TT-BTC gồm những bước nào trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 142: Công ty Tân Tiến có trụ sở tại Bắc Ninh, công trình xây dựng tại Đà Nẵng và nhân sự làm việc tại cả hai nơi. Công ty phải kiểm tra những nghĩa vụ khai, nộp thuế nào?
-Câu 143: Công ty Thiên Long có trụ sở tại Hà Nội, công trình xây dựng tại Bình Dương và nhân sự làm việc tại cả hai nơi. Công ty phải kiểm tra những nghĩa vụ khai, nộp thuế nào?
-Câu 144: Quy trình lập phụ lục phân bổ thuế cho doanh nghiệp có hoạt động nhiều tỉnh theo Thông tư 80/2021/TT-BTC gồm những bước nào trong trường hợp hồ sơ bị yêu cầu bổ sung?
-Câu 145: Công ty Xuân Mai đến quý IV mới phát hiện số thuế TNDN tạm nộp cả năm có thể thấp hơn 80% số quyết toán. Theo Nghị định 91/2022/NĐ-CP, rủi ro là gì?
-Câu 146: Doanh nghiệp có phát sinh thu nhập vãng lai cho cá nhân thì cần chú ý nghĩa vụ gì?
-Câu 147: Công ty Bình Minh hỏi có phải phân bổ thuế cho Quảng Ninh không nhưng chỉ nói có chi nhánh ở đó, không nêu chi nhánh hạch toán độc lập hay phụ thuộc và phát sinh sắc thuế nào. Cần trả lời ra sao?
-Câu 148: Quy trình lập phụ lục phân bổ thuế cho doanh nghiệp có hoạt động nhiều tỉnh theo Thông tư 80/2021/TT-BTC gồm những bước nào trong trường hợp người nộp thuế nhận kết quả qua bưu chính?
-Câu 149: Quy trình lập phụ lục phân bổ thuế cho doanh nghiệp có hoạt động nhiều tỉnh theo Thông tư 80/2021/TT-BTC gồm những bước nào trong trường hợp phát sinh nghĩa vụ lần đầu trong năm?
-Câu 150: Thuế TNDN của hoạt động chuyển nhượng bất động sản ngoại tỉnh có cần phân bổ không?
-Câu 151: Công ty Gia Hưng đến quý IV mới phát hiện số thuế TNDN tạm nộp cả năm có thể thấp hơn 80% số quyết toán. Theo Nghị định 91/2022/NĐ-CP, rủi ro là gì?
-Câu 152: Doanh nghiệp có chi nhánh phụ thuộc khác tỉnh thì có luôn phải nộp tờ khai riêng tại tỉnh đó không?
-Câu 153: Quy trình lập phụ lục phân bổ thuế cho doanh nghiệp có hoạt động nhiều tỉnh theo Thông tư 80/2021/TT-BTC gồm những bước nào trong trường hợp cần đối chiếu với cơ quan thuế quản lý trực tiếp?
-Câu 154: Công ty Nam Việt đến quý IV mới phát hiện số thuế TNDN tạm nộp cả năm có thể thấp hơn 80% số quyết toán. Theo Nghị định 91/2022/NĐ-CP, rủi ro là gì?
-Câu 155: Công ty Phú An đến quý IV mới phát hiện số thuế TNDN tạm nộp cả năm có thể thấp hơn 80% số quyết toán. Theo Nghị định 91/2022/NĐ-CP, rủi ro là gì?
-Câu 156: Quy trình lập phụ lục phân bổ thuế cho doanh nghiệp có hoạt động nhiều tỉnh theo Thông tư 80/2021/TT-BTC gồm những bước nào trong trường hợp hồ sơ phát sinh sau ngày văn bản mới có hiệu lực?
-Câu 157: Công ty Tân Tiến có trụ sở tại Đà Nẵng, công trình xây dựng tại Hải Phòng và nhân sự làm việc tại cả hai nơi. Công ty phải kiểm tra những nghĩa vụ khai, nộp thuế nào?
-Câu 158: Quy trình lập phụ lục phân bổ thuế cho doanh nghiệp có hoạt động nhiều tỉnh theo Thông tư 80/2021/TT-BTC gồm những bước nào trong trường hợp hồ sơ phát sinh trước ngày văn bản mới có hiệu lực?
-Câu 159: Thuế TNCN khấu trừ từ tiền lương của người lao động làm việc nhiều địa bàn được xử lý thế nào?
-Câu 160: Công ty Xuân Mai đến quý IV mới phát hiện số thuế TNDN tạm nộp cả năm có thể thấp hơn 80% số quyết toán. Theo Nghị định 91/2022/NĐ-CP, rủi ro là gì đối với công ty trách nhiệm hữu hạn mới thành lập?
-Câu 161: Công ty An Phát đến quý IV mới phát hiện số thuế TNDN tạm nộp cả năm có thể thấp hơn 80% số quyết toán. Theo Nghị định 91/2022/NĐ-CP, rủi ro là gì?
-Câu 162: Công ty Bình Minh có trụ sở tại Quảng Ninh, công trình xây dựng tại Long An và nhân sự làm việc tại cả hai nơi. Công ty phải kiểm tra những nghĩa vụ khai, nộp thuế nào?
-Câu 163: Doanh nghiệp tạm nộp thuế TNDN trong năm theo nguyên tắc nào để tránh tiền chậm nộp đối với hồ sơ kiểm tra trước hoàn sau?
-Câu 164: Quy trình lập phụ lục phân bổ thuế cho doanh nghiệp có hoạt động nhiều tỉnh theo Thông tư 80/2021/TT-BTC gồm những bước nào trong trường hợp cần xử lý trên cổng thuế điện tử?
-Câu 165: Thuế GTGT của hoạt động kinh doanh ngoại tỉnh được xử lý theo văn bản nào?
-Câu 166: Công ty Gia Hưng có trụ sở tại Bắc Ninh, công trình xây dựng tại Đà Nẵng và nhân sự làm việc tại cả hai nơi. Công ty phải kiểm tra những nghĩa vụ khai, nộp thuế nào?
-Câu 167: Công ty Hải Vân hỏi có phải phân bổ thuế cho Bình Dương không nhưng chỉ nói có chi nhánh ở đó, không nêu chi nhánh hạch toán độc lập hay phụ thuộc và phát sinh sắc thuế nào. Cần trả lời ra sao?
-Câu 168: Quy trình lập phụ lục phân bổ thuế cho doanh nghiệp có hoạt động nhiều tỉnh theo Thông tư 80/2021/TT-BTC gồm những bước nào trong trường hợp người nộp thuế thay đổi thông tin sau đăng ký?
-Câu 169: Công ty Nam Việt có trụ sở tại Đà Nẵng, công trình xây dựng tại Hải Phòng và nhân sự làm việc tại cả hai nơi. Công ty phải kiểm tra những nghĩa vụ khai, nộp thuế nào?
-Câu 170: Công ty Phú An có trụ sở tại Bình Dương, công trình xây dựng tại Cần Thơ và nhân sự làm việc tại cả hai nơi. Công ty phải kiểm tra những nghĩa vụ khai, nộp thuế nào?
-Câu 171: Công ty Sơn Hà có trụ sở tại Đồng Nai, công trình xây dựng tại Quảng Ninh và nhân sự làm việc tại cả hai nơi. Công ty phải kiểm tra những nghĩa vụ khai, nộp thuế nào?
-Câu 172: Công ty Tân Tiến có trụ sở tại Hải Phòng, công trình xây dựng tại Khánh Hòa và nhân sự làm việc tại cả hai nơi. Công ty phải kiểm tra những nghĩa vụ khai, nộp thuế nào?
-Câu 173: Công ty Thiên Long hỏi có phải phân bổ thuế cho Nghệ An không nhưng chỉ nói có chi nhánh ở đó, không nêu chi nhánh hạch toán độc lập hay phụ thuộc và phát sinh sắc thuế nào. Cần trả lời ra sao?
-Câu 174: Thuế TNDN của hoạt động chuyển nhượng bất động sản ngoại tỉnh có cần phân bổ không trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 175: Công ty Xuân Mai đến quý IV mới phát hiện số thuế TNDN tạm nộp cả năm có thể thấp hơn 80% số quyết toán. Theo Nghị định 91/2022/NĐ-CP, rủi ro là gì đối với công ty cổ phần mới thành lập?
-Câu 176: Quy trình xử lý số tiền thuế nộp thừa theo Luật Quản lý thuế và Thông tư 80/2021/TT-BTC gồm những bước nào?
-Câu 177: Người nộp thuế nộp thừa thì được xử lý thế nào?
-Câu 178: Hồ sơ hoàn thuế được phân loại theo những diện nào?
-Câu 179: Thời hạn giải quyết hồ sơ hoàn trước kiểm tra sau là bao lâu?
-Câu 180: Thời hạn giải quyết hồ sơ kiểm tra trước hoàn sau là bao lâu?
-Câu 181: Công ty Gia Hưng hỏi có được hoàn thuế ngay không nhưng không nói loại thuế, kỳ hoàn, lý do hoàn và tình trạng hồ sơ. Trả lời chuẩn cần nêu gì?
-Câu 182: Khoanh tiền thuế nợ được áp dụng trong trường hợp nào?
-Câu 183: Công ty Minh Khang nộp thiếu thuế TNDN tạm nộp, đồng thời có khoản thuế GTGT nộp thừa ở Quảng Ninh. Có thể lấy khoản nộp thừa để giảm tiền chậm nộp không?
-Câu 184: Công ty Nam Việt nộp thuế sau hạn 15 ngày do quên lịch nộp, không có quyết định gia hạn. Tiền chậm nộp được tính thế nào?
-Câu 185: Quy trình xử lý số tiền thuế nộp thừa theo Luật Quản lý thuế và Thông tư 80/2021/TT-BTC gồm những bước nào đối với hồ sơ hoàn trước kiểm tra sau?
-Câu 186: Quy trình xử lý số tiền thuế nộp thừa theo Luật Quản lý thuế và Thông tư 80/2021/TT-BTC gồm những bước nào đối với hồ sơ kiểm tra trước hoàn sau?
-Câu 187: Công ty Tân Tiến hỏi có được hoàn thuế ngay không nhưng không nói loại thuế, kỳ hoàn, lý do hoàn và tình trạng hồ sơ. Trả lời chuẩn cần nêu gì?
-Câu 188: Công ty Thiên Long nộp thiếu thuế TNDN tạm nộp, đồng thời có khoản thuế GTGT nộp thừa ở Hà Nội. Có thể lấy khoản nộp thừa để giảm tiền chậm nộp không?
-Câu 189: Công ty Việt Tín nộp thuế sau hạn 15 ngày do quên lịch nộp, không có quyết định gia hạn. Tiền chậm nộp được tính thế nào?
-Câu 190: Quy trình xử lý số tiền thuế nộp thừa theo Luật Quản lý thuế và Thông tư 80/2021/TT-BTC gồm những bước nào đối với khoản nộp thừa cùng tiểu mục ngân sách?
-Câu 191: Công ty An Phát hỏi có được hoàn thuế ngay không nhưng không nói loại thuế, kỳ hoàn, lý do hoàn và tình trạng hồ sơ. Trả lời chuẩn cần nêu gì?
-Câu 192: Quy trình xử lý số tiền thuế nộp thừa theo Luật Quản lý thuế và Thông tư 80/2021/TT-BTC gồm những bước nào đối với khoản nộp thừa khác địa bàn thu ngân sách?
-Câu 193: Công ty Cửu Long nộp thiếu thuế TNDN tạm nộp, đồng thời có khoản thuế GTGT nộp thừa ở Hải Phòng. Có thể lấy khoản nộp thừa để giảm tiền chậm nộp không?
-Câu 194: Quy trình xử lý số tiền thuế nộp thừa theo Luật Quản lý thuế và Thông tư 80/2021/TT-BTC gồm những bước nào đối với hồ sơ hoàn trước kiểm tra sau (tình huống kiểm thử bổ sung 2)?
-Câu 195: Người nộp thuế nộp thừa thì được xử lý thế nào đối với hồ sơ hoàn trước kiểm tra sau?
-Câu 196: Hồ sơ hoàn thuế được phân loại theo những diện nào đối với hồ sơ hoàn trước kiểm tra sau?
-Câu 197: Công ty Hải Vân nộp thiếu thuế TNDN tạm nộp, đồng thời có khoản thuế GTGT nộp thừa ở Nghệ An. Có thể lấy khoản nộp thừa để giảm tiền chậm nộp không?
-Câu 198: Thời hạn giải quyết hồ sơ kiểm tra trước hoàn sau là bao lâu đối với hồ sơ hoàn trước kiểm tra sau?
-Câu 199: Công ty Nam Việt nộp thuế sau hạn 15 ngày do quên lịch nộp, không có quyết định gia hạn. Tiền chậm nộp được tính thế nào đối với công ty trách nhiệm hữu hạn mới thành lập?
-Câu 200: Công ty Phú An nộp thiếu thuế TNDN tạm nộp, đồng thời có khoản thuế GTGT nộp thừa ở Hà Nội. Có thể lấy khoản nộp thừa để giảm tiền chậm nộp không?
-Câu 201: Công ty Sơn Hà hỏi có được hoàn thuế ngay không nhưng không nói loại thuế, kỳ hoàn, lý do hoàn và tình trạng hồ sơ. Trả lời chuẩn cần nêu gì?
-Câu 202: Công ty Tân Tiến nộp thiếu thuế TNDN tạm nộp, đồng thời có khoản thuế GTGT nộp thừa ở Đà Nẵng. Có thể lấy khoản nộp thừa để giảm tiền chậm nộp không?
-Câu 203: Công ty Thiên Long nộp thuế sau hạn 15 ngày do quên lịch nộp, không có quyết định gia hạn. Tiền chậm nộp được tính thế nào?
-Câu 204: Người nộp thuế nộp thừa thì được xử lý thế nào đối với hồ sơ kiểm tra trước hoàn sau?
-Câu 205: Quy trình xử lý số tiền thuế nộp thừa theo Luật Quản lý thuế và Thông tư 80/2021/TT-BTC gồm những bước nào đối với hồ sơ kiểm tra trước hoàn sau (tình huống kiểm thử bổ sung 2)?
-Câu 206: Công ty An Phát nộp thiếu thuế TNDN tạm nộp, đồng thời có khoản thuế GTGT nộp thừa ở Cần Thơ. Có thể lấy khoản nộp thừa để giảm tiền chậm nộp không?
-Câu 207: Công ty Bình Minh nộp thuế sau hạn 15 ngày do quên lịch nộp, không có quyết định gia hạn. Tiền chậm nộp được tính thế nào?
-Câu 208: Người nộp thuế có được gia hạn nộp thuế không?
-Câu 209: Công ty Đại Nam hỏi có được hoàn thuế ngay không nhưng không nói loại thuế, kỳ hoàn, lý do hoàn và tình trạng hồ sơ. Trả lời chuẩn cần nêu gì?
-Câu 210: Xóa nợ tiền thuế, tiền chậm nộp, tiền phạt được áp dụng khi nào?
-Câu 211: Quy trình xử lý số tiền thuế nộp thừa theo Luật Quản lý thuế và Thông tư 80/2021/TT-BTC gồm những bước nào đối với khoản nộp thừa cùng tiểu mục ngân sách (tình huống kiểm thử bổ sung 2)?
-Câu 212: Tiền chậm nộp thuế được tính theo mức nào?
-Câu 213: Người nộp thuế nộp thừa thì được xử lý thế nào đối với khoản nộp thừa cùng tiểu mục ngân sách?
-Câu 214: Quy trình xử lý số tiền thuế nộp thừa theo Luật Quản lý thuế và Thông tư 80/2021/TT-BTC gồm những bước nào đối với khoản nộp thừa khác địa bàn thu ngân sách (tình huống kiểm thử bổ sung 2)?
-Câu 215: Công ty Phú An nộp thuế sau hạn 15 ngày do quên lịch nộp, không có quyết định gia hạn. Tiền chậm nộp được tính thế nào?
-Câu 216: Thời hạn giải quyết hồ sơ kiểm tra trước hoàn sau là bao lâu đối với hồ sơ kiểm tra trước hoàn sau?
-Câu 217: Người nộp thuế có được gia hạn nộp thuế không trong trường hợp nộp hồ sơ điện tử qua cổng thuế?
-Câu 218: Quy trình xử lý số tiền thuế nộp thừa theo Luật Quản lý thuế và Thông tư 80/2021/TT-BTC gồm những bước nào đối với hồ sơ hoàn trước kiểm tra sau (tình huống kiểm thử bổ sung 3)?
-Câu 219: Công ty Việt Tín nộp thuế sau hạn 15 ngày do quên lịch nộp, không có quyết định gia hạn. Tiền chậm nộp được tính thế nào đối với công ty trách nhiệm hữu hạn mới thành lập?
-Câu 220: Công ty Xuân Mai nộp thuế sau hạn 15 ngày do quên lịch nộp, không có quyết định gia hạn. Tiền chậm nộp được tính thế nào?
-Câu 221: Công ty An Phát hỏi vì sao số thuế TNDN tạm nộp phải đạt 80% quyết toán năm chứ không phải tỷ lệ khác. Căn cứ hiện hành là gì?
-Câu 222: Công ty Bình Minh hỏi hồ sơ đăng ký thuế phát sinh ngày 20/02/2025 nên dùng Thông tư 105/2020/TT-BTC hay Thông tư 86/2024/TT-BTC. Trả lời thế nào?
-Câu 223: Công ty Cửu Long hỏi vì sao số thuế TNDN tạm nộp phải đạt 80% quyết toán năm chứ không phải tỷ lệ khác. Căn cứ hiện hành là gì?
-Câu 224: Công ty Đại Nam hỏi hồ sơ đăng ký thuế phát sinh ngày 20/02/2025 nên dùng Thông tư 105/2020/TT-BTC hay Thông tư 86/2024/TT-BTC. Trả lời thế nào?
-Câu 225: Công ty Đông Á hỏi hồ sơ đăng ký thuế phát sinh ngày 20/02/2025 nên dùng Thông tư 105/2020/TT-BTC hay Thông tư 86/2024/TT-BTC. Trả lời thế nào?
-Câu 226: Công ty Gia Hưng hỏi vì sao số thuế TNDN tạm nộp phải đạt 80% quyết toán năm chứ không phải tỷ lệ khác. Căn cứ hiện hành là gì?
-Câu 227: So sánh cách xử lý hồ sơ khai thuế thiếu sót trước và sau khi có quyết định kiểm tra tại trụ sở?
-Câu 228: So sánh hoàn trước kiểm tra sau và kiểm tra trước hoàn sau trong hoàn thuế?
-Câu 229: Khi nào phải trả lời 'chưa đủ thông tin' trong câu hỏi thuế?
-Câu 230: Quy trình kiểm tra hiệu lực văn bản trước khi trả lời câu hỏi thuế nên gồm những bước nào?
-Câu 231: Thông tư 86/2024/TT-BTC thay thế văn bản nào về đăng ký thuế?
-Câu 232: Công ty Tân Tiến hỏi hồ sơ đăng ký thuế phát sinh ngày 20/02/2025 nên dùng Thông tư 105/2020/TT-BTC hay Thông tư 86/2024/TT-BTC. Trả lời thế nào?
-Câu 233: Thông tư 100/2021/TT-BTC có ý nghĩa gì khi trả lời câu hỏi về sàn thương mại điện tử khai thuế thay cá nhân?
-Câu 234: Luật Quản lý thuế 108/2025/QH15 đã thay thế hoàn toàn Luật 38/2019/QH14 vào ngày 01/06/2026 chưa?
-Câu 235: Công ty Xuân Mai hỏi hồ sơ đăng ký thuế phát sinh ngày 20/02/2025 nên dùng Thông tư 105/2020/TT-BTC hay Thông tư 86/2024/TT-BTC. Trả lời thế nào?
-Câu 236: Công ty An Phát hỏi hồ sơ đăng ký thuế phát sinh ngày 20/02/2025 nên dùng Thông tư 105/2020/TT-BTC hay Thông tư 86/2024/TT-BTC. Trả lời thế nào?
-Câu 237: So sánh cách xử lý hồ sơ khai thuế thiếu sót trước và sau khi có quyết định kiểm tra tại trụ sở khi ngày phát sinh là trước ngày văn bản mới có hiệu lực?
-Câu 238: So sánh hoàn trước kiểm tra sau và kiểm tra trước hoàn sau trong hoàn thuế đối với hồ sơ hoàn trước kiểm tra sau?
-Câu 239: Người hỏi chỉ nói 'theo luật mới tôi có phải nộp thuế không' nhưng không nêu loại thuế, kỳ tính thuế, ngày phát sinh và loại người nộp thuế. Câu trả lời chuẩn là gì?
-Câu 240: Công ty Đông Á hỏi vì sao số thuế TNDN tạm nộp phải đạt 80% quyết toán năm chứ không phải tỷ lệ khác. Căn cứ hiện hành là gì?
-Câu 241: Người hỏi chỉ nói 'theo luật mới tôi có phải nộp thuế không' nhưng không nêu loại thuế, kỳ tính thuế, ngày phát sinh và loại người nộp thuế. Câu trả lời chuẩn là gì khi ngày phát sinh là trước ngày văn bản mới có hiệu lực?
-Câu 242: Công ty Hải Vân hỏi vì sao số thuế TNDN tạm nộp phải đạt 80% quyết toán năm chứ không phải tỷ lệ khác. Căn cứ hiện hành là gì?
-Câu 243: Công ty Minh Khang hỏi hồ sơ đăng ký thuế phát sinh ngày 20/02/2025 nên dùng Thông tư 105/2020/TT-BTC hay Thông tư 86/2024/TT-BTC. Trả lời thế nào?
-Câu 244: Quy trình kiểm tra hiệu lực văn bản trước khi trả lời câu hỏi thuế nên gồm những bước nào khi ngày phát sinh là trước ngày văn bản mới có hiệu lực?
-Câu 245: Công ty Phú An hỏi hồ sơ đăng ký thuế phát sinh ngày 20/02/2025 nên dùng Thông tư 105/2020/TT-BTC hay Thông tư 86/2024/TT-BTC. Trả lời thế nào?
-Câu 246: Công ty Sơn Hà hỏi hồ sơ đăng ký thuế phát sinh ngày 20/02/2025 nên dùng Thông tư 105/2020/TT-BTC hay Thông tư 86/2024/TT-BTC. Trả lời thế nào?
-Câu 247: So sánh cách xử lý hồ sơ khai thuế thiếu sót trước và sau khi có quyết định kiểm tra tại trụ sở khi ngày phát sinh là sau ngày văn bản mới có hiệu lực?
-Câu 248: So sánh hoàn trước kiểm tra sau và kiểm tra trước hoàn sau trong hoàn thuế đối với hồ sơ kiểm tra trước hoàn sau?
-Câu 249: Quy trình kiểm tra hiệu lực văn bản trước khi trả lời câu hỏi thuế nên gồm những bước nào khi ngày phát sinh là sau ngày văn bản mới có hiệu lực?
-Câu 250: Quy trình kiểm tra hiệu lực văn bản trước khi trả lời câu hỏi thuế nên gồm những bước nào khi có quy định chuyển tiếp?
+Theo Luật Quản lý thuế 2019, luật này điều chỉnh việc quản lý những loại khoản thu nào?
+Theo Luật Quản lý thuế 2019, người nộp thuế gồm những nhóm chủ thể nào?
+Theo Luật Quản lý thuế 2019, cơ quan quản lý thuế gồm những cơ quan nào?
+Theo Luật Quản lý thuế 2019, công chức quản lý thuế bao gồm những người nào?
+Theo Luật Quản lý thuế 2019, thuế được hiểu là khoản nộp ngân sách nhà nước như thế nào?
+Theo Luật Quản lý thuế 2019, tiền chậm nộp có thuộc khoản thu khác do cơ quan quản lý thuế quản lý thu không?
+Theo Luật Quản lý thuế 2019, tiền sử dụng đất nộp ngân sách nhà nước có phải là khoản thu khác do cơ quan quản lý thuế quản lý thu không?
+Theo Luật Quản lý thuế 2019, tiền thuê đất, thuê mặt nước thuộc nhóm khoản thu nào trong quản lý thuế?
+Theo Luật Quản lý thuế 2019, hoàn thành nghĩa vụ nộp thuế được hiểu là người nộp thuế đã nộp đủ những khoản nào?
+Theo Luật Quản lý thuế 2019, cưỡng chế thi hành quyết định hành chính về quản lý thuế là việc gì?
+Theo Luật Quản lý thuế 2019, rủi ro về thuế được hiểu là nguy cơ gì?
+Theo Luật Quản lý thuế 2019, nội dung quản lý thuế có bao gồm đăng ký thuế không?
+Theo Luật Quản lý thuế 2019, nội dung quản lý thuế có bao gồm khai thuế, nộp thuế và ấn định thuế không?
+Theo Luật Quản lý thuế 2019, nội dung quản lý thuế có bao gồm hoàn thuế, miễn thuế, giảm thuế và không thu thuế không?
+Theo Luật Quản lý thuế 2019, nội dung quản lý thuế có bao gồm khoanh tiền thuế nợ và xóa nợ tiền thuế không?
+Theo Luật Quản lý thuế 2019, nội dung quản lý thuế có bao gồm quản lý thông tin người nộp thuế không?
+Theo Luật Quản lý thuế 2019, nội dung quản lý thuế có bao gồm kiểm tra thuế, thanh tra thuế không?
+Theo Luật Quản lý thuế 2019, nội dung quản lý thuế có bao gồm xử lý vi phạm hành chính về quản lý thuế không?
+Theo Luật Quản lý thuế 2019, nội dung quản lý thuế có bao gồm giải quyết khiếu nại, tố cáo về thuế không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có quyền được hướng dẫn thực hiện nộp thuế không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có quyền được cung cấp thông tin, tài liệu để thực hiện nghĩa vụ thuế không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có quyền yêu cầu cơ quan quản lý thuế giải thích việc tính thuế không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có quyền yêu cầu cơ quan quản lý thuế giữ bí mật thông tin không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có quyền hưởng ưu đãi thuế, hoàn thuế theo quy định không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có quyền khiếu nại, khởi kiện quyết định hành chính về quản lý thuế không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có quyền tố cáo hành vi vi phạm pháp luật của công chức quản lý thuế không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có nghĩa vụ đăng ký thuế đúng thời hạn không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có nghĩa vụ khai thuế chính xác, trung thực, đầy đủ không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có nghĩa vụ nộp tiền thuế đầy đủ, đúng thời hạn không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có nghĩa vụ chấp hành quyết định, thông báo, yêu cầu của cơ quan quản lý thuế không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có phải chịu trách nhiệm về tính chính xác của hồ sơ thuế đã nộp không?
+Theo Luật Quản lý thuế 2019, cơ quan quản lý thuế có trách nhiệm giải thích, cung cấp thông tin liên quan đến nghĩa vụ thuế cho người nộp thuế không?
+Theo Luật Quản lý thuế 2019, cơ quan quản lý thuế có trách nhiệm giữ bí mật thông tin của người nộp thuế không?
+Theo Luật Quản lý thuế 2019, cơ quan quản lý thuế có được ấn định thuế trong trường hợp pháp luật quy định không?
+Theo Luật Quản lý thuế 2019, hành vi thông đồng, móc nối để trốn thuế có bị nghiêm cấm không?
+Theo Luật Quản lý thuế 2019, hành vi gây phiền hà, sách nhiễu người nộp thuế có bị nghiêm cấm không?
+Theo Luật Quản lý thuế 2019, hành vi sử dụng trái phép tiền thuế có bị nghiêm cấm không?
+Theo Luật Quản lý thuế 2019, hành vi cố tình khai sai dẫn đến thiếu số tiền thuế phải nộp có bị xử lý không?
+Theo Luật Quản lý thuế 2019, đăng ký thuế là một thủ tục bắt buộc đối với người nộp thuế thuộc diện đăng ký không?
+Theo Luật Quản lý thuế 2019, mã số thuế được cấp cho người nộp thuế để sử dụng trong quan hệ thuế đúng không?
+Theo Luật Quản lý thuế 2019, người nộp thuế có được sử dụng mã số thuế trong giao dịch với cơ quan thuế không?
+Theo Luật Quản lý thuế 2019, hồ sơ khai thuế phải được nộp cho cơ quan quản lý thuế theo thời hạn do pháp luật quy định đúng không?
+Theo Luật Quản lý thuế 2019, người nộp thuế tự tính số tiền thuế phải nộp trong hồ sơ khai thuế, trừ trường hợp cơ quan thuế tính thuế đúng không?
+Theo Luật Quản lý thuế 2019, người nộp thuế phải nộp tiền thuế vào ngân sách nhà nước theo đúng thời hạn đúng không?
+Theo Luật Quản lý thuế 2019, trường hợp nộp thừa tiền thuế thì người nộp thuế có thể được bù trừ hoặc hoàn trả theo quy định không?
+Theo Luật Quản lý thuế 2019, hoàn thuế là nội dung thuộc quản lý thuế đúng không?
+Theo Luật Quản lý thuế 2019, miễn thuế và giảm thuế là nội dung thuộc quản lý thuế đúng không?
+Theo Luật Quản lý thuế 2019, cơ quan quản lý thuế thực hiện hạch toán kế toán tiền thuế, tiền chậm nộp và tiền phạt đúng không?
+Theo Luật Quản lý thuế 2019, Ủy ban nhân dân các cấp có trách nhiệm phối hợp với cơ quan quản lý thuế trong quản lý thuế tại địa phương không?
+Theo Luật Quản lý thuế 2019, hoạt động thương mại điện tử của nhà cung cấp nước ngoài không có cơ sở thường trú tại Việt Nam có thể phải đăng ký, khai và nộp thuế tại Việt Nam không?
+Theo Nghị định 126/2020/NĐ-CP, nghị định này quy định chi tiết cho luật nào?
+Theo Nghị định 126/2020/NĐ-CP, nghị định này áp dụng đối với việc quản lý những khoản thu nào?
+Theo Nghị định 126/2020/NĐ-CP, nội dung về hóa đơn, chứng từ có thuộc phạm vi điều chỉnh trực tiếp của nghị định này không?
+Theo Nghị định 126/2020/NĐ-CP, hồ sơ khai thuế là căn cứ để cơ quan thuế quản lý nghĩa vụ thuế của người nộp thuế đúng không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế khai thuế theo tháng khi thuộc trường hợp nào?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế khai thuế theo quý khi đáp ứng điều kiện khai theo quý đúng không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế có hoạt động kinh doanh nhiều địa bàn có phải xác định nơi nộp hồ sơ khai thuế theo quy định không?
+Theo Nghị định 126/2020/NĐ-CP, thuế giá trị gia tăng có thể được khai theo tháng hoặc theo quý đúng không?
+Theo Nghị định 126/2020/NĐ-CP, thuế thu nhập cá nhân khấu trừ từ tiền lương, tiền công có thể khai theo tháng hoặc theo quý đúng không?
+Theo Nghị định 126/2020/NĐ-CP, thuế thu nhập doanh nghiệp có phải tạm nộp trong năm trước khi quyết toán năm không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế phải khai quyết toán thuế thu nhập doanh nghiệp theo năm đúng không?
+Theo Nghị định 126/2020/NĐ-CP, tổ chức trả thu nhập có trách nhiệm khai quyết toán thuế thu nhập cá nhân theo quy định không?
+Theo Nghị định 126/2020/NĐ-CP, cá nhân có thu nhập từ tiền lương, tiền công có thể trực tiếp quyết toán thuế trong trường hợp phải quyết toán không?
+Theo Nghị định 126/2020/NĐ-CP, cơ quan thuế có thể tiếp nhận hồ sơ khai thuế bằng phương thức điện tử không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế có phải khai bổ sung khi phát hiện hồ sơ khai thuế đã nộp có sai sót không?
+Theo Nghị định 126/2020/NĐ-CP, khai bổ sung hồ sơ thuế có thể làm tăng hoặc giảm số thuế phải nộp không?
+Theo Nghị định 126/2020/NĐ-CP, trường hợp khai bổ sung làm tăng số thuế phải nộp thì người nộp thuế phải nộp thêm tiền thuế và tiền chậm nộp đúng không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế có phải nộp hồ sơ khai thuế cho từng lần phát sinh đối với một số loại nghĩa vụ thuế không?
+Theo Nghị định 126/2020/NĐ-CP, cơ quan thuế có quyền ấn định thuế khi người nộp thuế thuộc trường hợp bị ấn định không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế không đăng ký thuế có thể bị ấn định thuế không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế không nộp hồ sơ khai thuế có thể bị ấn định thuế không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế khai thuế không trung thực có thể bị ấn định thuế không?
+Theo Nghị định 126/2020/NĐ-CP, cơ sở dữ liệu của cơ quan thuế có thể được dùng làm căn cứ ấn định thuế không?
+Theo Nghị định 126/2020/NĐ-CP, kết quả kiểm tra, thanh tra thuế có thể là căn cứ xác định nghĩa vụ thuế không?
+Theo Nghị định 126/2020/NĐ-CP, cơ quan thuế có thể khoanh tiền thuế nợ khi người nộp thuế thuộc trường hợp được khoanh nợ không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế đã chết, mất tích hoặc mất năng lực hành vi dân sự có thể thuộc diện xem xét khoanh nợ không?
+Theo Nghị định 126/2020/NĐ-CP, doanh nghiệp làm thủ tục giải thể có phải hoàn thành nghĩa vụ thuế trước khi chấm dứt hoạt động không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế bị cưỡng chế nợ thuế khi quá thời hạn nộp mà chưa nộp đủ tiền thuế đúng không?
+Theo Nghị định 126/2020/NĐ-CP, biện pháp trích tiền từ tài khoản có thể là biện pháp cưỡng chế nợ thuế không?
+Theo Nghị định 126/2020/NĐ-CP, biện pháp khấu trừ một phần tiền lương hoặc thu nhập có thể được áp dụng để cưỡng chế nợ thuế không?
+Theo Nghị định 126/2020/NĐ-CP, biện pháp dừng làm thủ tục hải quan có thể được áp dụng trong cưỡng chế nợ thuế không?
+Theo Nghị định 126/2020/NĐ-CP, biện pháp ngừng sử dụng hóa đơn có thể được áp dụng trong cưỡng chế nợ thuế không?
+Theo Nghị định 126/2020/NĐ-CP, cơ quan thuế có thể công khai thông tin người nộp thuế trong trường hợp pháp luật quy định không?
+Theo Nghị định 126/2020/NĐ-CP, ngân hàng thương mại có trách nhiệm cung cấp thông tin tài khoản của người nộp thuế theo yêu cầu của cơ quan thuế không?
+Theo Nghị định 126/2020/NĐ-CP, tổ chức chi trả thu nhập có trách nhiệm khấu trừ thuế trước khi trả thu nhập trong trường hợp phải khấu trừ không?
+Theo Nghị định 126/2020/NĐ-CP, nhà cung cấp ở nước ngoài kinh doanh thương mại điện tử tại Việt Nam có thể trực tiếp đăng ký, khai, nộp thuế tại Việt Nam không?
+Theo Nghị định 126/2020/NĐ-CP, tổ chức tại Việt Nam có trách nhiệm khấu trừ, nộp thay thuế khi trả tiền cho nhà cung cấp nước ngoài trong trường hợp quy định không?
+Theo Nghị định 126/2020/NĐ-CP, cơ quan thuế quản lý trực tiếp có vai trò tiếp nhận và xử lý hồ sơ thuế của người nộp thuế đúng không?
+Theo Nghị định 126/2020/NĐ-CP, người nộp thuế phải theo dõi thời hạn nộp thuế để tránh phát sinh tiền chậm nộp đúng không?
+Theo Nghị định 126/2020/NĐ-CP, các khoản thu khác thuộc ngân sách nhà nước cũng có thể được quản lý theo thủ tục quản lý thuế đúng không?
+Theo Nghị định 91/2022/NĐ-CP, nghị định này sửa đổi, bổ sung văn bản nào về quản lý thuế?
+Theo Nghị định 91/2022/NĐ-CP, tổng số thuế thu nhập doanh nghiệp đã tạm nộp của 04 quý không được thấp hơn bao nhiêu phần trăm số thuế phải nộp theo quyết toán năm?
+Theo Nghị định 91/2022/NĐ-CP, quy định tạm nộp thuế thu nhập doanh nghiệp được xác định theo 04 quý hay theo 03 quý đầu năm?
+Theo Nghị định 91/2022/NĐ-CP, nếu tổng số thuế thu nhập doanh nghiệp tạm nộp của 04 quý thấp hơn mức quy định thì người nộp thuế có thể bị tính tiền chậm nộp không?
+Theo Nghị định 91/2022/NĐ-CP, tiền chậm nộp do tạm nộp thiếu thuế thu nhập doanh nghiệp được tính trên phần chênh lệch thiếu đúng không?
+Theo Nghị định 91/2022/NĐ-CP, quy định về kết thúc thời hạn được bổ sung vào Nghị định 126/2020/NĐ-CP tại điều nào?
+Theo Nghị định 91/2022/NĐ-CP, thời hạn nộp hồ sơ hoặc nộp thuế rơi vào ngày nghỉ thì có được chuyển sang ngày làm việc tiếp theo không?
+Theo Nghị định 91/2022/NĐ-CP, sàn thương mại điện tử có trách nhiệm cung cấp thông tin của người bán cho cơ quan thuế theo quy định không?
+Theo Nghị định 91/2022/NĐ-CP, thông tin người bán trên sàn thương mại điện tử được cung cấp cho cơ quan thuế theo định kỳ đúng không?
+Theo Nghị định 91/2022/NĐ-CP, tổ chức là chủ sở hữu sàn giao dịch thương mại điện tử có phải cung cấp thông tin người bán qua Cổng thông tin điện tử của Tổng cục Thuế không?
+Theo Nghị định 91/2022/NĐ-CP, thông tin người bán mà sàn thương mại điện tử cung cấp có thể bao gồm tên người bán không?
+Theo Nghị định 91/2022/NĐ-CP, thông tin người bán mà sàn thương mại điện tử cung cấp có thể bao gồm mã số thuế hoặc số định danh cá nhân không?
+Theo Nghị định 91/2022/NĐ-CP, thông tin người bán mà sàn thương mại điện tử cung cấp có thể bao gồm địa chỉ và số điện thoại liên lạc không?
+Theo Nghị định 91/2022/NĐ-CP, thông tin người bán mà sàn thương mại điện tử cung cấp có thể bao gồm doanh thu bán hàng thông qua chức năng đặt hàng trực tuyến không?
+Theo Nghị định 91/2022/NĐ-CP, Nghị định này có sửa đổi quy định về trách nhiệm của chủ sở hữu sàn thương mại điện tử trong quản lý thuế không?
+Theo Nghị định 91/2022/NĐ-CP, cá nhân kinh doanh trên sàn thương mại điện tử vẫn là người chịu trách nhiệm về nghĩa vụ thuế của mình đúng không?
+Theo Nghị định 91/2022/NĐ-CP, cơ quan thuế có thể khai thác dữ liệu từ sàn thương mại điện tử để quản lý thuế không?
+Theo Nghị định 91/2022/NĐ-CP, việc sửa đổi quy định tạm nộp thuế thu nhập doanh nghiệp nhằm xác định nghĩa vụ theo quyết toán năm đúng không?
+Theo Nghị định 91/2022/NĐ-CP, doanh nghiệp phải tự theo dõi số thuế tạm nộp trong năm để tránh thiếu so với ngưỡng quy định đúng không?
+Theo Nghị định 91/2022/NĐ-CP, số thuế thu nhập doanh nghiệp phải nộp theo quyết toán năm là căn cứ so sánh với số đã tạm nộp đúng không?
+Theo Nghị định 91/2022/NĐ-CP, nếu doanh nghiệp nộp thừa thuế thu nhập doanh nghiệp tạm nộp thì xử lý theo quy định về nộp thừa đúng không?
+Theo Nghị định 91/2022/NĐ-CP, người nộp thuế có phải căn cứ thời hạn đã được gia hạn hoặc điều chỉnh để xác định việc nộp đúng hạn không?
+Theo Nghị định 91/2022/NĐ-CP, nghị định này được ban hành ngày nào?
+Theo Nghị định 91/2022/NĐ-CP, nghị định này căn cứ vào Luật Quản lý thuế năm nào?
+Theo Nghị định 91/2022/NĐ-CP, nội dung sửa đổi chủ yếu tập trung vào một số quy định của Nghị định 126/2020/NĐ-CP đúng không?
+Theo Nghị định 91/2022/NĐ-CP, quy định cung cấp thông tin thương mại điện tử áp dụng cho tổ chức là chủ sở hữu sàn giao dịch thương mại điện tử đúng không?
+Theo Nghị định 91/2022/NĐ-CP, việc cung cấp dữ liệu thương mại điện tử là để phục vụ quản lý thuế đúng không?
+Theo Nghị định 91/2022/NĐ-CP, trường hợp có phát sinh nghĩa vụ thuế thì người nộp thuế phải thực hiện khai, nộp theo quy định hiện hành đúng không?
+Theo Nghị định 91/2022/NĐ-CP, số thuế thu nhập doanh nghiệp tạm nộp được xem xét trên tổng 04 quý trong năm tính thuế đúng không?
+Theo Nghị định 91/2022/NĐ-CP, nghĩa vụ tạm nộp thuế thu nhập doanh nghiệp áp dụng trước khi doanh nghiệp nộp hồ sơ quyết toán năm đúng không?
+Theo Thông tư 80/2021/TT-BTC, thông tư này hướng dẫn thi hành văn bản nào về quản lý thuế?
+Theo Thông tư 80/2021/TT-BTC, thông tư này hướng dẫn Nghị định nào của Chính phủ về Luật Quản lý thuế?
+Theo Thông tư 80/2021/TT-BTC, thông tư này có hiệu lực từ ngày nào?
+Theo Thông tư 80/2021/TT-BTC, thông tư này có thay thế Thông tư 156/2013/TT-BTC không?
+Theo Thông tư 80/2021/TT-BTC, thông tư này có bãi bỏ Thông tư 99/2016/TT-BTC về hoàn thuế giá trị gia tăng không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ khai thuế được hướng dẫn theo từng sắc thuế và từng trường hợp phát sinh đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế có thể khai thuế theo tháng trong trường hợp thuộc diện khai tháng đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế có thể khai thuế theo quý khi đáp ứng điều kiện khai theo quý đúng không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ khai thuế theo từng lần phát sinh áp dụng cho một số khoản thu phát sinh không thường xuyên đúng không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ quyết toán thuế năm là hồ sơ khai thuế theo năm đúng không?
+Theo Thông tư 80/2021/TT-BTC, tổ chức trả thu nhập có trách nhiệm khai thuế thu nhập cá nhân đối với khoản thu nhập đã khấu trừ đúng không?
+Theo Thông tư 80/2021/TT-BTC, cá nhân cư trú có thu nhập tiền lương, tiền công có thể tự quyết toán thuế khi thuộc diện trực tiếp quyết toán không?
+Theo Thông tư 80/2021/TT-BTC, cá nhân có thể ủy quyền quyết toán thuế thu nhập cá nhân cho tổ chức trả thu nhập khi đủ điều kiện không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ khai thuế giá trị gia tăng phải sử dụng mẫu biểu tương ứng do Bộ Tài chính ban hành đúng không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ khai thuế thu nhập doanh nghiệp phải sử dụng mẫu biểu tương ứng theo phụ lục của thông tư đúng không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ khai thuế thu nhập cá nhân phải sử dụng mẫu biểu tương ứng theo phụ lục của thông tư đúng không?
+Theo Thông tư 80/2021/TT-BTC, việc phân bổ thuế phải nộp cho địa phương được thực hiện khi người nộp thuế có hoạt động ở nhiều tỉnh đúng không?
+Theo Thông tư 80/2021/TT-BTC, thuế giá trị gia tăng của hoạt động xây dựng vãng lai ngoại tỉnh có thể phải phân bổ cho địa phương nơi phát sinh hoạt động đúng không?
+Theo Thông tư 80/2021/TT-BTC, thuế thu nhập doanh nghiệp của đơn vị phụ thuộc hoặc địa điểm kinh doanh khác tỉnh có thể phải phân bổ theo quy định không?
+Theo Thông tư 80/2021/TT-BTC, thuế thu nhập cá nhân từ tiền lương, tiền công có thể phải phân bổ cho từng địa phương nơi người lao động làm việc đúng không?
+Theo Thông tư 80/2021/TT-BTC, thuế bảo vệ môi trường đối với xăng dầu có quy định phân bổ nghĩa vụ thuế cho địa phương không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế phải lập bảng phân bổ số thuế phải nộp khi thuộc trường hợp phải phân bổ đúng không?
+Theo Thông tư 80/2021/TT-BTC, số thuế phân bổ cho từng tỉnh được xác định theo nguyên tắc và công thức hướng dẫn tại thông tư đúng không?
+Theo Thông tư 80/2021/TT-BTC, cơ quan thuế quản lý trực tiếp là nơi tiếp nhận hồ sơ khai thuế trong nhiều trường hợp đúng không?
+Theo Thông tư 80/2021/TT-BTC, cơ quan thuế nơi có khoản thu được phân bổ có quyền theo dõi số thuế được hưởng đúng không?
+Theo Thông tư 80/2021/TT-BTC, hoàn thuế giá trị gia tăng được thực hiện theo hồ sơ và trình tự hướng dẫn tại thông tư đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế muốn hoàn thuế phải lập giấy đề nghị hoàn trả khoản thu ngân sách nhà nước đúng không?
+Theo Thông tư 80/2021/TT-BTC, cơ quan thuế phân loại hồ sơ hoàn thuế trước khi kiểm tra hoặc hoàn trước đúng không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ hoàn thuế có thể thuộc diện hoàn trước, kiểm tra sau đúng không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ hoàn thuế có thể thuộc diện kiểm tra trước, hoàn sau đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế phải chịu trách nhiệm về tính hợp pháp của hồ sơ đề nghị hoàn thuế đúng không?
+Theo Thông tư 80/2021/TT-BTC, bù trừ khoản nộp thừa với khoản còn phải nộp là một cách xử lý tiền thuế nộp thừa đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế có thể đề nghị hoàn trả tiền thuế nộp thừa theo quy định không?
+Theo Thông tư 80/2021/TT-BTC, cơ quan thuế có trách nhiệm kiểm tra điều kiện hoàn trả khi xử lý đề nghị hoàn nộp thừa đúng không?
+Theo Thông tư 80/2021/TT-BTC, miễn thuế và giảm thuế được giải quyết theo hồ sơ đề nghị của người nộp thuế trong trường hợp pháp luật quy định đúng không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ miễn giảm thuế phải có tài liệu chứng minh thuộc diện được miễn giảm đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế gặp thiên tai, hỏa hoạn, tai nạn bất ngờ có thể thuộc diện xem xét miễn giảm theo quy định của pháp luật thuế không?
+Theo Thông tư 80/2021/TT-BTC, gia hạn nộp thuế được thực hiện khi người nộp thuế thuộc trường hợp được gia hạn đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế đề nghị gia hạn nộp thuế phải gửi hồ sơ đến cơ quan thuế có thẩm quyền đúng không?
+Theo Thông tư 80/2021/TT-BTC, thông báo chấp nhận hoặc không chấp nhận gia hạn nộp thuế do cơ quan thuế ban hành đúng không?
+Theo Thông tư 80/2021/TT-BTC, khoanh nợ tiền thuế được thực hiện theo hồ sơ và điều kiện của Luật Quản lý thuế đúng không?
+Theo Thông tư 80/2021/TT-BTC, xóa nợ tiền thuế, tiền chậm nộp, tiền phạt được thực hiện theo thẩm quyền pháp luật quy định đúng không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ xóa nợ phải có tài liệu chứng minh người nộp thuế thuộc trường hợp được xóa nợ đúng không?
+Theo Thông tư 80/2021/TT-BTC, cơ quan thuế có thể yêu cầu bổ sung tài liệu nếu hồ sơ thuế chưa đầy đủ đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế được nộp hồ sơ khai thuế bằng phương thức điện tử khi đủ điều kiện đúng không?
+Theo Thông tư 80/2021/TT-BTC, thông báo của cơ quan thuế có thể được gửi bằng phương thức điện tử cho người nộp thuế đúng không?
+Theo Thông tư 80/2021/TT-BTC, nhà cung cấp ở nước ngoài không có cơ sở thường trú tại Việt Nam có thể đăng ký, khai và nộp thuế qua cổng thông tin điện tử dành riêng không?
+Theo Thông tư 80/2021/TT-BTC, nhà cung cấp ở nước ngoài có thể trực tiếp hoặc ủy quyền thực hiện nghĩa vụ thuế tại Việt Nam không?
+Theo Thông tư 80/2021/TT-BTC, ngân hàng thương mại và tổ chức cung ứng dịch vụ trung gian thanh toán có trách nhiệm phối hợp cung cấp thông tin phục vụ quản lý thuế theo quy định không?
+Theo Thông tư 80/2021/TT-BTC, tổ chức Việt Nam mua dịch vụ của nhà cung cấp nước ngoài có thể phải khấu trừ, kê khai, nộp thay thuế trong trường hợp quy định không?
+Theo Thông tư 80/2021/TT-BTC, đại lý thuế được hướng dẫn thực hiện dịch vụ làm thủ tục về thuế cho người nộp thuế đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế có thể ủy quyền cho đại lý thuế thực hiện thủ tục thuế nếu đáp ứng điều kiện pháp luật không?
+Theo Thông tư 80/2021/TT-BTC, hội đồng tư vấn thuế xã, phường, thị trấn có nội dung hướng dẫn trong thông tư không?
+Theo Thông tư 80/2021/TT-BTC, hội đồng tư vấn thuế cấp xã tham gia tư vấn doanh thu và mức thuế của hộ kinh doanh, cá nhân kinh doanh đúng không?
+Theo Thông tư 80/2021/TT-BTC, việc quản lý thuế đối với hộ khoán có gắn với công khai thông tin hộ kinh doanh nộp thuế khoán đúng không?
+Theo Thông tư 80/2021/TT-BTC, hộ kinh doanh nộp thuế theo phương pháp kê khai phải thực hiện chế độ khai thuế theo quy định đúng không?
+Theo Thông tư 80/2021/TT-BTC, cá nhân kinh doanh nộp thuế từng lần phát sinh phải khai thuế cho từng lần phát sinh đúng không?
+Theo Thông tư 80/2021/TT-BTC, hộ kinh doanh, cá nhân kinh doanh có thể nộp thuế theo phương pháp khoán nếu thuộc diện nộp thuế khoán đúng không?
+Theo Thông tư 80/2021/TT-BTC, cơ quan thuế có trách nhiệm thông báo số thuế khoán cho hộ kinh doanh nộp thuế khoán đúng không?
+Theo Thông tư 80/2021/TT-BTC, thông tin quản lý thuế của người nộp thuế phải được cập nhật trên hệ thống quản lý thuế đúng không?
+Theo Thông tư 80/2021/TT-BTC, việc xử lý tiền chậm nộp phải căn cứ số tiền thuế chậm nộp và thời gian chậm nộp đúng không?
+Theo Thông tư 80/2021/TT-BTC, cơ quan thuế có thể ban hành thông báo tiền thuế nợ, tiền phạt và tiền chậm nộp cho người nộp thuế đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế có quyền đề nghị xác nhận việc hoàn thành nghĩa vụ thuế trong trường hợp cần chứng minh nghĩa vụ thuế đúng không?
+Theo Thông tư 80/2021/TT-BTC, cơ quan thuế có trách nhiệm trả lời văn bản đề nghị xác nhận nghĩa vụ thuế theo thời hạn quy định đúng không?
+Theo Thông tư 80/2021/TT-BTC, hồ sơ đề nghị xác nhận nghĩa vụ thuế phải gửi đến cơ quan thuế quản lý trực tiếp hoặc cơ quan có thẩm quyền đúng không?
+Theo Thông tư 80/2021/TT-BTC, người nộp thuế chấm dứt hoạt động phải thực hiện đầy đủ nghĩa vụ thuế trước khi chấm dứt hiệu lực mã số thuế đúng không?
+Theo Thông tư 80/2021/TT-BTC, việc chuyển địa điểm kinh doanh sang địa bàn khác có thể làm phát sinh thủ tục với cơ quan thuế nơi chuyển đi và nơi chuyển đến đúng không?
+Theo Thông tư 80/2021/TT-BTC, khi chia, tách, hợp nhất, sáp nhập doanh nghiệp thì nghĩa vụ thuế phải được xử lý theo quy định trước khi hoàn tất thủ tục đúng không?
+Theo Thông tư 80/2021/TT-BTC, mẫu biểu hồ sơ thuế là một phần quan trọng để đảm bảo hồ sơ được tiếp nhận đúng quy định đúng không?
+Theo Thông tư 86/2024/TT-BTC, thông tư này quy định về lĩnh vực nào của quản lý thuế?
+Theo Thông tư 86/2024/TT-BTC, thông tư này có hiệu lực từ ngày nào?
+Theo Thông tư 86/2024/TT-BTC, thông tư này được Bộ Tài chính ban hành ngày nào?
+Theo Thông tư 86/2024/TT-BTC, thông tư này thay thế thông tư nào về đăng ký thuế?
+Theo Thông tư 86/2024/TT-BTC, đối tượng đăng ký thuế trực tiếp với cơ quan thuế có được quy định riêng không?
+Theo Thông tư 86/2024/TT-BTC, cấu trúc mã số thuế có phải là một nội dung được thông tư quy định không?
+Theo Thông tư 86/2024/TT-BTC, thủ tục đăng ký thuế lần đầu có được hướng dẫn trong thông tư không?
+Theo Thông tư 86/2024/TT-BTC, thủ tục thay đổi thông tin đăng ký thuế có được hướng dẫn trong thông tư không?
+Theo Thông tư 86/2024/TT-BTC, thủ tục tạm ngừng hoạt động, kinh doanh có được hướng dẫn về đăng ký thuế không?
+Theo Thông tư 86/2024/TT-BTC, thủ tục chấm dứt hiệu lực mã số thuế có được quy định không?
+Theo Thông tư 86/2024/TT-BTC, tổ chức đăng ký thuế trực tiếp với cơ quan thuế được cấp Giấy chứng nhận đăng ký thuế trong trường hợp quy định đúng không?
+Theo Thông tư 86/2024/TT-BTC, Thông báo mã số thuế được cấp cho đối tượng nào trong trường hợp thông tư quy định?
+Theo Thông tư 86/2024/TT-BTC, người nộp thuế bị mất Giấy chứng nhận đăng ký thuế có được đề nghị cấp lại không?
+Theo Thông tư 86/2024/TT-BTC, người nộp thuế bị rách, nát, cháy Giấy chứng nhận đăng ký thuế có được đề nghị cấp lại không?
+Theo Thông tư 86/2024/TT-BTC, hồ sơ đề nghị cấp lại Giấy chứng nhận đăng ký thuế sử dụng mẫu nào?
+Theo Thông tư 86/2024/TT-BTC, cơ quan thuế cấp lại Giấy chứng nhận đăng ký thuế trong thời hạn bao nhiêu ngày làm việc kể từ khi nhận đủ hồ sơ?
+Theo Thông tư 86/2024/TT-BTC, kết quả cấp lại Giấy chứng nhận đăng ký thuế có thể được trả qua Cổng thông tin điện tử của Tổng cục Thuế không?
+Theo Thông tư 86/2024/TT-BTC, cá nhân đăng ký thuế qua cơ quan chi trả thu nhập thì cơ quan chi trả có trách nhiệm thông báo mã số thuế cho cá nhân không?
+Theo Thông tư 86/2024/TT-BTC, cá nhân đăng ký thuế qua hồ sơ khai thuế thì mã số thuế có thể được ghi trên thông báo nộp tiền không?
+Theo Thông tư 86/2024/TT-BTC, hồ sơ đăng ký thuế không đủ điều kiện cấp mã số thuế thì cơ quan thuế có gửi thông báo không chấp nhận hồ sơ không?
+Theo Thông tư 86/2024/TT-BTC, cơ quan thuế gửi thông báo hồ sơ đăng ký thuế không đủ điều kiện trong thời hạn bao nhiêu ngày làm việc?
+Theo Thông tư 86/2024/TT-BTC, hộ kinh doanh đăng ký thuế theo cơ chế một cửa liên thông khi thay đổi thông tin thì thực hiện cùng thủ tục thay đổi đăng ký hộ kinh doanh đúng không?
+Theo Thông tư 86/2024/TT-BTC, hộ gia đình, cá nhân kinh doanh thay đổi thông tin đăng ký thuế trực tiếp với cơ quan thuế phải dùng mẫu số 08-MST đúng không?
+Theo Thông tư 86/2024/TT-BTC, cá nhân thay đổi thông tin đăng ký thuế trực tiếp có thể dùng mẫu 08-MST hoặc mẫu 20-ĐK-TCT đúng không?
+Theo Thông tư 86/2024/TT-BTC, khi hộ kinh doanh thay đổi địa chỉ trụ sở sang địa bàn khác thì phải làm thủ tục thuế tại cơ quan thuế nơi chuyển đi trước đúng không?
+Theo Thông tư 86/2024/TT-BTC, tổ chức được tách phải thực hiện thủ tục đăng ký thuế để được cấp mã số thuế đúng không?
+Theo Thông tư 86/2024/TT-BTC, tổ chức nhận sáp nhập có được giữ nguyên mã số thuế không?
+Theo Thông tư 86/2024/TT-BTC, tổ chức bị sáp nhập bị chấm dứt hiệu lực mã số thuế đúng không?
+Theo Thông tư 86/2024/TT-BTC, tổ chức bị hợp nhất phải làm thủ tục chấm dứt hiệu lực mã số thuế đúng không?
+Theo Thông tư 86/2024/TT-BTC, tổ chức hợp nhất phải thực hiện đăng ký thuế để được cấp mã số thuế mới đúng không?
+Theo Thông tư 86/2024/TT-BTC, đơn vị phụ thuộc chuyển thành đơn vị độc lập phải đăng ký thuế để được cấp mã số thuế mới đúng không?
+Theo Thông tư 86/2024/TT-BTC, đơn vị độc lập chuyển thành đơn vị phụ thuộc phải làm thủ tục đăng ký thuế lại đúng không?
+Theo Thông tư 86/2024/TT-BTC, mã số thuế của tổ chức bị chấm dứt hiệu lực khi tổ chức chấm dứt tồn tại đúng không?
+Theo Thông tư 86/2024/TT-BTC, người nộp thuế chấm dứt hiệu lực mã số thuế phải hoàn thành nghĩa vụ thuế trước khi chấm dứt đúng không?
+Theo Thông tư 86/2024/TT-BTC, hồ sơ đăng ký thuế của tổ chức trực tiếp với cơ quan thuế có thể cần bản sao giấy phép thành lập hoặc quyết định thành lập đúng không?
+Theo Thông tư 86/2024/TT-BTC, giấy tờ đăng ký thuế có thể nộp bằng phương thức điện tử nếu đáp ứng điều kiện không?
+Theo Thông tư 86/2024/TT-BTC, cơ quan thuế có trách nhiệm cập nhật thông tin đăng ký thuế vào hệ thống ứng dụng đăng ký thuế đúng không?
+Theo Thông tư 86/2024/TT-BTC, mã số thuế được sử dụng để nhận diện người nộp thuế trong suốt quá trình thực hiện nghĩa vụ thuế đúng không?
+Theo Thông tư 86/2024/TT-BTC, người phụ thuộc của cá nhân có thể được cấp mã số thuế để tính giảm trừ gia cảnh đúng không?
+Theo Thông tư 86/2024/TT-BTC, cơ quan chi trả thu nhập có thể đăng ký thuế cho người lao động và người phụ thuộc theo ủy quyền đúng không?
+Theo Thông tư 40/2025/TT-BTC, thông tư này sửa đổi, bổ sung các thông tư thuộc lĩnh vực nào?
+Theo Thông tư 40/2025/TT-BTC, mục đích sửa đổi của thông tư là để phân định thẩm quyền theo mô hình chính quyền địa phương mấy cấp?
+Theo Thông tư 40/2025/TT-BTC, thông tư này được ban hành ngày nào?
+Theo Thông tư 40/2025/TT-BTC, thông tư này có hiệu lực từ ngày nào?
+Theo Thông tư 40/2025/TT-BTC, cơ quan ban hành thông tư này là cơ quan nào?
+Theo Thông tư 40/2025/TT-BTC, người ký ban hành thông tư này là ai?
+Theo Thông tư 40/2025/TT-BTC, việc sửa đổi thẩm quyền trong quản lý thuế gắn với mô hình tổ chức chính quyền địa phương 02 cấp đúng không?
+Theo Thông tư 40/2025/TT-BTC, các quy định được sửa đổi nhằm làm rõ thẩm quyền của chính quyền địa phương trong lĩnh vực quản lý thuế đúng không?
+Theo Thông tư 40/2025/TT-BTC, khi một thủ tục thuế trước đây dẫn chiếu đến cấp huyện thì có thể được điều chỉnh để phù hợp mô hình 02 cấp đúng không?
+Theo Thông tư 40/2025/TT-BTC, thông tư này có phải là văn bản sửa đổi, bổ sung chứ không phải văn bản quy định một sắc thuế mới không?
+Theo Thông tư 40/2025/TT-BTC, thông tư này có liên quan đến việc phân định thẩm quyền giữa các cấp chính quyền địa phương trong quản lý thuế không?
+Theo Thông tư 40/2025/TT-BTC, thông tư này có áp dụng cho các thông tư thuộc lĩnh vực quản lý thuế do Bộ Tài chính ban hành không?
+Theo Thông tư 40/2025/TT-BTC, từ ngày 01/7/2025 việc áp dụng thẩm quyền trong các thông tư quản lý thuế phải phù hợp với sửa đổi tại thông tư này đúng không?
+Theo Thông tư 40/2025/TT-BTC, nội dung sửa đổi có liên quan đến tổ chức chính quyền địa phương sau khi không còn mô hình ba cấp truyền thống đúng không?
+Theo Thông tư 40/2025/TT-BTC, cơ quan thuế khi giải quyết thủ tục phải căn cứ thẩm quyền đã được phân định lại đúng không?
+Theo Thông tư 40/2025/TT-BTC, người nộp thuế cần căn cứ quy định thẩm quyền mới khi nộp hồ sơ thuế sau ngày thông tư có hiệu lực đúng không?
+Theo Thông tư 40/2025/TT-BTC, các nội dung sửa đổi có tính chất kỹ thuật về thẩm quyền hành chính trong lĩnh vực thuế đúng không?
+Theo Thông tư 40/2025/TT-BTC, thông tư này không làm thay đổi bản chất nghĩa vụ nộp thuế của người nộp thuế đúng không?
+Theo Thông tư 40/2025/TT-BTC, thông tư này là căn cứ để cập nhật các mẫu, thủ tục hoặc thẩm quyền trong các thông tư quản lý thuế liên quan đúng không?
+Theo Thông tư 40/2025/TT-BTC, khi có sự khác nhau về thẩm quyền do mô hình chính quyền mới thì áp dụng quy định sửa đổi tại thông tư này đúng không?
+Theo Thông tư 40/2025/TT-BTC, các cơ quan, tổ chức liên quan phải thực hiện quy định sửa đổi từ thời điểm thông tư có hiệu lực đúng không?

@@ -467,6 +467,15 @@ def print_expired_warning(expired_results: list[RetrievedItem]) -> None:
         print(f"- {format_source(item)}")
 
 
+def build_fallback_notice(decision: RetrievalDecision) -> str:
+    if decision.expired_results:
+        item = decision.expired_results[0]
+        label = item.document_title or item.document_number or item.source_file
+        suffix = f" ({item.expiry_date})" if item.expiry_date else ""
+        return f"tài liệu {label}{suffix} hết hạn, cần cập nhật"
+    return "không tìm thấy tài liệu làm căn cứ cho câu hỏi trong kho nội bộ"
+
+
 def run_query(
     query: str,
     backend: str,
@@ -513,6 +522,8 @@ def run_query(
         return
 
     print("\n[FALLBACK REQUIRED]")
+    fallback_notice = build_fallback_notice(decision)
+    print(fallback_notice)
     print(decision.reason)
     if decision.expired_results:
         print("Tai lieu noi bo bi loai do het hieu luc:")
@@ -535,13 +546,14 @@ def run_query(
         question=query,
         reason=decision.reason,
         domain=domain,
+        fallback_notice=fallback_notice,
         expired_sources=[format_source(item) for item in decision.expired_results],
         low_confidence_sources=[
             format_source(item) for item in decision.low_confidence_results[:5]
         ],
     )
     try:
-        answer = generate_gemini_fallback_answer(
+        fallback_result = generate_gemini_fallback_answer(
             request=request,
             api_key=gemini_api_key,
             model_name=gemini_model,
@@ -551,7 +563,13 @@ def run_query(
         return
 
     print("\n" + "=" * 90)
-    print(answer)
+    print(fallback_result.answer)
+    if fallback_result.sources:
+        print("\nTai lieu/can cu tham khao tu Gemini grounding:")
+        for source in fallback_result.sources:
+            title = source.get("title") or source.get("source") or "N/A"
+            url = source.get("url") or ""
+            print(f"- {title}{' | ' + url if url else ''}")
 
 
 def read_manifest(manifest_path: Path) -> dict[str, object]:

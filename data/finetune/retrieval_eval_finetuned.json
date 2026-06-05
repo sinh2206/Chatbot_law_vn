@@ -1,0 +1,13 @@
+{
+  "query_count": 250,
+  "corpus_count": 1250,
+  "embedding_dim": 768,
+  "mrr_at_10": 0.5091095238095238,
+  "ndcg_at_10": 0.561721494029874,
+  "recall_at_1": 0.408,
+  "recall_at_3": 0.564,
+  "recall_at_5": 0.66,
+  "recall_at_10": 0.728,
+  "model_name": "data/models/vietnamese-embedding-legal",
+  "test_file": "/app/data/finetune/test_pairs.jsonl"
+}

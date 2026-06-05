@@ -88,8 +88,13 @@ def validate_local_model_dir(model_name: str) -> None:
     missing = [str(item.name) for item in required if not item.exists()]
     if missing:
         raise RuntimeError(
-            f"Local model directory is missing required files: {', '.join(missing)}\n"
-            f"Model directory: {model_path}"
+            f"Local model directory is incomplete: {model_path}\n"
+            f"Missing required files: {', '.join(missing)}\n"
+            "This usually means fine-tuning did not finish, or the directory was created "
+            "before the model was saved.\n"
+            "Fix it by running scripts/train_embedding.py first, then rebuild the vector store. "
+            "If you only want to use the base model, pass "
+            "--embedding-model dangvantuan/vietnamese-embedding."
         )
 
 
@@ -318,6 +323,8 @@ def decide_retrieval(
 
 
 def load_embedder(model_name: str):
+    validate_local_model_dir(model_name)
+
     try:
         from sentence_transformers import SentenceTransformer
     except ImportError as exc:
@@ -325,7 +332,6 @@ def load_embedder(model_name: str):
             "Missing sentence-transformers. Install requirements first.\n"
             f"Try: \"{sys.executable}\" -m pip install sentence-transformers"
         ) from exc
-    validate_local_model_dir(model_name)
     model = SentenceTransformer(model_name)
     tokenizer_limit = getattr(getattr(model, "tokenizer", None), "model_max_length", None)
     config_limit = getattr(getattr(model[0], "auto_model", None), "config", None)

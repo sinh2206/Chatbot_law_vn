@@ -29,6 +29,8 @@ COPY requirements.txt /app/requirements.txt
 RUN python -m pip install --upgrade pip wheel setuptools \
     && if [ "$INSTALL_CUDA_TORCH" = "1" ]; then \
         python -m pip install torch --index-url https://download.pytorch.org/whl/cu121 ; \
+    else \
+        python -m pip install torch --index-url https://download.pytorch.org/whl/cpu ; \
     fi \
     && python -m pip install -r /app/requirements.txt
 
@@ -41,5 +43,7 @@ RUN mkdir -p \
     /app/data/models \
     /app/model \
     /app/checkpoints
+
+EXPOSE 8000
 
 CMD ["bash"]

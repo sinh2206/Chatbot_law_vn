@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import argparse
+import gc
 import json
+import os
 import random
 from pathlib import Path
 import sys
+
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -23,6 +27,30 @@ def setup_stdout_utf8() -> None:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     except Exception:
         pass
+
+
+def is_cuda_oom(exc: BaseException) -> bool:
+    exc_name = type(exc).__name__.lower()
+    message = str(exc).lower()
+    return (
+        "outofmemory" in exc_name
+        or "out of memory" in message
+        or "cuda out of memory" in message
+    ) and ("cuda" in exc_name or "cuda" in message)
+
+
+def clear_cuda_cache() -> None:
+    gc.collect()
+    try:
+        import torch
+    except Exception:
+        return
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        try:
+            torch.cuda.ipc_collect()
+        except Exception:
+            pass
 
 
 def load_jsonl(path: Path) -> list[dict[str, object]]:
@@ -80,7 +108,7 @@ def build_eval_binary(rows: list[dict[str, object]], seed: int) -> tuple[list[st
     return sent1, sent2, labels
 
 
-def train(
+def _train_once(
     model_name: str,
     train_rows: list[dict[str, object]],
     valid_rows: list[dict[str, object]],
@@ -189,6 +217,65 @@ def train(
     }
 
 
+def train(
+    model_name: str,
+    train_rows: list[dict[str, object]],
+    valid_rows: list[dict[str, object]],
+    output_dir: Path,
+    batch_size: int,
+    epochs: int,
+    lr: float,
+    warmup_ratio: float,
+    max_seq_length: int,
+    use_amp: bool,
+    seed: int,
+    auto_reduce_batch_on_oom: bool,
+    min_batch_size: int,
+) -> dict[str, object]:
+    batch_attempts: list[int] = []
+    current_batch_size = batch_size
+
+    while True:
+        batch_attempts.append(current_batch_size)
+        try:
+            summary = _train_once(
+                model_name=model_name,
+                train_rows=train_rows,
+                valid_rows=valid_rows,
+                output_dir=output_dir,
+                batch_size=current_batch_size,
+                epochs=epochs,
+                lr=lr,
+                warmup_ratio=warmup_ratio,
+                max_seq_length=max_seq_length,
+                use_amp=use_amp,
+                seed=seed,
+            )
+            summary["requested_batch_size"] = batch_size
+            summary["batch_retry_attempts"] = batch_attempts
+            summary["auto_reduced_batch"] = current_batch_size != batch_size
+            return summary
+        except Exception as exc:
+            if not auto_reduce_batch_on_oom or not is_cuda_oom(exc):
+                raise
+
+            next_batch_size = max(min_batch_size, current_batch_size // 2)
+            if next_batch_size >= current_batch_size:
+                raise RuntimeError(
+                    "CUDA out of memory while fine-tuning. "
+                    f"Tried batch sizes: {batch_attempts}. "
+                    "Free GPU memory by stopping other GPU processes, or rerun with "
+                    "--batch-size 2 --max-seq-length 128."
+                ) from exc
+
+            print(
+                f"\n[WARN] CUDA OOM with batch_size={current_batch_size}. "
+                f"Clearing CUDA cache and retrying with batch_size={next_batch_size}."
+            )
+            clear_cuda_cache()
+            current_batch_size = next_batch_size
+
+
 def main() -> None:
     setup_stdout_utf8()
     parser = argparse.ArgumentParser(
@@ -214,12 +301,28 @@ def main() -> None:
     parser.add_argument("--max-valid-samples", type=int, default=0)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--use-amp", action="store_true")
+    parser.add_argument(
+        "--auto-reduce-batch-on-oom",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Automatically retry with smaller batch sizes when CUDA runs out of memory.",
+    )
+    parser.add_argument(
+        "--min-batch-size",
+        type=int,
+        default=2,
+        help="Smallest batch size used by --auto-reduce-batch-on-oom.",
+    )
     args = parser.parse_args()
 
     if args.epochs <= 0:
         raise ValueError("--epochs must be > 0")
     if args.batch_size <= 1:
         raise ValueError("--batch-size must be > 1")
+    if args.min_batch_size <= 1:
+        raise ValueError("--min-batch-size must be > 1")
+    if args.min_batch_size > args.batch_size:
+        raise ValueError("--min-batch-size must be <= --batch-size")
     if args.lr <= 0:
         raise ValueError("--lr must be > 0")
     if args.warmup_ratio < 0 or args.warmup_ratio >= 1:
@@ -250,6 +353,8 @@ def main() -> None:
         max_seq_length=args.max_seq_length,
         use_amp=args.use_amp,
         seed=args.seed,
+        auto_reduce_batch_on_oom=args.auto_reduce_batch_on_oom,
+        min_batch_size=args.min_batch_size,
     )
 
     summary_path = output_dir / "train_summary.json"

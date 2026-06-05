@@ -2,12 +2,12 @@
   "query_count": 250,
   "corpus_count": 1250,
   "embedding_dim": 768,
-  "mrr_at_10": 0.3023396825396826,
-  "ndcg_at_10": 0.36083345356653723,
-  "recall_at_1": 0.196,
-  "recall_at_3": 0.36,
-  "recall_at_5": 0.432,
-  "recall_at_10": 0.548,
+  "mrr_at_10": 0.2530174603174604,
+  "ndcg_at_10": 0.3061214525049549,
+  "recall_at_1": 0.168,
+  "recall_at_3": 0.276,
+  "recall_at_5": 0.344,
+  "recall_at_10": 0.48,
   "model_name": "dangvantuan/vietnamese-embedding",
-  "test_file": "D:\\Documents\\Thực tập doanh nghiệp\\Chatbot_law_vn\\data\\finetune\\test_pairs.jsonl"
+  "test_file": "/app/data/finetune/test_pairs.jsonl"
 }

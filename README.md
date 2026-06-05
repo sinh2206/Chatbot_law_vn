@@ -79,41 +79,18 @@ Kết quả retrieval hiện tại trên `data/finetune/test_pairs.jsonl`:
 | `dangvantuan/vietnamese-embedding` | 0.460 | 0.636 | 0.676 | 0.744 | 0.5599 | 0.6047 |
 | `data/models/vietnamese-embedding-legal` | 0.724 | 0.896 | 0.924 | 0.944 | 0.8103 | 0.8437 |
 
-Lệnh đánh giá baseline:
-
-```bash
-docker compose run --rm app python scripts/evaluate_retrieval.py \
-  --model-name dangvantuan/vietnamese-embedding \
-  --test-file data/finetune/test_pairs.jsonl \
-  --train-file data/finetune/train_pairs.jsonl \
-  --valid-file data/finetune/valid_pairs.jsonl \
-  --output-json data/finetune/retrieval_eval_baseline.json
-```
-
-Lệnh đánh giá model fine-tuned:
-
-```bash
-docker compose run --rm app python scripts/evaluate_retrieval.py \
-  --model-name data/models/vietnamese-embedding-legal \
-  --test-file data/finetune/test_pairs.jsonl \
-  --train-file data/finetune/train_pairs.jsonl \
-  --valid-file data/finetune/valid_pairs.jsonl \
-  --output-json data/finetune/retrieval_eval_finetuned.json
-```
-
-Khi đánh giá chất lượng local RAG, nên tắt Gemini để kết quả khách quan:
-
-```bash
-docker compose run --rm app python scripts/query_cli.py \
-  --query "Công dân cần đổi thẻ căn cước khi nào?" \
-  --domain CCCD \
-  --top-k 5 \
-  --no-gemini-fallback
-```
+Với dangvantuan/vietnamese-embedding chưa được fine-tune
+    data/models/vietnamese-embedding-legal đã được fine tune cho phù hợp với dự án
+|Chỉ số |	Ý nghĩa trong chatbot luật|
+|Recall@1 | Tỷ lệ câu hỏi mà chunk luật đúng nằm ngay top 1|
+|Recall@3 	Tỷ lệ câu hỏi mà chunk luật đúng nằm trong top 3|
+|Recall@5 |	Tỷ lệ câu hỏi mà chunk luật đúng nằm trong top 5|
+|Recall@10	| Tỷ lệ câu hỏi mà chunk luật đúng nằm trong top 10|
+|MRR@10 |	Đo chunk đúng xuất hiện càng cao càng tốt trong top 10|
+|NDCG@10 |	Đo chất lượng sắp xếp top 10, có xét mức độ liên quan của kết quả|
 
 ## 🛠️ Tech Stack
 
-- Python 3.10
 - FastAPI + Uvicorn
 - Sentence Transformers
 - Transformers, Datasets, Accelerate
@@ -121,7 +98,7 @@ docker compose run --rm app python scripts/query_cli.py \
 - FAISS
 - NumPy
 - SQLite
-- Google Gemini API qua `google-genai`
+- Google Gemini API
 - PyMuPDF để render PDF
 - Tesseract OCR, PyMuPDF, OpenCV, Pillow
 - HTML/CSS/JavaScript frontend tĩnh
@@ -141,7 +118,7 @@ cd Chatbot_law_vn
 - Linux/macOS/Windows có Docker.
 - Docker Compose plugin: `docker compose`.
 - Internet lần đầu để tải image, Python packages và model Hugging Face nếu chưa có cache.
-- Nếu fine-tune bằng GPU: NVIDIA driver + NVIDIA Container Toolkit.
+- Nếu fine-tune bằng GPU: NVIDIA driver + NVIDIA Container Toolkit, ít nhất 24GB VRAM
 
 Kiểm tra Docker:
 
@@ -333,21 +310,7 @@ docker compose --profile gpu run --rm gpu python scripts/train_embedding.py \
   --use-amp
 ```
 
-Nếu CUDA out of memory:
 
-```bash
-docker compose --profile gpu run --rm gpu python scripts/train_embedding.py \
-  --model-name dangvantuan/vietnamese-embedding \
-  --train-file data/finetune/train_pairs.jsonl \
-  --valid-file data/finetune/valid_pairs.jsonl \
-  --output-dir data/models/vietnamese-embedding-legal \
-  --epochs 3 \
-  --batch-size 4 \
-  --lr 2e-5 \
-  --warmup-ratio 0.1 \
-  --max-seq-length 128 \
-  --use-amp
-```
 
 Sau khi train xong, build lại vector store:
 

@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+import asyncio
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import datetime, time, timedelta, timezone
+from email.message import EmailMessage
 import hashlib
 import json
 from pathlib import Path
 import re
 import sqlite3
+import smtplib
 from threading import RLock
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,6 +32,17 @@ from config import (
     MAX_CANDIDATE_MULTIPLIER,
     METADATA_PATH,
     MIN_RETRIEVAL_SCORE,
+    REPORT_DAILY_TIME,
+    REPORT_SCHEDULER_ENABLED,
+    REPORT_TIMEZONE,
+    REPORT_WATCHLIST_TOPICS,
+    REPORTS_DIR,
+    SMTP_FROM_EMAIL,
+    SMTP_HOST,
+    SMTP_PASSWORD,
+    SMTP_PORT,
+    SMTP_USERNAME,
+    SMTP_USE_TLS,
     TOP_K,
 )
 from scripts.gemini_fallback import (
@@ -38,6 +53,8 @@ from scripts.query_cli import (
     RetrievedItem,
     attach_document_status,
     decide_retrieval,
+    detect_requested_documents,
+    document_labels,
     format_source,
     load_embedder,
     load_faiss_index,
@@ -45,6 +62,7 @@ from scripts.query_cli import (
     load_metadata,
     load_numpy_embeddings,
     read_manifest,
+    recover_internal_decision,
     search,
 )
 
@@ -70,11 +88,14 @@ ARTICLE_RE = re.compile(r"(Điều|điều)\s+(\d+[a-zA-Z]?)")
 ARTICLE_HEADING_RE = re.compile(r"(?m)^\s*Điều\s+\d+[a-zA-Z]?\s*[\\.:]")
 ARTICLE_HEADING_CAPTURE_RE = re.compile(r"(?m)^\s*Điều\s+(\d+[a-zA-Z]?)\s*[\\.:]")
 CLAUSE_RE = re.compile(r"(?:^|\n)\s*(\d+[a-zA-Z]?)\.\s+")
+LIST_MARKER_RE = re.compile(r"^\s*(?:\d+[a-zA-Z]?\.|[a-zà-ỹđ]\))\s+")
 SECTION_RE = re.compile(r"(?:(?:khoản|Khoản)\s+(\d+[a-zA-Z]?))?\s*(?:Điều|điều)\s+(\d+[a-zA-Z]?)")
 SENTENCE_BOUNDARY_RE = re.compile(r"(?<=[.!?;:])\s+(?=[A-ZĐ0-9])")
 LEADING_LEGAL_BOUNDARY_RE = re.compile(
     r"(?m)(^Điều\s+\d+[a-zA-Z]?\s*[\\.:]|^\d+[a-zA-Z]?\.\s+|^[a-z]\)\s+)"
 )
+WORD_RE = re.compile(r"[0-9a-zA-ZÀ-ỹĐđ]+")
+LEGAL_HEADING_LINE_RE = re.compile(r"^\s*(?:Điều\s+\d+[a-zA-Z]?\s*[\\.:]|Mục\s+|Chương\s+)", re.IGNORECASE)
 
 
 class ChatRequest(BaseModel):
@@ -102,6 +123,17 @@ class ChatResponse(BaseModel):
     expired_sources: list[dict[str, Any]]
     low_confidence_sources: list[dict[str, Any]]
     metadata: dict[str, Any]
+
+
+class ReportSubscriberRequest(BaseModel):
+    email: str = Field(..., min_length=3)
+    name: str | None = None
+    active: bool = True
+
+
+class ReportSendRequest(BaseModel):
+    recipients: list[str] | None = None
+    force: bool = False
 
 
 class ChatStore:
@@ -151,6 +183,18 @@ class ChatStore:
                 ON chat_messages(created_at DESC)
                 """
             )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS report_subscribers (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    email TEXT NOT NULL UNIQUE,
+                    name TEXT,
+                    active INTEGER NOT NULL DEFAULT 1,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                )
+                """
+            )
 
     def cache_key(self, question: str, domain: str | None) -> tuple[str, str]:
         normalized = " ".join(question.strip().lower().split())
@@ -161,17 +205,22 @@ class ChatStore:
         )
         return hashlib.sha256(raw_key.encode("utf-8")).hexdigest(), normalized
 
-    def get_cached_fallback(self, cache_key: str) -> ChatResponse | None:
+    def get_cached_fallback(
+        self,
+        cache_key: str,
+        modes: tuple[str, ...] = ("gemini_fallback",),
+    ) -> ChatResponse | None:
+        placeholders = ",".join("?" for _ in modes)
         with self._lock, self._connect() as connection:
             row = connection.execute(
-                """
+                f"""
                 SELECT *
                 FROM chat_messages
-                WHERE cache_key = ? AND mode = 'gemini_fallback' AND gemini_used = 1
+                WHERE cache_key = ? AND mode IN ({placeholders}) AND gemini_used = 1
                 ORDER BY id DESC
                 LIMIT 1
                 """,
-                (cache_key,),
+                (cache_key, *modes),
             ).fetchone()
         if row is None:
             return None
@@ -250,6 +299,72 @@ class ChatStore:
                 LIMIT ?
                 """,
                 (limit,),
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def recent_messages(self, limit: int = 100) -> list[dict[str, Any]]:
+        limit = max(1, min(limit, 500))
+        with self._lock, self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT created_at, question, domain, mode, local_used, gemini_used, reason
+                FROM chat_messages
+                ORDER BY id DESC
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def upsert_subscriber(
+        self,
+        *,
+        email: str,
+        name: str | None,
+        active: bool,
+    ) -> dict[str, Any]:
+        normalized_email = email.strip().lower()
+        if "@" not in normalized_email:
+            raise ValueError("Email không hợp lệ.")
+        now = datetime.now(timezone.utc).isoformat()
+        with self._lock, self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO report_subscribers(email, name, active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(email) DO UPDATE SET
+                    name = excluded.name,
+                    active = excluded.active,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    normalized_email,
+                    (name or "").strip() or None,
+                    int(active),
+                    now,
+                    now,
+                ),
+            )
+            row = connection.execute(
+                """
+                SELECT id, email, name, active, created_at, updated_at
+                FROM report_subscribers
+                WHERE email = ?
+                """,
+                (normalized_email,),
+            ).fetchone()
+        return dict(row)
+
+    def subscribers(self, active_only: bool = True) -> list[dict[str, Any]]:
+        where = "WHERE active = 1" if active_only else ""
+        with self._lock, self._connect() as connection:
+            rows = connection.execute(
+                f"""
+                SELECT id, email, name, active, created_at, updated_at
+                FROM report_subscribers
+                {where}
+                ORDER BY email
+                """
             ).fetchall()
         return [dict(row) for row in rows]
 
@@ -354,6 +469,12 @@ class RagEngine:
             domain=domain,
             min_score=request.min_score,
         )
+        decision = recover_internal_decision(
+            decision=decision,
+            query=question,
+            metadata=self.metadata,
+            min_score=request.min_score,
+        )
 
         fallback_enabled = (
             GEMINI_FALLBACK_ENABLED
@@ -363,24 +484,111 @@ class RagEngine:
         gemini_model = request.gemini_model or GEMINI_MODEL
 
         if decision.use_internal:
+            local_answer = self._format_local_answer(
+                decision.usable_results,
+                question=question,
+                snippet_chars=request.snippet_chars,
+            )
+            local_sources = [self._source_payload(item) for item in decision.usable_results]
+            expired_sources = [
+                self._source_payload(item) for item in decision.expired_results
+            ]
+            low_confidence_sources = [
+                self._source_payload(item) for item in decision.low_confidence_results
+            ]
+            requested_documents = detect_requested_documents(question, self.metadata)
+            available_documents = document_labels(requested_documents, available=True)
+            missing_documents = document_labels(requested_documents, available=False)
+            metadata = self._response_metadata()
+            if requested_documents:
+                metadata["requested_documents"] = [
+                    asdict(document) for document in requested_documents
+                ]
+
+            if missing_documents and fallback_enabled:
+                cached_response = self.store.get_cached_fallback(
+                    cache_key,
+                    modes=("local_rag_with_api_supplement",),
+                )
+                if cached_response is not None:
+                    self.store.save(
+                        cache_key=cache_key,
+                        normalized_question=normalized_question,
+                        question=question,
+                        domain=domain,
+                        response=cached_response,
+                    )
+                    return cached_response
+
+                try:
+                    supplement_result = generate_gemini_fallback_answer(
+                        request=GeminiFallbackRequest(
+                            question=question,
+                            reason=(
+                                "RAG noi bo da co can cu cho cac van ban co san; "
+                                "chi can tra cuu bo sung cac van ban con thieu."
+                            ),
+                            domain=domain,
+                            available_local_documents=available_documents,
+                            missing_documents=missing_documents,
+                            local_answer=local_answer,
+                        ),
+                        api_key=GEMINI_API_KEY,
+                        model_name=gemini_model,
+                    )
+                    metadata["api_supplement_documents"] = missing_documents
+                    response = ChatResponse(
+                        mode="local_rag_with_api_supplement",
+                        answer=self._merge_api_supplement(
+                            local_answer=local_answer,
+                            supplement_answer=supplement_result.answer,
+                            missing_documents=missing_documents,
+                        ),
+                        reason=(
+                            f"{decision.reason} Bo sung API chi cho tai lieu con thieu."
+                        ),
+                        local_used=True,
+                        gemini_used=True,
+                        sources=local_sources + supplement_result.sources,
+                        expired_sources=expired_sources,
+                        low_confidence_sources=low_confidence_sources,
+                        metadata=metadata,
+                    )
+                    self.store.save(
+                        cache_key=cache_key,
+                        normalized_question=normalized_question,
+                        question=question,
+                        domain=domain,
+                        response=response,
+                    )
+                    return response
+                except Exception as exc:
+                    metadata["api_supplement_error"] = str(exc)
+                    local_answer = (
+                        f"{local_answer}\n\n"
+                        "Tài liệu chưa có trong kho nội bộ cần bổ sung: "
+                        f"{', '.join(missing_documents)}.\n"
+                        f"Không thể gọi Gemini để bổ sung: {exc}"
+                    )
+
+            elif missing_documents:
+                metadata["missing_documents"] = missing_documents
+                local_answer = (
+                    f"{local_answer}\n\n"
+                    "Tài liệu chưa có trong kho nội bộ cần bổ sung: "
+                    f"{', '.join(missing_documents)}."
+                )
+
             response = ChatResponse(
                 mode="local_rag",
-                answer=self._format_local_answer(
-                    decision.usable_results,
-                    snippet_chars=request.snippet_chars,
-                ),
+                answer=local_answer,
                 reason=decision.reason,
                 local_used=True,
                 gemini_used=False,
-                sources=[self._source_payload(item) for item in decision.usable_results],
-                expired_sources=[
-                    self._source_payload(item) for item in decision.expired_results
-                ],
-                low_confidence_sources=[
-                    self._source_payload(item)
-                    for item in decision.low_confidence_results
-                ],
-                metadata=self._response_metadata(),
+                sources=local_sources,
+                expired_sources=expired_sources,
+                low_confidence_sources=low_confidence_sources,
+                metadata=metadata,
             )
             self.store.save(
                 cache_key=cache_key,
@@ -503,6 +711,26 @@ class RagEngine:
         )
         return response
 
+    def _merge_api_supplement(
+        self,
+        local_answer: str,
+        supplement_answer: str,
+        missing_documents: list[str],
+    ) -> str:
+        supplement = supplement_answer.strip()
+        supplement = re.sub(
+            r"(?is)^không tìm thấy tài liệu làm căn cứ cho câu hỏi trong kho nội bộ\s*",
+            "",
+            supplement,
+        ).strip()
+        if not re.match(r"(?i)^b[oổ]\s+sung\s+t[aà]i\s+li[eệ]u", supplement):
+            heading = (
+                "Bổ sung tài liệu cần tra cứu qua API: "
+                f"{', '.join(missing_documents)}."
+            )
+            supplement = f"{heading}\n{supplement}" if supplement else heading
+        return f"{local_answer.strip()}\n\n{supplement.strip()}".strip()
+
     def _resolve_path(self, value: str, default_path: Path) -> Path:
         if value:
             candidate = Path(value)
@@ -517,19 +745,22 @@ class RagEngine:
     def _format_local_answer(
         self,
         results: list[RetrievedItem],
+        question: str,
         snippet_chars: int,
     ) -> str:
-        snippets: list[str] = []
-        seen_snippets: set[str] = set()
-        per_snippet_chars = max(500, min(snippet_chars, 1100))
-        for item in results[:3]:
-            snippet = self._clean_snippet(item.text, snippet_chars=per_snippet_chars)
-            key = re.sub(r"\W+", "", snippet[:140].lower())
-            if not snippet or key in seen_snippets:
-                continue
-            seen_snippets.add(key)
-            snippets.append(snippet)
-        answer_text = "\n\n".join(snippets)
+        answer_text = self._build_concise_answer(results=results, question=question)
+        if not answer_text:
+            snippets: list[str] = []
+            seen_snippets: set[str] = set()
+            per_snippet_chars = max(500, min(snippet_chars, 900))
+            for item in results[:2]:
+                snippet = self._clean_snippet(item.text, snippet_chars=per_snippet_chars)
+                key = re.sub(r"\W+", "", snippet[:140].lower())
+                if not snippet or key in seen_snippets:
+                    continue
+                seen_snippets.add(key)
+                snippets.append(snippet)
+            answer_text = self._format_answer_block("\n\n".join(snippets))
         citations = [self._citation_payload(item) for item in results]
         seen_citations: set[str] = set()
         deduped_citations: list[dict[str, str]] = []
@@ -546,6 +777,177 @@ class RagEngine:
             for citation in deduped_citations[:5]:
                 lines.append(f"- {citation['citation']}")
         return "\n".join(line for line in lines if line.strip())
+
+    def _format_answer_block(self, text: str) -> str:
+        text = text.strip()
+        if not text or text.lstrip().startswith("- "):
+            return text
+        units: list[str] = []
+        for block in re.split(r"\n{2,}", text):
+            block = re.sub(r"\s+", " ", block).strip()
+            if block:
+                units.extend(self._split_answer_unit(block))
+        return self._format_answer_bullets(units)
+
+    def _build_concise_answer(self, results: list[RetrievedItem], question: str) -> str:
+        terms = self._query_terms(question)
+        candidates: list[tuple[float, int, str]] = []
+        seen: set[str] = set()
+        for item_index, item in enumerate(results[:6]):
+            for unit_index, unit in enumerate(self._answer_units(item.text)):
+                normalized = re.sub(r"\W+", "", unit.lower())
+                if not normalized or normalized in seen:
+                    continue
+                seen.add(normalized)
+                score = self._answer_unit_score(unit=unit, terms=terms, rank=item_index)
+                if score <= 0:
+                    continue
+                candidates.append((score, unit_index, unit))
+
+        candidates.sort(key=lambda row: (-row[0], row[1]))
+        selected: list[str] = []
+        selected_keys: set[str] = set()
+        for _, _, unit in candidates:
+            key = re.sub(r"\W+", "", unit[:180].lower())
+            if key in selected_keys:
+                continue
+            selected_keys.add(key)
+            selected.append(unit)
+            if len(selected) >= 4:
+                break
+
+        if not selected:
+            return ""
+
+        selected.sort(key=lambda text: self._unit_order_key(text))
+        bullets = self._format_answer_bullets(selected)
+        return self._trim_answer_length(bullets, max_chars=1400)
+
+    def _answer_units(self, text: str) -> list[str]:
+        clean = self._clean_snippet(text, snippet_chars=1800)
+        raw_lines = [line.strip() for line in clean.splitlines() if line.strip()]
+        units: list[str] = []
+        current = ""
+        for line in raw_lines:
+            if LEGAL_HEADING_LINE_RE.match(line):
+                continue
+            line = re.sub(r"^[a-zà-ỹđ]\)\s+", "", line, flags=re.IGNORECASE).strip()
+            if not line:
+                continue
+            starts_new = bool(LIST_MARKER_RE.match(line))
+            if starts_new and current:
+                units.append(current.strip())
+                current = line
+            elif current:
+                current = f"{current} {line}"
+            else:
+                current = line
+            if current.endswith((".", ";", ":")) and len(current) >= 90:
+                units.append(current.strip())
+                current = ""
+        if current:
+            units.append(current.strip())
+        return [self._normalize_answer_unit(unit) for unit in units if len(unit) >= 45]
+
+    def _normalize_answer_unit(self, unit: str) -> str:
+        unit = re.sub(r"\s+", " ", unit).strip()
+        unit = re.sub(r"^\d+[a-zA-Z]?\.\s+", "", unit)
+        return unit
+
+    def _format_answer_bullets(self, units: list[str]) -> str:
+        lines: list[str] = []
+        for unit in units:
+            for sentence in self._split_answer_unit(unit):
+                sentence = sentence.strip(" -")
+                if not sentence:
+                    continue
+                if not sentence.endswith((".", ";", ":", "!", "?")):
+                    sentence = f"{sentence}."
+                lines.append(f"- {sentence}")
+        return "\n".join(lines)
+
+    def _split_answer_unit(self, unit: str) -> list[str]:
+        unit = re.sub(r"\s+", " ", unit).strip()
+        if len(unit) <= 260:
+            return [unit]
+
+        parts = [
+            part.strip()
+            for part in re.split(r"(?<=[.;:])\s+(?=[A-ZĐ0-9À-Ỹ])", unit)
+            if part.strip()
+        ]
+        if len(parts) > 1:
+            return parts
+
+        chunks: list[str] = []
+        current = ""
+        for part in re.split(r",\s+", unit):
+            candidate = f"{current}, {part}".strip(", ") if current else part
+            if len(candidate) <= 230:
+                current = candidate
+                continue
+            if current:
+                chunks.append(current)
+            current = part
+        if current:
+            chunks.append(current)
+        return chunks or [unit]
+
+    def _query_terms(self, question: str) -> set[str]:
+        normalized = question.lower()
+        expansions = {
+            "góp đủ": ["thanh toán xong", "chuyển quyền sở hữu", "tài sản góp vốn"],
+            "tiền mặt": ["đồng việt nam", "ngoại tệ", "vàng", "quyền sử dụng đất", "quyền sở hữu trí tuệ"],
+            "không có giấy tờ": ["điều 138", "không vi phạm pháp luật đất đai", "không thuộc trường hợp đất được giao không đúng thẩm quyền"],
+            "chưa có sổ đỏ": ["cấp giấy chứng nhận", "không có giấy tờ về quyền sử dụng đất"],
+            "cập nhật thông tin": ["cơ sở dữ liệu quốc gia về dân cư", "cơ sở dữ liệu căn cước", "đổi thẻ"],
+            "thay đổi thông tin": ["đổi thẻ", "cập nhật", "điều chỉnh"],
+            "cải chính hộ tịch": ["cập nhật thông tin", "cơ sở dữ liệu quốc gia về dân cư", "cơ sở dữ liệu căn cước"],
+            "thông tin căn cước": ["số định danh cá nhân", "cập nhật", "chỉnh sửa thông tin", "cấp đổi thẻ căn cước"],
+            "mã số thuế": ["thay đổi thông tin đăng ký thuế", "khớp đúng với cơ sở dữ liệu quốc gia về dân cư"],
+            "giấy tờ nhà đất": ["giấy chứng nhận", "người sử dụng đất", "quyền sử dụng đất"],
+            "xác minh danh tính": ["nhận biết khách hàng", "xác thực danh tính", "phòng chống rửa tiền"],
+            "tài khoản ngân hàng": ["ngân hàng", "xác minh danh tính", "nhận biết khách hàng"],
+        }
+        term_text = [normalized]
+        for trigger, values in expansions.items():
+            if trigger in normalized:
+                term_text.extend(values)
+        tokens = {
+            token
+            for token in WORD_RE.findall(" ".join(term_text).lower())
+            if len(token) >= 3 and token not in {"theo", "trong", "trường", "hợp", "của", "với", "cho", "khi", "nào"}
+        }
+        phrases = {
+            phrase
+            for phrase in term_text[1:]
+            if len(phrase.split()) >= 2
+        }
+        return tokens | phrases
+
+    def _answer_unit_score(self, unit: str, terms: set[str], rank: int) -> float:
+        normalized = unit.lower()
+        score = max(0, 5 - rank)
+        for term in terms:
+            if term in normalized:
+                score += 4 if " " in term else 1
+        if any(marker in normalized for marker in ("được cấp", "phải", "được đổi", "chỉ được", "được coi là", "thanh toán xong", "cập nhật")):
+            score += 2
+        return float(score)
+
+    def _unit_order_key(self, text: str) -> tuple[int, str]:
+        match = re.match(r"^(\d+)[a-zA-Z]?\.", text)
+        return (int(match.group(1)) if match else 999, text)
+
+    def _trim_answer_length(self, answer: str, max_chars: int) -> str:
+        if len(answer) <= max_chars:
+            return answer
+        cut = answer.rfind(". ", 0, max_chars)
+        if cut < max_chars * 0.5:
+            cut = answer.rfind("; ", 0, max_chars)
+        if cut < max_chars * 0.5:
+            return answer[:max_chars].rstrip(" ,;:")
+        return answer[: cut + 1].strip()
 
     def _source_payload(self, item: RetrievedItem) -> dict[str, Any]:
         payload = asdict(item)
@@ -634,7 +1036,7 @@ class RagEngine:
         stem = source_path.stem
         domain = DOMAIN_LABELS.get(item.domain, item.domain or source_path.parent.name)
         document_label = self._document_label(item, stem)
-        clause, article = self._section_label(item.text)
+        clause, article = self._section_label(item)
         year = self._document_year(stem, item.document_number)
         document_number = self._document_number(item, stem)
 
@@ -705,7 +1107,13 @@ class RagEngine:
         match = re.search(r"(20\d{2}|19\d{2})", document_number or stem)
         return match.group(1) if match else ""
 
-    def _section_label(self, text: str) -> tuple[str, str]:
+    def _section_label(self, item: RetrievedItem) -> tuple[str, str]:
+        clause = getattr(item, "clause_id", "") or ""
+        article = getattr(item, "article_id", "") or ""
+        if article:
+            return clause, article
+
+        text = item.text
         heading_match = ARTICLE_HEADING_CAPTURE_RE.search(text)
         if heading_match:
             article = heading_match.group(1)
@@ -747,8 +1155,238 @@ class RagEngine:
         }
 
 
+class DailyReportService:
+    def __init__(self, store: ChatStore, rag_engine: RagEngine) -> None:
+        self.store = store
+        self.engine = rag_engine
+
+    def build_report(self) -> tuple[str, Path]:
+        now = datetime.now(self._timezone())
+        report_date = now.strftime("%Y-%m-%d")
+        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+        markdown = self._build_markdown(now)
+        pdf_path = REPORTS_DIR / f"legal-watchlist-report-{report_date}.pdf"
+        self._render_pdf(markdown=markdown, output_path=pdf_path)
+        markdown_path = REPORTS_DIR / f"legal-watchlist-report-{report_date}.md"
+        markdown_path.write_text(markdown, encoding="utf-8")
+        return markdown, pdf_path
+
+    def send_daily_report(
+        self,
+        recipients: list[str] | None = None,
+    ) -> dict[str, Any]:
+        subscribers = self.store.subscribers(active_only=True)
+        recipient_list = recipients or [item["email"] for item in subscribers]
+        recipient_list = sorted({email.strip().lower() for email in recipient_list if email.strip()})
+        if not recipient_list:
+            return {"sent": 0, "recipients": [], "reason": "no_active_subscribers"}
+        if not SMTP_HOST or not SMTP_FROM_EMAIL:
+            raise RuntimeError("Missing SMTP_HOST or SMTP_FROM_EMAIL in environment.")
+
+        markdown, pdf_path = self.build_report()
+        subject = f"Báo cáo danh mục theo dõi pháp luật - {datetime.now(self._timezone()):%d/%m/%Y}"
+        message = EmailMessage()
+        message["Subject"] = subject
+        message["From"] = SMTP_FROM_EMAIL
+        message["To"] = ", ".join(recipient_list)
+        message.set_content(
+            "Chào bạn,\n\n"
+            "Hệ thống gửi kèm báo cáo danh mục theo dõi pháp luật hằng ngày.\n\n"
+            "Nội dung tóm tắt Markdown:\n\n"
+            f"{markdown[:3500]}\n\n"
+            "File PDF đầy đủ được đính kèm trong email này.\n",
+            charset="utf-8",
+        )
+        message.add_attachment(
+            pdf_path.read_bytes(),
+            maintype="application",
+            subtype="pdf",
+            filename=pdf_path.name,
+        )
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as smtp:
+            if SMTP_USE_TLS:
+                smtp.starttls()
+            if SMTP_USERNAME:
+                smtp.login(SMTP_USERNAME, SMTP_PASSWORD)
+            smtp.send_message(message)
+        return {
+            "sent": len(recipient_list),
+            "recipients": recipient_list,
+            "pdf_path": str(pdf_path),
+        }
+
+    def _build_markdown(self, now: datetime) -> str:
+        recent_messages = self.store.recent_messages(limit=100)
+        total = len(recent_messages)
+        gemini_count = sum(1 for item in recent_messages if item.get("gemini_used"))
+        local_count = sum(1 for item in recent_messages if item.get("local_used"))
+        lines = [
+            "# Báo cáo danh mục theo dõi pháp luật",
+            "",
+            f"- Thời điểm tạo: {now:%d/%m/%Y %H:%M} ({REPORT_TIMEZONE})",
+            f"- Số lượt hỏi gần nhất được phân tích: {total}",
+            f"- Lượt dùng căn cứ nội bộ: {local_count}",
+            f"- Lượt cần Gemini/API: {gemini_count}",
+            "",
+            "## Danh mục theo dõi",
+            "",
+        ]
+        for index, topic in enumerate(REPORT_WATCHLIST_TOPICS, start=1):
+            analysis = self._analyze_topic(topic)
+            lines.extend(
+                [
+                    f"### {index}. {topic}",
+                    "",
+                    f"- Chế độ trả lời: {analysis.mode}",
+                    f"- Lý do: {analysis.reason}",
+                    "",
+                    self._compact_markdown_answer(analysis.answer),
+                    "",
+                ]
+            )
+        lines.extend(["## Hoạt động gần đây", ""])
+        if not recent_messages:
+            lines.append("- Chưa có lịch sử hỏi đáp.")
+        else:
+            for item in recent_messages[:10]:
+                question = str(item.get("question", "")).strip()
+                mode = str(item.get("mode", "")).strip()
+                created_at = str(item.get("created_at", "")).strip()
+                lines.append(f"- {created_at}: `{mode}` - {question[:180]}")
+        return "\n".join(lines).strip() + "\n"
+
+    def _analyze_topic(self, topic: str) -> ChatResponse:
+        try:
+            return self.engine.query(
+                ChatRequest(
+                    message=topic,
+                    top_k=5,
+                    gemini_fallback=False,
+                    snippet_chars=900,
+                )
+            )
+        except Exception as exc:
+            return ChatResponse(
+                mode="report_error",
+                answer=f"- Không thể phân tích chủ đề này: {exc}",
+                reason=str(exc),
+                local_used=False,
+                gemini_used=False,
+                sources=[],
+                expired_sources=[],
+                low_confidence_sources=[],
+                metadata={},
+            )
+
+    def _compact_markdown_answer(self, answer: str) -> str:
+        lines = [line.strip() for line in answer.splitlines() if line.strip()]
+        kept: list[str] = []
+        for line in lines:
+            kept.append(line if line.startswith(("-", "#")) else f"- {line}")
+            if len(kept) >= 8:
+                break
+        return "\n".join(kept) if kept else "- Không có nội dung."
+
+    def _render_pdf(self, markdown: str, output_path: Path) -> None:
+        try:
+            import fitz
+        except ImportError as exc:
+            raise RuntimeError("PyMuPDF is required to render PDF reports.") from exc
+
+        document = fitz.open()
+        page = document.new_page(width=595, height=842)
+        margin = 54
+        y = margin
+        line_height = 15
+        max_width = 78
+        font_file = self._pdf_font_file()
+        font_name = "dejavu" if font_file else "helv"
+        for raw_line in markdown.splitlines():
+            if y > 790:
+                page = document.new_page(width=595, height=842)
+                y = margin
+            line = raw_line.strip()
+            if not line:
+                y += line_height
+                continue
+            font_size = 16 if line.startswith("# ") else 13 if line.startswith("##") else 11
+            text = line.lstrip("#").strip()
+            wrapped = self._wrap_text(text, max_width=max_width)
+            for wrapped_line in wrapped:
+                if y > 790:
+                    page = document.new_page(width=595, height=842)
+                    y = margin
+                page.insert_text(
+                    (margin, y),
+                    wrapped_line,
+                    fontsize=font_size,
+                    fontname=font_name,
+                    fontfile=font_file,
+                )
+                y += line_height + (4 if font_size > 11 else 0)
+        document.save(output_path)
+        document.close()
+
+    def _pdf_font_file(self) -> str | None:
+        candidates = [
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
+            "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        ]
+        for candidate in candidates:
+            if Path(candidate).exists():
+                return candidate
+        return None
+
+    def _wrap_text(self, text: str, max_width: int) -> list[str]:
+        words = text.split()
+        lines: list[str] = []
+        current = ""
+        for word in words:
+            candidate = f"{current} {word}".strip()
+            if len(candidate) <= max_width:
+                current = candidate
+                continue
+            if current:
+                lines.append(current)
+            current = word
+        if current:
+            lines.append(current)
+        return lines or [text]
+
+    def _timezone(self) -> ZoneInfo:
+        try:
+            return ZoneInfo(REPORT_TIMEZONE)
+        except Exception:
+            return ZoneInfo("Asia/Ho_Chi_Minh")
+
+
+def _next_report_run(now: datetime) -> datetime:
+    hour_text, _, minute_text = REPORT_DAILY_TIME.partition(":")
+    hour = int(hour_text or "7")
+    minute = int(minute_text or "0")
+    target = datetime.combine(now.date(), time(hour=hour, minute=minute), tzinfo=now.tzinfo)
+    if target <= now:
+        target += timedelta(days=1)
+    return target
+
+
+async def _daily_report_scheduler() -> None:
+    timezone_info = report_service._timezone()
+    while True:
+        now = datetime.now(timezone_info)
+        next_run = _next_report_run(now)
+        await asyncio.sleep(max(1.0, (next_run - now).total_seconds()))
+        try:
+            await asyncio.to_thread(report_service.send_daily_report)
+        except Exception as exc:
+            print(f"[REPORT_SCHEDULER] Failed to send report: {exc}")
+
+
 chat_store = ChatStore(CHAT_DB_PATH)
 engine = RagEngine(chat_store)
+report_service = DailyReportService(chat_store, engine)
 
 app = FastAPI(
     title="Chatbot Law VN API",
@@ -774,6 +1412,10 @@ def health() -> dict[str, Any]:
         "gemini_fallback_enabled": GEMINI_FALLBACK_ENABLED,
         "gemini_model": GEMINI_MODEL,
         "chat_db": str(CHAT_DB_PATH),
+        "report_scheduler_enabled": REPORT_SCHEDULER_ENABLED,
+        "report_daily_time": REPORT_DAILY_TIME,
+        "report_timezone": REPORT_TIMEZONE,
+        "report_subscribers": len(chat_store.subscribers(active_only=True)),
     }
 
 
@@ -782,6 +1424,50 @@ def history(limit: int = 30) -> dict[str, Any]:
     return {
         "items": chat_store.recent(limit=limit),
         "db_path": str(CHAT_DB_PATH),
+    }
+
+
+@app.get("/reports/subscribers")
+def report_subscribers(active_only: bool = True) -> dict[str, Any]:
+    return {
+        "items": chat_store.subscribers(active_only=active_only),
+        "db_path": str(CHAT_DB_PATH),
+    }
+
+
+@app.post("/reports/subscribers")
+def upsert_report_subscriber(request: ReportSubscriberRequest) -> dict[str, Any]:
+    try:
+        subscriber = chat_store.upsert_subscriber(
+            email=request.email,
+            name=request.name,
+            active=request.active,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"ok": True, "subscriber": subscriber}
+
+
+@app.post("/reports/send")
+def send_report(request: ReportSendRequest) -> dict[str, Any]:
+    if not request.force and not REPORT_SCHEDULER_ENABLED:
+        raise HTTPException(
+            status_code=400,
+            detail="REPORT_SCHEDULER_ENABLED=false. Set force=true to send manually.",
+        )
+    try:
+        result = report_service.send_daily_report(recipients=request.recipients)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {"ok": True, **result}
+
+
+@app.get("/reports/preview")
+def preview_report() -> dict[str, Any]:
+    markdown, pdf_path = report_service.build_report()
+    return {
+        "markdown": markdown,
+        "pdf_path": str(pdf_path),
     }
 
 
@@ -800,6 +1486,12 @@ def reload_engine() -> dict[str, Any]:
 @app.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest) -> ChatResponse:
     return engine.query(request)
+
+
+@app.on_event("startup")
+async def start_report_scheduler() -> None:
+    if REPORT_SCHEDULER_ENABLED:
+        asyncio.create_task(_daily_report_scheduler())
 
 
 if FRONTEND_DIR.exists():

@@ -18,9 +18,15 @@
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   margin: 0;
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
   background: var(--bg);
   color: var(--text);
   font-family:
@@ -38,13 +44,17 @@ textarea {
 .app-shell {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
   padding: 18px;
   background: #111827;
   color: #f8fafc;
@@ -102,6 +112,8 @@ textarea {
 .chat-list {
   display: grid;
   gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .chat-list-item {
@@ -127,7 +139,9 @@ textarea {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   min-width: 0;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .topbar {
@@ -136,9 +150,11 @@ textarea {
   justify-content: space-between;
   gap: 16px;
   min-height: 68px;
+  z-index: 2;
   padding: 14px 24px;
   border-bottom: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
 }
 
 .model-title {
@@ -194,7 +210,9 @@ input {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 28px 24px;
 }
 
@@ -305,7 +323,9 @@ input {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 48px;
   gap: 10px;
+  z-index: 2;
   padding: 16px 24px 22px;
+  border-top: 1px solid var(--border);
   background: var(--panel);
 }
 

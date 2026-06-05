@@ -23,6 +23,7 @@ VECTOR_STORE_DIR = DATA_DIR / "vector_store"
 FINETUNE_DIR = DATA_DIR / "finetune"
 MODELS_DIR = DATA_DIR / "models"
 CHAT_DB_PATH = Path(os.getenv("CHAT_DB_PATH", str(DATA_DIR / "chat_history.sqlite3")))
+REPORTS_DIR = Path(os.getenv("REPORTS_DIR", str(DATA_DIR / "reports")))
 
 # Local embedding model directory (offline first).
 LOCAL_MODEL_DIR = BASE_DIR / "model"
@@ -77,6 +78,35 @@ GEMINI_FALLBACK_ENABLED = os.getenv("GEMINI_FALLBACK_ENABLED", "false").lower() 
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
 
+# Daily report email. Scheduler runs inside the backend process.
+REPORT_SCHEDULER_ENABLED = os.getenv("REPORT_SCHEDULER_ENABLED", "false").lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
+REPORT_DAILY_TIME = os.getenv("REPORT_DAILY_TIME", "07:00")
+REPORT_TIMEZONE = os.getenv("REPORT_TIMEZONE", "Asia/Ho_Chi_Minh")
+REPORT_WATCHLIST_TOPICS = [
+    item.strip()
+    for item in os.getenv(
+        "REPORT_WATCHLIST_TOPICS",
+        "cập nhật thông tin căn cước,cải chính hộ tịch,đăng ký doanh nghiệp,cấp giấy chứng nhận quyền sử dụng đất,thay đổi thông tin đăng ký thuế",
+    ).split(",")
+    if item.strip()
+]
+SMTP_HOST = os.getenv("SMTP_HOST", "")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL", SMTP_USERNAME)
+SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
+
 
 def ensure_directories() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -85,3 +115,4 @@ def ensure_directories() -> None:
     FINETUNE_DIR.mkdir(parents=True, exist_ok=True)
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     CHAT_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)

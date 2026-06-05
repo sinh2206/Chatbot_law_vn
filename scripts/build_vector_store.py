@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -51,6 +52,23 @@ class ChunkItem:
     source_file: str
     text: str
     chunk_index: int
+    chunk_type: str = "text"
+    article_id: str = ""
+    article_title: str = ""
+    clause_id: str = ""
+
+
+@dataclass
+class ArticleBlock:
+    article_id: str
+    article_title: str
+    text: str
+
+
+ARTICLE_START_RE = re.compile(
+    r"(?m)^Điều\s+(\d+[a-zA-Z]?)\s*[\\.:]\s*(.*?)(?=\n|$)"
+)
+CLAUSE_START_RE = re.compile(r"(?m)^(\d+[a-zA-Z]?)\.\s+")
 
 
 def validate_local_model_dir(model_name: str) -> None:
@@ -156,6 +174,161 @@ def split_text_into_chunks(text: str, chunk_size: int, overlap: int) -> list[str
     return chunks
 
 
+def make_article_slug(article_id: str) -> str:
+    return re.sub(r"[^0-9a-zA-Z]+", "_", article_id).strip("_")
+
+
+def article_heading(article: ArticleBlock) -> str:
+    title = article.article_title.strip()
+    return f"Điều {article.article_id}. {title}".strip()
+
+
+def split_into_article_blocks(text: str) -> tuple[str, list[ArticleBlock]]:
+    clean = normalize_text(text)
+    matches = list(ARTICLE_START_RE.finditer(clean))
+    if not matches:
+        return clean, []
+
+    preamble = clean[: matches[0].start()].strip()
+    articles: list[ArticleBlock] = []
+    for index, match in enumerate(matches):
+        start = match.start()
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(clean)
+        articles.append(
+            ArticleBlock(
+                article_id=match.group(1).strip(),
+                article_title=match.group(2).strip(),
+                text=clean[start:end].strip(),
+            )
+        )
+    return preamble, articles
+
+
+def split_article_by_clause(article: ArticleBlock) -> list[tuple[str, str]]:
+    matches = list(CLAUSE_START_RE.finditer(article.text))
+    if not matches:
+        return []
+
+    heading_end = article.text.find("\n")
+    heading_end = heading_end if heading_end != -1 else 0
+    clauses: list[tuple[str, str]] = []
+    for index, match in enumerate(matches):
+        if match.start() <= heading_end:
+            continue
+        start = match.start()
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(article.text)
+        clause_text = article.text[start:end].strip()
+        if len(clause_text) >= MIN_CHUNK_CHARS:
+            clauses.append((match.group(1).strip(), clause_text))
+    return clauses
+
+
+def split_long_legal_text(text: str, chunk_size: int) -> list[str]:
+    return split_text_into_chunks(
+        text=text,
+        chunk_size=chunk_size,
+        overlap=0,
+    )
+
+
+def build_legal_chunks_for_file(
+    text: str,
+    source_file: str,
+    domain: str,
+    chunk_size: int,
+) -> list[ChunkItem]:
+    preamble, articles = split_into_article_blocks(text)
+    chunks: list[ChunkItem] = []
+
+    for part_index, part in enumerate(split_long_legal_text(preamble, chunk_size), start=1):
+        chunk_id = f"{source_file}::preamble_{part_index}"
+        chunks.append(
+            ChunkItem(
+                chunk_id=chunk_id,
+                domain=domain,
+                source_file=source_file,
+                text=part,
+                chunk_index=-1,
+                chunk_type="preamble",
+            )
+        )
+
+    for article in articles:
+        article_slug = make_article_slug(article.article_id)
+        article_text = article.text.strip()
+        if len(article_text) <= chunk_size:
+            chunks.append(
+                ChunkItem(
+                    chunk_id=f"{source_file}::dieu_{article_slug}",
+                    domain=domain,
+                    source_file=source_file,
+                    text=article_text,
+                    chunk_index=-1,
+                    chunk_type="article",
+                    article_id=article.article_id,
+                    article_title=article.article_title,
+                )
+            )
+            continue
+
+        clauses = split_article_by_clause(article)
+        if not clauses:
+            for part_index, part in enumerate(split_long_legal_text(article_text, chunk_size), start=1):
+                chunks.append(
+                    ChunkItem(
+                        chunk_id=f"{source_file}::dieu_{article_slug}_part_{part_index}",
+                        domain=domain,
+                        source_file=source_file,
+                        text=part,
+                        chunk_index=-1,
+                        chunk_type="article_part",
+                        article_id=article.article_id,
+                        article_title=article.article_title,
+                    )
+                )
+            continue
+
+        heading = article_heading(article)
+        for clause_id, clause_text in clauses:
+            clause_slug = make_article_slug(clause_id)
+            chunk_text = f"{heading}\n{clause_text}".strip()
+            if len(chunk_text) <= chunk_size:
+                chunks.append(
+                    ChunkItem(
+                        chunk_id=f"{source_file}::dieu_{article_slug}_khoan_{clause_slug}",
+                        domain=domain,
+                        source_file=source_file,
+                        text=chunk_text,
+                        chunk_index=-1,
+                        chunk_type="clause",
+                        article_id=article.article_id,
+                        article_title=article.article_title,
+                        clause_id=clause_id,
+                    )
+                )
+                continue
+
+            for part_index, part in enumerate(split_long_legal_text(clause_text, chunk_size), start=1):
+                chunks.append(
+                    ChunkItem(
+                        chunk_id=(
+                            f"{source_file}::dieu_{article_slug}_"
+                            f"khoan_{clause_slug}_part_{part_index}"
+                        ),
+                        domain=domain,
+                        source_file=source_file,
+                        text=f"{heading}\n{part}".strip(),
+                        chunk_index=-1,
+                        chunk_type="clause_part",
+                        article_id=article.article_id,
+                        article_title=article.article_title,
+                        clause_id=clause_id,
+                    )
+                )
+
+    return chunks
+
+
 def iter_processed_files(processed_dir: Path, domains: set[str] | None) -> list[Path]:
     files: list[Path] = []
     for path in processed_dir.rglob("*.txt"):
@@ -180,19 +353,28 @@ def collect_chunks(
     files = iter_processed_files(processed_dir=processed_dir, domains=domains)
     for file_path in files:
         text = file_path.read_text(encoding="utf-8", errors="ignore")
-        chunks = split_text_into_chunks(text=text, chunk_size=chunk_size, overlap=overlap)
         relative = file_path.relative_to(processed_dir)
         domain = relative.parts[0] if relative.parts else "Unknown"
         source_file = str(relative).replace("\\", "/")
-        for idx, chunk_text in enumerate(chunks):
-            chunk_id = f"{source_file}::chunk_{idx}"
+        chunks = build_legal_chunks_for_file(
+            text=text,
+            source_file=source_file,
+            domain=domain,
+            chunk_size=chunk_size,
+        )
+        for idx, chunk in enumerate(chunks):
+            chunk.chunk_index = idx
             items.append(
                 ChunkItem(
-                    chunk_id=chunk_id,
-                    domain=domain,
-                    source_file=source_file,
-                    text=chunk_text,
+                    chunk_id=chunk.chunk_id,
+                    domain=chunk.domain,
+                    source_file=chunk.source_file,
+                    text=chunk.text,
                     chunk_index=idx,
+                    chunk_type=chunk.chunk_type,
+                    article_id=chunk.article_id,
+                    article_title=chunk.article_title,
+                    clause_id=chunk.clause_id,
                 )
             )
     return items
@@ -272,6 +454,10 @@ def write_metadata_jsonl(items: list[ChunkItem], output_path: Path) -> None:
                 "domain": item.domain,
                 "source_file": item.source_file,
                 "chunk_index": item.chunk_index,
+                "chunk_type": item.chunk_type,
+                "article_id": item.article_id,
+                "article_title": item.article_title,
+                "clause_id": item.clause_id,
                 "text": item.text,
             }
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -292,6 +478,7 @@ def write_manifest(
         "embedding_model": model_name,
         "chunk_size": chunk_size,
         "chunk_overlap": overlap,
+        "chunk_strategy": "legal_article_clause_v1",
         "domains": sorted(domains),
         "index_backend": index_backend,
         "faiss_index_path": str(FAISS_INDEX_PATH),

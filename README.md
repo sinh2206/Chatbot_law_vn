@@ -1,298 +1,84 @@
-# Chatbot Law VN - Legal RAG
+# Chatbot Law VN
 
-Du an xay chatbot hoi dap phap luat Viet Nam bang RAG local:
+Chatbot Law VN là hệ thống hỏi đáp pháp luật Việt Nam theo kiến trúc RAG local-first. Người dùng tải mã nguồn từ GitHub về máy, build Docker, chạy backend/web, sau đó hỏi đáp trên giao diện chat đơn giản. Hệ thống luôn ưu tiên căn cứ trong kho văn bản nội bộ; Gemini chỉ được dùng như fallback runtime khi kho nội bộ thiếu hoặc không đủ căn cứ.
 
-- Van ban phap luat nam trong `data/processed/`.
-- Bo Q/A fine-tune nam trong `data/train/` va `data/test/`.
-- Model embedding goc: `dangvantuan/vietnamese-embedding`.
-- Model fine-tuned local: `data/models/vietnamese-embedding-legal`.
-- Vector store nam trong `data/vector_store/`.
-- Gemini chi la fallback, chi goi khi local RAG khong co can cu hop le.
-- Lich su chat va cache Gemini nam trong `data/chat_history.sqlite3`.
-- Frontend tinh nam trong `frontend/`.
+## 📖 Giới Thiệu
 
-## Chay web nhanh
+Dự án phục vụ việc tra cứu, hỏi đáp và thử nghiệm chatbot pháp luật Việt Nam trên 5 nhóm dữ liệu chính:
 
-Dung luong nay khi da co:
+- `CCCD`: căn cước, căn cước công dân.
+- `DatDai`: đất đai, cấp giấy chứng nhận, quyền sử dụng đất.
+- `DoanhNghiep`: thành lập, quản trị và đăng ký doanh nghiệp.
+- `HoTich`: khai sinh, cải chính hộ tịch, cập nhật thông tin hộ tịch.
+- `Thue`: mã số thuế, đăng ký thuế, cập nhật thông tin thuế.
 
-- `data/models/vietnamese-embedding-legal/`
-- `data/vector_store/manifest.json`
-- `data/vector_store/faiss.index` hoac `data/vector_store/embeddings.npy`
+Nguồn văn bản đã xử lý nằm trong `data/processed/`. Vector store hiện dùng chiến lược chunk theo cấu trúc pháp lý `legal_article_clause_v1`, gồm 6.277 chunk, embedding model `data/models/vietnamese-embedding-legal`, backend index FAISS.
 
-Chuan bi `.env`:
+## ✨ Tính Năng Kỹ Thuật Nổi Bật
 
-```bash
-cp .env.example .env
-```
+- Local RAG ưu tiên tuyệt đối: truy xuất `data/vector_store/` trước khi dùng API ngoài.
+- Fine-tuned Vietnamese legal embedding: model local tại `data/models/vietnamese-embedding-legal`.
+- Chunk pháp lý theo Điều/Khoản: metadata có `article_id`, `clause_id`, `source_file`, giúp câu trả lời nêu căn cứ rõ hơn.
+- Gemini runtime fallback: chỉ bổ sung khi local không có căn cứ hoặc thiếu một văn bản cụ thể.
+- API supplement tiết kiệm token: văn bản đã có trong kho nội bộ không bị gửi đi tìm lại qua Gemini.
+- SQLite persistence: lưu lịch sử chat, cache fallback/API supplement và danh sách nhận báo cáo.
+- Web UI kiểu ChatGPT đơn giản trong `frontend/`.
+- OCR/convert tài liệu: chuyển `.doc/.docx/.txt` và hỗ trợ OCR để tạo `data/processed/`.
+- Scheduler báo cáo email: tạo Markdown, render PDF và gửi email hằng ngày theo danh mục theo dõi.
+- Docker-first: có service CPU, backend web và profile GPU để fine-tune.
 
-Neu chi muon hoi dap bang kho noi bo, giu Gemini tat:
-
-```env
-GEMINI_API_KEY=
-GEMINI_FALLBACK_ENABLED=false
-EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
-MIN_RETRIEVAL_SCORE=0.45
-CHAT_DB_PATH=data/chat_history.sqlite3
-```
-
-Neu muon cho web goi Gemini khi local RAG khong co can cu du tin cay:
-
-```env
-GEMINI_API_KEY=your_real_gemini_key
-GEMINI_FALLBACK_ENABLED=true
-GEMINI_MODEL=gemini-2.5-flash
-EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
-MIN_RETRIEVAL_SCORE=0.45
-CHAT_DB_PATH=data/chat_history.sqlite3
-```
-
-Build va chay web:
-
-```bash
-docker compose build backend
-docker compose up -d backend
-```
-
-Service `backend` co `restart: unless-stopped`, nen se tu khoi dong lai neu container dung ngoai y muon.
-
-Mo trinh duyet:
+## 🏗️ Kiến Trúc Hệ Thống
 
 ```text
-http://localhost:8000
+GitHub repo
+  |
+  |-- Multi-Agent/                 # Văn bản gốc theo lĩnh vực
+  |-- data/processed/              # Văn bản .txt đã xử lý
+  |-- data/train/, data/test/      # Bộ câu hỏi/câu trả lời mẫu
+  |-- data/finetune/               # JSONL train/test + báo cáo đánh giá
+  |-- data/models/                 # Model embedding fine-tuned local
+  |-- data/vector_store/           # FAISS index + metadata + manifest
+  |-- data/chat_history.sqlite3    # Lịch sử chat/cache/subscriber email
+  |-- scripts/                     # Convert, train, evaluate, query CLI
+  |-- backend/app.py               # FastAPI, RAG API, scheduler email
+  |-- frontend/                    # Giao diện chat web
+  |-- Dockerfile
+  |-- docker-compose.yml
 ```
 
-Neu chay tren server va cho may khac truy cap, mo:
+Luồng hỏi đáp:
 
 ```text
-http://<IP_SERVER>:8000
+Người dùng -> Frontend -> FastAPI /chat
+  -> Embed câu hỏi
+  -> Search FAISS local
+  -> Lọc score/hết hiệu lực/metadata
+  -> Sinh câu trả lời + căn cứ pháp lý
+  -> Nếu thiếu căn cứ: gọi Gemini fallback/supplement
+  -> Lưu lịch sử và cache vào SQLite
 ```
 
-Kiem tra backend:
-
-```bash
-curl http://localhost:8000/health
-```
-
-Test chat API:
-
-```bash
-curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message":"Công dân cần cấp đổi thẻ căn cước khi nào?","domain":"CCCD","top_k":5,"gemini_fallback":true}'
-```
-
-Dung hoac restart web:
-
-```bash
-docker compose down
-docker compose restart backend
-```
-
-## 1. Thu muc chinh
+Luồng huấn luyện và cập nhật dữ liệu:
 
 ```text
-Multi-Agent/          # Tai lieu goc .doc/.docx/.txt theo linh vuc
-data/processed/       # Tai lieu .txt da xu ly, dung de build vector store
-data/train/           # questions.txt + reference_answers.txt
-data/test/            # questons.txt + reference_answers.txt
-data/finetune/        # JSONL sinh tu train/test
-data/models/          # Model fine-tuned local, khong commit Git
-data/vector_store/    # faiss.index/embeddings.npy + metadata + manifest
-data/chat_history.sqlite3 # Lich su chat va cache cau tra loi Gemini
-metadata/             # Metadata hieu luc van ban
-scripts/              # Script convert, train, evaluate, query
-backend/              # FastAPI backend cho frontend va API /chat
-frontend/             # Giao dien chat don gian
+Multi-Agent/ hoặc tài liệu mới
+  -> scripts/convert_docs_to_txt.py hoặc scripts/OCR.py
+  -> data/processed/
+  -> scripts/build_vector_store.py
+  -> data/vector_store/
+  -> /reload backend
 ```
 
-## 2. Chuan bi moi truong
+## 🧪 Đánh Giá Chất Lượng Kết Quả
 
-Yeu cau:
+Kết quả retrieval hiện tại trên `data/finetune/test_pairs.jsonl`:
 
-- Linux server.
-- Docker Engine.
-- Docker Compose plugin: `docker compose`.
-- Internet lan dau de tai Python packages va model Hugging Face.
-- Neu fine-tune GPU: NVIDIA driver va NVIDIA Container Toolkit.
+| Model | Recall@1 | Recall@3 | Recall@5 | Recall@10 | MRR@10 | NDCG@10 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `dangvantuan/vietnamese-embedding` | 0.460 | 0.636 | 0.676 | 0.744 | 0.5599 | 0.6047 |
+| `data/models/vietnamese-embedding-legal` | 0.724 | 0.896 | 0.924 | 0.944 | 0.8103 | 0.8437 |
 
-Kiem tra GPU:
-
-```bash
-nvidia-smi
-docker run --rm --gpus all nvidia/cuda:12.1.0-base-ubuntu22.04 nvidia-smi
-```
-
-Build Docker image:
-
-```bash
-docker compose build app backend
-docker compose --profile gpu build gpu
-```
-
-Neu vua sua `requirements.txt` hoac gap loi version `torch/transformers`, build lai khong dung cache:
-
-```bash
-docker compose build --no-cache app backend
-docker compose --profile gpu build --no-cache gpu
-```
-
-Kiem tra Python packages:
-
-```bash
-docker compose run --rm app python --version
-docker compose run --rm app python -c "import sentence_transformers, numpy; print('ok')"
-docker compose --profile gpu run --rm gpu python -c "import torch, transformers, sentence_transformers; print(torch.__version__, transformers.__version__, sentence_transformers.__version__)"
-```
-
-## 3. Cau hinh `.env`
-
-Tao file `.env`:
-
-```bash
-cp .env.example .env
-```
-
-Neu muon danh gia/fine-tune khach quan, tat Gemini:
-
-```env
-GEMINI_API_KEY=
-GEMINI_MODEL=gemini-2.5-flash
-GEMINI_FALLBACK_ENABLED=false
-MIN_RETRIEVAL_SCORE=0.45
-EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
-```
-
-Neu muon chatbot goi Gemini fallback khi local RAG khong tra loi duoc:
-
-```env
-GEMINI_API_KEY=your_real_gemini_key
-GEMINI_MODEL=gemini-2.5-flash
-GEMINI_FALLBACK_ENABLED=true
-MIN_RETRIEVAL_SCORE=0.45
-EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
-```
-
-Kiem tra Docker da nhan bien:
-
-```bash
-docker compose config | grep -E "GEMINI_API_KEY|GOOGLE_API_KEY|GEMINI_FALLBACK_ENABLED|EMBEDDING_MODEL_NAME|MIN_RETRIEVAL_SCORE"
-```
-
-## 4. Chuan bi tai lieu phap luat
-
-Neu `data/processed/` da co file `.txt`, co the bo qua buoc nay.
-
-Convert tai lieu trong `Multi-Agent/`:
-
-```bash
-docker compose run --rm app python scripts/convert_docs_to_txt.py --clean-output
-```
-
-Convert rieng mot linh vuc:
-
-```bash
-docker compose run --rm app python scripts/convert_docs_to_txt.py --domain Thue --overwrite
-```
-
-OCR anh/PDF scan neu co:
-
-```bash
-docker compose run --rm app python scripts/convert_images_to_txt_ocr.py \
-  --overwrite \
-  --lang vie+eng \
-  --preprocess adaptive \
-  --pdf-dpi 220
-```
-
-Script OCR doc cac file `.png`, `.jpg`, `.jpeg`, `.tif`, `.tiff`, `.bmp`, `.webp`, `.pdf`
-trong `Multi-Agent/` va ghi `.txt` tuong ung vao `data/processed/`.
-Sau khi OCR them tai lieu moi, build lai vector store va reload backend:
-
-```bash
-docker compose run --rm app python scripts/build_vector_store.py \
-  --embedding-model data/models/vietnamese-embedding-legal \
-  --batch-size 64
-
-curl -X POST http://localhost:8000/reload
-```
-
-Kiem tra output:
-
-```bash
-find data/processed -maxdepth 2 -type f -name "*.txt" | sort
-```
-
-## 5. Tao lai fine-tune JSONL
-
-Bo hien tai dung:
-
-```text
-data/train/questions.txt
-data/train/reference_answers.txt
-data/test/questons.txt
-data/test/reference_answers.txt
-```
-
-Kiem tra so dong:
-
-```bash
-wc -l data/train/questions.txt \
-      data/train/reference_answers.txt \
-      data/test/questons.txt \
-      data/test/reference_answers.txt
-```
-
-Ky vong:
-
-```text
-1000 data/train/questions.txt
-1000 data/train/reference_answers.txt
- 250 data/test/questons.txt
- 250 data/test/reference_answers.txt
-```
-
-Tao JSONL, dung toan bo 1000 cau train va khong tach validation:
-
-```bash
-docker compose run --rm app python scripts/prepare_qa_finetune_data.py \
-  --valid-ratio 0 \
-  --seed 20260603
-```
-
-Kiem tra:
-
-```bash
-wc -l data/finetune/train_pairs.jsonl \
-      data/finetune/valid_pairs.jsonl \
-      data/finetune/test_pairs.jsonl
-cat data/finetune/summary.json
-```
-
-## 6. Validate data
-
-```bash
-docker compose run --rm app python scripts/validate_finetune_data.py \
-  --model-name dangvantuan/vietnamese-embedding \
-  --max-seq-length 256 \
-  --output-json data/finetune/validation_report.json
-```
-
-Xem bao cao:
-
-```bash
-cat data/finetune/validation_report.json
-```
-
-Can de y:
-
-- Duplicate nen thap.
-- Cau hoi/cau tra loi khong rong.
-- Ty le truncate thap.
-- Train/test khong bi leak qua nhau.
-
-## 7. Danh gia baseline
-
-Chay model goc truoc khi fine-tune:
+Lệnh đánh giá baseline:
 
 ```bash
 docker compose run --rm app python scripts/evaluate_retrieval.py \
@@ -303,32 +89,231 @@ docker compose run --rm app python scripts/evaluate_retrieval.py \
   --output-json data/finetune/retrieval_eval_baseline.json
 ```
 
-Xem diem:
+Lệnh đánh giá model fine-tuned:
 
 ```bash
-cat data/finetune/retrieval_eval_baseline.json
+docker compose run --rm app python scripts/evaluate_retrieval.py \
+  --model-name data/models/vietnamese-embedding-legal \
+  --test-file data/finetune/test_pairs.jsonl \
+  --train-file data/finetune/train_pairs.jsonl \
+  --valid-file data/finetune/valid_pairs.jsonl \
+  --output-json data/finetune/retrieval_eval_finetuned.json
 ```
 
-Chi so chinh:
-
-- `recall_at_1`
-- `recall_at_5`
-- `recall_at_10`
-- `mrr_at_10`
-- `ndcg_at_10`
-
-## 8. Fine-tune model embedding
-
-Xoa model cu neu muon train lai tu dau:
+Khi đánh giá chất lượng local RAG, nên tắt Gemini để kết quả khách quan:
 
 ```bash
-rm -rf data/models/vietnamese-embedding-legal
+docker compose run --rm app python scripts/query_cli.py \
+  --query "Công dân cần đổi thẻ căn cước khi nào?" \
+  --domain CCCD \
+  --top-k 5 \
+  --no-gemini-fallback
 ```
 
-Kiem tra GPU co bi chiem VRAM khong:
+## 🛠️ Tech Stack
+
+- Python 3.10
+- FastAPI + Uvicorn
+- Sentence Transformers
+- Transformers, Datasets, Accelerate
+- PyTorch CPU/GPU
+- FAISS
+- NumPy
+- SQLite
+- Google Gemini API qua `google-genai`
+- PyMuPDF để render PDF
+- Tesseract OCR, PyMuPDF, OpenCV, Pillow
+- HTML/CSS/JavaScript frontend tĩnh
+- Docker, Docker Compose
+
+## 🚀 Hướng Dẫn Cài Đặt & Triển Khai
+
+### 1. Clone mã nguồn
+
+```bash
+git clone <URL_GITHUB_CUA_DU_AN>
+cd Chatbot_law_vn
+```
+
+### 2. Yêu cầu máy chạy
+
+- Linux/macOS/Windows có Docker.
+- Docker Compose plugin: `docker compose`.
+- Internet lần đầu để tải image, Python packages và model Hugging Face nếu chưa có cache.
+- Nếu fine-tune bằng GPU: NVIDIA driver + NVIDIA Container Toolkit.
+
+Kiểm tra Docker:
+
+```bash
+docker --version
+docker compose version
+```
+
+Kiểm tra GPU nếu có:
 
 ```bash
 nvidia-smi
+docker run --rm --gpus all nvidia/cuda:12.1.0-base-ubuntu22.04 nvidia-smi
+```
+
+### 3. Tạo file cấu hình môi trường
+
+```bash
+cp .env.example .env
+```
+
+Chạy local-only, không dùng Gemini:
+
+```env
+GEMINI_API_KEY=
+GEMINI_FALLBACK_ENABLED=false
+EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
+MIN_RETRIEVAL_SCORE=0.45
+CHAT_DB_PATH=data/chat_history.sqlite3
+```
+
+Bật Gemini fallback runtime:
+
+```env
+GEMINI_API_KEY=your_real_gemini_key
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_FALLBACK_ENABLED=true
+EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
+MIN_RETRIEVAL_SCORE=0.45
+CHAT_DB_PATH=data/chat_history.sqlite3
+```
+
+### 4. Build Docker image
+
+```bash
+docker compose build app backend
+```
+
+Build image GPU để fine-tune:
+
+```bash
+docker compose --profile gpu build gpu
+```
+
+Nếu vừa sửa dependencies hoặc gặp lỗi version:
+
+```bash
+docker compose build --no-cache app backend
+docker compose --profile gpu build --no-cache gpu
+```
+
+### 5. Chạy web nhanh
+
+Điều kiện tốt nhất là repo đã có sẵn:
+
+- `data/models/vietnamese-embedding-legal/`
+- `data/vector_store/manifest.json`
+- `data/vector_store/faiss.index`
+- `data/vector_store/metadata.jsonl`
+
+Chạy backend + frontend:
+
+```bash
+docker compose up -d backend
+```
+
+Mở trình duyệt:
+
+```text
+http://localhost:8000
+```
+
+Kiểm tra API:
+
+```bash
+curl http://localhost:8000/health
+```
+
+Gửi câu hỏi thử:
+
+```bash
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Công dân cần đổi thẻ căn cước khi nào?",
+    "domain": "CCCD",
+    "top_k": 5,
+    "gemini_fallback": false
+  }'
+```
+
+Restart hoặc dừng:
+
+```bash
+docker compose restart backend
+docker compose down
+```
+
+### 6. Chuyển văn bản gốc sang `data/processed`
+
+Nếu repo đã có `data/processed/`, có thể bỏ qua bước này.
+
+Chuyển toàn bộ tài liệu:
+
+```bash
+docker compose run --rm app python scripts/convert_docs_to_txt.py --clean-output
+```
+
+Chuyển riêng một lĩnh vực:
+
+```bash
+docker compose run --rm app python scripts/convert_docs_to_txt.py --domain Thue --overwrite
+```
+
+OCR tài liệu scan/ảnh/PDF:
+
+```bash
+docker compose run --rm app python scripts/OCR.py
+```
+
+Kiểm tra kết quả:
+
+```bash
+find data/processed -maxdepth 2 -type f -name "*.txt" | sort
+```
+
+### 7. Build lại vector store
+
+```bash
+docker compose run --rm app python scripts/build_vector_store.py \
+  --embedding-model data/models/vietnamese-embedding-legal \
+  --batch-size 64
+```
+
+Kiểm tra manifest:
+
+```bash
+cat data/vector_store/manifest.json
+```
+
+Sau khi backend đang chạy, reload index:
+
+```bash
+curl -X POST http://localhost:8000/reload
+```
+
+### 8. Fine-tune lại embedding model
+
+Chuẩn bị JSONL từ `data/train/` và `data/test/`:
+
+```bash
+docker compose run --rm app python scripts/prepare_qa_finetune_data.py \
+  --valid-ratio 0 \
+  --seed 20260603
+```
+
+Validate dữ liệu:
+
+```bash
+docker compose run --rm app python scripts/validate_finetune_data.py \
+  --model-name dangvantuan/vietnamese-embedding \
+  --max-seq-length 256 \
+  --output-json data/finetune/validation_report.json
 ```
 
 Train GPU:
@@ -347,7 +332,7 @@ docker compose --profile gpu run --rm gpu python scripts/train_embedding.py \
   --use-amp
 ```
 
-Neu CUDA OOM:
+Nếu CUDA out of memory:
 
 ```bash
 docker compose --profile gpu run --rm gpu python scripts/train_embedding.py \
@@ -363,58 +348,7 @@ docker compose --profile gpu run --rm gpu python scripts/train_embedding.py \
   --use-amp
 ```
 
-Train CPU chi dung de smoke test vi rat cham:
-
-```bash
-docker compose run --rm app python scripts/train_embedding.py \
-  --model-name dangvantuan/vietnamese-embedding \
-  --train-file data/finetune/train_pairs.jsonl \
-  --valid-file data/finetune/valid_pairs.jsonl \
-  --output-dir data/models/vietnamese-embedding-legal \
-  --epochs 1 \
-  --batch-size 4 \
-  --lr 2e-5 \
-  --warmup-ratio 0.1 \
-  --max-seq-length 128
-```
-
-Kiem tra model da luu:
-
-```bash
-ls data/models/vietnamese-embedding-legal/modules.json \
-   data/models/vietnamese-embedding-legal/config_sentence_transformers.json
-```
-
-## 9. Danh gia model fine-tuned
-
-```bash
-docker compose run --rm app python scripts/evaluate_retrieval.py \
-  --model-name data/models/vietnamese-embedding-legal \
-  --test-file data/finetune/test_pairs.jsonl \
-  --train-file data/finetune/train_pairs.jsonl \
-  --valid-file data/finetune/valid_pairs.jsonl \
-  --output-json data/finetune/retrieval_eval_finetuned.json
-```
-
-So sanh baseline va fine-tuned:
-
-```bash
-docker compose run --rm -T app python - <<'PY'
-import json
-from pathlib import Path
-
-for name in ["baseline", "finetuned"]:
-    path = Path(f"data/finetune/retrieval_eval_{name}.json")
-    data = json.loads(path.read_text(encoding="utf-8"))
-    print(name)
-    for key in ["recall_at_1", "recall_at_3", "recall_at_5", "recall_at_10", "mrr_at_10", "ndcg_at_10"]:
-        print(f"  {key}: {data.get(key)}")
-PY
-```
-
-## 10. Build vector store
-
-Sau khi fine-tune, build lai vector store bang model moi:
+Sau khi train xong, build lại vector store:
 
 ```bash
 docker compose run --rm app python scripts/build_vector_store.py \
@@ -422,136 +356,48 @@ docker compose run --rm app python scripts/build_vector_store.py \
   --batch-size 64
 ```
 
-Kiem tra:
+### 9. Query bằng CLI
 
-```bash
-cat data/vector_store/manifest.json
-```
-
-Can thay:
-
-```text
-"embedding_model": "data/models/vietnamese-embedding-legal"
-"total_chunks": > 0
-```
-
-## 11. Query CLI local va Gemini fallback
-
-Local RAG khong goi Gemini:
+Local-only:
 
 ```bash
 docker compose run --rm app python scripts/query_cli.py \
-  --query "Cong dan can cap doi the can cuoc khi nao?" \
+  --query "Công dân cần cấp đổi thẻ căn cước khi nào?" \
   --domain CCCD \
   --top-k 5 \
   --no-gemini-fallback
 ```
 
-Bat fallback Gemini:
+Bật fallback Gemini:
 
 ```bash
 docker compose run --rm app python scripts/query_cli.py \
-  --query "Tu van chien luoc marketing cho quan ca phe" \
-  --domain CCCD \
+  --query "Tư vấn một vấn đề pháp luật mới chưa có trong kho nội bộ" \
   --top-k 5 \
-  --min-score 0.99 \
   --gemini-fallback
 ```
 
-Nguyen tac:
+### 10. API backend
 
-- Neu local co chunk hop le voi score >= `MIN_RETRIEVAL_SCORE`: in `[LOCAL RAG]` va khong goi Gemini.
-- Neu khong co chunk, sai domain, score thap, hoac chunk bi het hieu luc: in `[FALLBACK REQUIRED]`.
-- Gemini chi goi sau do neu `--gemini-fallback` hoac `GEMINI_FALLBACK_ENABLED=true`.
-
-Smoke test 5 linh vuc:
-
-```bash
-docker compose run --rm app python scripts/query_cli.py --query "Dang ky khai sinh can giay to gi?" --domain HoTich --top-k 5 --gemini-fallback
-docker compose run --rm app python scripts/query_cli.py --query "Ma so doanh nghiep co dong thoi la ma so thue khong?" --domain Thue --top-k 5 --gemini-fallback
-docker compose run --rm app python scripts/query_cli.py --query "Tach thua dat can dieu kien gi?" --domain DatDai --top-k 5 --gemini-fallback
-docker compose run --rm app python scripts/query_cli.py --query "Co dong sang lap la ai?" --domain DoanhNghiep --top-k 5 --gemini-fallback
-docker compose run --rm app python scripts/query_cli.py --query "The can cuoc chua thong tin gi?" --domain CCCD --top-k 5 --gemini-fallback
-```
-
-## 12. Cap nhat tai lieu moi
-
-Them hoac sua tai lieu trong `Multi-Agent/`, sau do chay:
-
-```bash
-docker compose run --rm app python scripts/convert_docs_to_txt.py --clean-output
-docker compose run --rm app python scripts/build_vector_store.py \
-  --embedding-model data/models/vietnamese-embedding-legal \
-  --batch-size 64
-```
-
-Chi cap nhat mot domain:
-
-```bash
-docker compose run --rm app python scripts/convert_docs_to_txt.py --domain Thue --overwrite
-docker compose run --rm app python scripts/update_vector_store.py \
-  --domain Thue \
-  --scope domain \
-  --overwrite \
-  --embedding-model data/models/vietnamese-embedding-legal
-```
-
-## 13. Backend API
-
-Backend API nam trong `backend/app.py`, dung FastAPI va tai su dung logic retrieval trong `scripts/query_cli.py`.
-
-Chay backend:
-
-```bash
-docker compose up --build backend
-```
-
-Hoac chay nen:
-
-```bash
-docker compose up -d backend
-```
-
-Kiem tra health:
-
-```bash
-curl http://localhost:8000/health
-```
-
-Goi chat API:
-
-```bash
-curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{
-    "message": "Cong dan can cap doi the can cuoc khi nao?",
-    "domain": "CCCD",
-    "top_k": 5,
-    "gemini_fallback": true
-  }'
-```
-
-Reload model/index sau khi build lai vector store:
-
-```bash
-curl -X POST http://localhost:8000/reload
-```
-
-Endpoint:
+Endpoint chính:
 
 ```text
 GET  /health
 GET  /history
 POST /chat
 POST /reload
-GET  /              # serve frontend/
+GET  /reports/subscribers
+POST /reports/subscribers
+GET  /reports/preview
+POST /reports/send
+GET  /  # frontend
 ```
 
 Payload `/chat`:
 
 ```json
 {
-  "message": "Cau hoi cua nguoi dung",
+  "message": "Câu hỏi của người dùng",
   "domain": "CCCD",
   "top_k": 5,
   "min_score": 0.45,
@@ -559,90 +405,72 @@ Payload `/chat`:
 }
 ```
 
-Nguyen tac fallback:
+Nguyên tắc Gemini:
 
-- Backend luon search local vector store truoc.
-- Neu local co can cu hop le, response co `mode="local_rag"` va `gemini_used=false`.
-- Neu local khong tim thay tai lieu du tin cay va `gemini_fallback=true`, backend moi goi Gemini.
-- Gemini mac dinh dung model `gemini-2.5-flash` qua `google-genai`.
-- Neu mot cau hoi fallback da co trong `data/chat_history.sqlite3`, backend tra lai ban luu va khong goi Gemini them lan nua.
-- Truoc khi tra loi fallback, response luon mo dau bang mot trong hai dong:
-  - `không tìm thấy tài liệu làm căn cứ cho câu hỏi trong kho nội bộ`
-  - `tài liệu <ten/so hieu/file> hết hạn, cần cập nhật`
-- Sau dong canh bao, Gemini moi tim cau tra loi bang Google Search grounding.
-- Response fallback co `mode="gemini_fallback"`, `gemini_used=true`, va `sources` chua cac tai lieu/trang tham khao neu Gemini tra ve grounding.
-- Cau tra loi local chi hien can cu phap ly noi bo, khong tu chen link ngoai vao phan can cu.
-- Neu Gemini tat hoac thieu key, response co `mode="fallback_required"` hoac `mode="gemini_error"`.
-- Tat ca cau hoi/cau tra loi duoc luu vao bang SQLite `chat_messages`.
-- Xem lich su gan nhat:
+- Backend luôn search local vector store trước.
+- Nếu local có căn cứ hợp lệ, response là `mode="local_rag"` và `gemini_used=false`.
+- Nếu local thiếu một văn bản cụ thể, response có thể là `mode="local_rag_with_api_supplement"`.
+- Nếu local không có căn cứ và bật fallback, response là `mode="gemini_fallback"`.
+- Lịch sử và cache được lưu ở `data/chat_history.sqlite3`.
+
+### 11. Báo cáo email tự động
+
+Cấu hình `.env`:
+
+```env
+REPORT_SCHEDULER_ENABLED=true
+REPORT_DAILY_TIME=07:00
+REPORT_TIMEZONE=Asia/Ho_Chi_Minh
+REPORTS_DIR=data/reports
+REPORT_WATCHLIST_TOPICS=cập nhật thông tin căn cước,cải chính hộ tịch,đăng ký doanh nghiệp,cấp giấy chứng nhận quyền sử dụng đất,thay đổi thông tin đăng ký thuế
+
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USERNAME=your_smtp_username
+SMTP_PASSWORD=your_smtp_password
+SMTP_FROM_EMAIL=chatbot-law-vn@example.com
+SMTP_USE_TLS=true
+```
+
+Thêm người nhận:
 
 ```bash
-curl "http://localhost:8000/history?limit=20"
+curl -X POST http://localhost:8000/reports/subscribers \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","name":"User","active":true}'
 ```
 
-## 14. Frontend
-
-Frontend nam trong `frontend/`. Day la giao dien chat tinh, kieu ChatGPT don gian.
-Giao dien chi hien phan hoi dap va chon linh vuc; khong hien cac tuy chon ky thuat nhu Endpoint, Top K hay Gemini fallback.
-
-Chay cung backend:
+Xem danh sách nhận email:
 
 ```bash
-docker compose up backend
+curl http://localhost:8000/reports/subscribers
 ```
 
-Mo:
-
-```text
-http://localhost:8000
-```
-
-Hoac serve rieng frontend bang Python:
+Xem trước báo cáo Markdown/PDF:
 
 ```bash
-cd frontend
-python3 -m http.server 8088
+curl http://localhost:8000/reports/preview
 ```
 
-Mo:
+Gửi thử thủ công:
 
-```text
-http://localhost:8088
+```bash
+curl -X POST http://localhost:8000/reports/send \
+  -H "Content-Type: application/json" \
+  -d '{"force":true}'
 ```
 
-Khi chay chung qua backend, frontend mac dinh goi:
+Khi bật scheduler, backend sẽ tự gửi báo cáo lúc `REPORT_DAILY_TIME` mỗi ngày.
 
-```text
-/chat
-```
+## 🔮 Roadmap
 
-Neu serve rieng frontend bang `python3 -m http.server`, can chinh hang `chatEndpoint` trong `frontend/app.js` thanh `http://localhost:8000/chat` hoac serve frontend truc tiep bang backend de tranh loi CORS/duong dan.
-
-Payload frontend gui:
-
-```json
-{
-  "message": "Cau hoi cua nguoi dung",
-  "domain": "CCCD",
-  "top_k": 5,
-  "gemini_fallback": true
-}
-```
-
-## 15. Bao cao can xem
-
-```text
-data/finetune/summary.json
-data/finetune/validation_report.json
-data/finetune/retrieval_eval_baseline.json
-data/finetune/retrieval_eval_finetuned.json
-data/models/vietnamese-embedding-legal/train_summary.json
-data/vector_store/manifest.json
-```
-
-## 16. Ghi chu ve tinh khach quan
-
-- Fine-tune embedding: nen tat API.
-- Evaluate retrieval: nen tat API.
-- Query/demo san pham: co the bat Gemini fallback.
-- Khi bat fallback, local RAG van duoc thu truoc. Gemini chi duoc goi khi local khong co can cu hop le.
+- Bổ sung giao diện quản lý người nhận báo cáo email ngay trên frontend.
+- Thêm trang dashboard hiển thị chất lượng retrieval theo từng lĩnh vực.
+- Tự động phát hiện văn bản hết hiệu lực và gợi ý văn bản thay thế.
+- Bổ sung nhiều lĩnh vực pháp luật hơn như ngân hàng, bảo hiểm, lao động, dân sự.
+- Cải thiện OCR cho tài liệu scan chất lượng thấp.
+- Thêm reranker để tăng độ chính xác top-1/top-3.
+- Thêm trích dẫn theo điều/khoản ổn định hơn cho câu hỏi đa văn bản.
+- Tách worker scheduler riêng nếu triển khai nhiều replica backend.
+- Thêm cơ chế phân quyền người dùng và quản trị viên.
+- Đóng gói model/vector store theo release artifact để người dùng GitHub tải về nhanh hơn.

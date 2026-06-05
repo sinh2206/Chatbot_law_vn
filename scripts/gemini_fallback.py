@@ -60,7 +60,7 @@ Linh vuc nguoi dung yeu cau: {domain_text}
 Yeu cau bat buoc:
 1. Tra loi bang tieng Viet, ngan gon, uu tien tiet kiem token.
 2. Dong dau tien phai la: Bổ sung tài liệu cần tra cứu qua API: <ten cac van ban con thieu>.
-3. Chi bo sung noi dung lien quan den van ban con thieu; khong lap lai cac can cu noi bo da co.
+3. Chi bo sung noi dung lien quan den van ban con thieu; khong lap lai hoac tra cuu lai cac can cu noi bo da co, ke ca khi nguoi dung nhac den cac van ban do trong cau hoi.
 4. Neu cau hoi co nhieu phan, chi tra loi phan ma cac van ban con thieu dieu chinh.
 5. Neu van ban con thieu da bi thay the/het hieu luc, noi ro van ban thay the neu tim duoc.
 6. Dua ra muc "Tai lieu/can cu tham khao" o cuoi cau tra loi, gom ten van ban/trang va duong dan neu co.

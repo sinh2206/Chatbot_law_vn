@@ -89,7 +89,8 @@ textarea {
 .new-chat-button,
 .chat-list-item,
 .send-button,
-.icon-button {
+.icon-button,
+.file-button {
   border: 1px solid transparent;
   cursor: pointer;
 }
@@ -218,7 +219,7 @@ input {
 
 .message {
   display: grid;
-  grid-template-columns: 36px minmax(0, 760px);
+  grid-template-columns: 36px 1100px;
   gap: 12px;
   width: 100%;
 }
@@ -321,7 +322,7 @@ input {
 
 .composer {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 48px;
+  grid-template-columns: minmax(0, 1fr) 54px 48px;
   gap: 10px;
   z-index: 2;
   padding: 16px 24px 22px;
@@ -336,6 +337,38 @@ input {
   resize: none;
   padding: 13px 14px;
   line-height: 1.45;
+}
+
+.file-button {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  border-radius: 8px;
+  background: var(--panel-subtle);
+  color: var(--text);
+  font-weight: 650;
+}
+
+.file-button:hover {
+  background: #e2e8f0;
+}
+
+.file-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.file-status {
+  grid-column: 1 / -1;
+  min-height: 16px;
+  color: var(--muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .send-button {

@@ -46,6 +46,7 @@
                 <option value="DoanhNghiep">Doanh nghiệp</option>
                 <option value="HoTich">Hộ tịch</option>
                 <option value="Thue">Thuế</option>
+                <option value="Uploaded">Tài liệu tải lên</option>
               </select>
             </label>
           </div>
@@ -62,11 +63,16 @@
 
         <form class="composer" id="chatForm">
           <textarea id="promptInput" rows="1" placeholder="Hỏi về CCCD, đất đai, thuế, hộ tịch..." autocomplete="off"></textarea>
+          <label class="file-button" title="Đính kèm PDF">
+            <input id="pdfInput" type="file" accept="application/pdf,.pdf" />
+            <span>PDF</span>
+          </label>
           <button class="send-button" type="submit" title="Send" aria-label="Send">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" />
             </svg>
           </button>
+          <div class="file-status" id="fileStatus" aria-live="polite"></div>
         </form>
       </main>
     </div>

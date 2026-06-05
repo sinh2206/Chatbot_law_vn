@@ -399,6 +399,32 @@ def recover_internal_decision(
     )
 
 
+def available_requested_source_files(
+    query: str,
+    metadata: list[dict[str, object]],
+) -> set[str]:
+    return {
+        document.source_file
+        for document in detect_requested_documents(query, metadata)
+        if document.available
+    }
+
+
+def metadata_to_retrieved_item(row: dict[str, object], score: float) -> RetrievedItem:
+    return RetrievedItem(
+        score=float(score),
+        domain=str(row.get("domain", "")),
+        source_file=str(row.get("source_file", "")),
+        chunk_id=str(row.get("chunk_id", "")),
+        chunk_index=int(row.get("chunk_index", -1)),
+        text=str(row.get("text", "")),
+        chunk_type=str(row.get("chunk_type", "")),
+        article_id=str(row.get("article_id", "")),
+        article_title=str(row.get("article_title", "")),
+        clause_id=str(row.get("clause_id", "")),
+    )
+
+
 def expand_query(query: str, domain: str | None) -> str:
     normalized = normalize_query_text(query)
     expansions: list[str] = []
@@ -752,20 +778,56 @@ def search(
         if domain and row_domain != domain:
             continue
 
-        results.append(
-            RetrievedItem(
-                score=float(score),
-                domain=row_domain,
-                source_file=str(row.get("source_file", "")),
-                chunk_id=str(row.get("chunk_id", "")),
-                chunk_index=int(row.get("chunk_index", -1)),
-                text=str(row.get("text", "")),
-                chunk_type=str(row.get("chunk_type", "")),
-                article_id=str(row.get("article_id", "")),
-                article_title=str(row.get("article_title", "")),
-                clause_id=str(row.get("clause_id", "")),
-            )
-        )
+        results.append(metadata_to_retrieved_item(row=row, score=float(score)))
+        if len(results) >= top_k:
+            break
+    return results
+
+
+def search_requested_local_documents(
+    backend: str,
+    index,
+    metadata: list[dict[str, object]],
+    embedder,
+    query: str,
+    top_k: int,
+) -> list[RetrievedItem]:
+    source_files = available_requested_source_files(query=query, metadata=metadata)
+    if not source_files:
+        return []
+
+    expanded_query = expand_query(query=query, domain=None)
+    query_vec = embedder.encode(
+        [expanded_query],
+        normalize_embeddings=True,
+        convert_to_numpy=True,
+    )
+    query_vec = np.asarray(query_vec, dtype=np.float32)
+    max_candidates = len(metadata)
+
+    if backend == "faiss":
+        scores, indices = index.search(query_vec, max_candidates)
+        score_list = scores[0]
+        index_list = indices[0]
+    else:
+        all_scores = np.dot(index, query_vec[0])
+        index_list = np.argsort(-all_scores)[:max_candidates]
+        score_list = all_scores[index_list]
+
+    results: list[RetrievedItem] = []
+    seen_chunks: set[str] = set()
+    for score, idx in zip(score_list, index_list):
+        if idx < 0 or idx >= len(metadata):
+            continue
+        row = metadata[idx]
+        source_file = normalize_source_file(str(row.get("source_file", "")))
+        if source_file not in source_files:
+            continue
+        chunk_id = str(row.get("chunk_id", ""))
+        if chunk_id in seen_chunks:
+            continue
+        seen_chunks.add(chunk_id)
+        results.append(metadata_to_retrieved_item(row=row, score=float(score)))
         if len(results) >= top_k:
             break
     return results
@@ -862,6 +924,37 @@ def run_query(
         metadata=metadata,
         min_score=min_score,
     )
+    if not decision.use_internal:
+        requested_local_results = search_requested_local_documents(
+            backend=backend,
+            index=index,
+            metadata=metadata,
+            embedder=embedder,
+            query=query,
+            top_k=top_k,
+        )
+        requested_local_results = attach_document_status(
+            requested_local_results,
+            document_statuses,
+        )
+        requested_local_decision = decide_retrieval(
+            results=requested_local_results,
+            metadata=metadata,
+            domain=domain,
+            min_score=min_score * 0.35,
+        )
+        if requested_local_decision.use_internal:
+            decision = RetrievalDecision(
+                use_internal=True,
+                reason=(
+                    "Tìm thấy căn cứ một phần trong kho nội bộ từ văn bản pháp luật "
+                    "được nhận diện theo nội dung câu hỏi."
+                ),
+                usable_results=requested_local_decision.usable_results,
+                expired_results=decision.expired_results
+                + requested_local_decision.expired_results,
+                low_confidence_results=requested_local_decision.low_confidence_results,
+            )
 
     if decision.use_internal:
         print("\n[LOCAL RAG] Su dung can cu tu data/processed.")

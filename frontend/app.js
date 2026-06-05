@@ -3,8 +3,11 @@ const formEl = document.querySelector("#chatForm");
 const promptEl = document.querySelector("#promptInput");
 const domainEl = document.querySelector("#domainSelect");
 const newChatButton = document.querySelector("#newChatButton");
+const pdfInputEl = document.querySelector("#pdfInput");
+const fileStatusEl = document.querySelector("#fileStatus");
 
 const chatEndpoint = "/chat";
+const chatWithPdfEndpoint = "/chat-with-pdf";
 
 function escapeHtml(value) {
   return value
@@ -33,32 +36,6 @@ function addMessage(role, text, sources = [], meta = {}) {
   const paragraph = document.createElement("p");
   paragraph.innerHTML = escapeHtml(text).replaceAll("\n", "<br>");
   bubble.appendChild(paragraph);
-
-  if (sources.length) {
-    const list = document.createElement("div");
-    list.className = "source-list";
-    for (const source of sources.slice(0, 5)) {
-      const chip = document.createElement("div");
-      chip.className = "source-chip";
-      const sourceText = [
-        source.citation || source.title || source.source || source.source_file || "source",
-      ]
-        .filter(Boolean)
-        .join(" | ");
-      if (source.url) {
-        const link = document.createElement("a");
-        link.href = source.url;
-        link.target = "_blank";
-        link.rel = "noreferrer";
-        link.textContent = sourceText;
-        chip.appendChild(link);
-      } else {
-        chip.textContent = sourceText;
-      }
-      list.appendChild(chip);
-    }
-    bubble.appendChild(list);
-  }
 
   article.appendChild(avatar);
   article.appendChild(bubble);
@@ -124,6 +101,27 @@ async function callChatApi(payload) {
   return normalizeResponse(await response.text());
 }
 
+async function callChatWithPdfApi({ question, domain, topK, geminiFallback, file }) {
+  const formData = new FormData();
+  formData.append("message", question);
+  formData.append("domain", domain || "");
+  formData.append("top_k", String(topK));
+  formData.append("gemini_fallback", String(geminiFallback));
+  formData.append("file", file);
+
+  const response = await fetch(chatWithPdfEndpoint, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`HTTP ${response.status}: ${detail}`);
+  }
+
+  return normalizeResponse(await response.json());
+}
+
 function resizePrompt() {
   promptEl.style.height = "auto";
   promptEl.style.height = `${Math.min(promptEl.scrollHeight, 180)}px`;
@@ -132,10 +130,17 @@ function resizePrompt() {
 newChatButton.addEventListener("click", () => {
   messagesEl.innerHTML = "";
   addMessage("assistant", "Chatbot Luật VN xin chào, rất vui được giúp đỡ bạn.");
+  pdfInputEl.value = "";
+  fileStatusEl.textContent = "";
   promptEl.focus();
 });
 
 promptEl.addEventListener("input", resizePrompt);
+
+pdfInputEl.addEventListener("change", () => {
+  const file = pdfInputEl.files?.[0];
+  fileStatusEl.textContent = file ? `Đã chọn PDF: ${file.name}` : "";
+});
 
 promptEl.addEventListener("keydown", (event) => {
   if (event.key === "Enter" && !event.shiftKey) {
@@ -166,7 +171,16 @@ formEl.addEventListener("submit", async (event) => {
 
   const pending = addMessage("assistant", "Đang xử lý...");
   try {
-    const result = await callChatApi(payload);
+    const pdfFile = pdfInputEl.files?.[0] || null;
+    const result = pdfFile
+      ? await callChatWithPdfApi({
+          question,
+          domain: domainEl.value,
+          topK: 5,
+          geminiFallback: true,
+          file: pdfFile,
+        })
+      : await callChatApi(payload);
     pending.remove();
     addMessage("assistant", result.answer, result.sources, {
       mode: result.mode,
@@ -174,6 +188,10 @@ formEl.addEventListener("submit", async (event) => {
       localUsed: result.localUsed,
       geminiUsed: result.geminiUsed,
     });
+    if (pdfFile) {
+      pdfInputEl.value = "";
+      fileStatusEl.textContent = "";
+    }
   } catch (error) {
     pending.remove();
     addMessage("assistant", buildErrorAnswer(question, error), [], { mode: "gemini_error" });

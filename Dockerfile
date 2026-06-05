@@ -7,7 +7,6 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     HF_HOME=/root/.cache/huggingface \
-    TRANSFORMERS_CACHE=/root/.cache/huggingface \
     SENTENCE_TRANSFORMERS_HOME=/root/.cache/huggingface/sentence-transformers
 
 WORKDIR /app

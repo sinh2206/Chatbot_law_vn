@@ -69,6 +69,28 @@ ARTICLE_START_RE = re.compile(
     r"(?m)^Điều\s+(\d+[a-zA-Z]?)\s*[\\.:]\s*(.*?)(?=\n|$)"
 )
 CLAUSE_START_RE = re.compile(r"(?m)^(\d+[a-zA-Z]?)\.\s+")
+PAGE_MARKER_RE = re.compile(r"(?im)^\s*-{0,3}\s*Trang\s+\d+\s*-{0,3}\s*$")
+STANDALONE_PAGE_NUMBER_RE = re.compile(r"(?m)^\s*\d{1,4}\.?\s*$")
+NUMBER_WITH_FOOTNOTE_RE = re.compile(r"(?m)^(\s*(?:Điều\s+)?\d+[a-zA-Z]?)\.\d{1,4}\s+")
+FOOTNOTE_LINE_RE = re.compile(
+    r"^\s*\d{1,4}\s+(?:Tên\s+Điều\s+này|Khoản\s+này|Điểm\s+này|Cụm\s+từ\s+"
+    r"|Nội\s+dung\s+|Điều\s+này)\b",
+    re.IGNORECASE,
+)
+EFFECTIVE_NOTE_RE = re.compile(
+    r"^\s*(?:[-–]\s*)?có\s+hiệu\s+lực\s+kể\s+từ\s+ngày\b",
+    re.IGNORECASE,
+)
+INLINE_FOOTNOTE_RE = re.compile(
+    r"\s+\d{1,4}\s+(?:Tên\s+Điều\s+này|Khoản\s+này|Điểm\s+này|Cụm\s+từ\s+"
+    r"|Nội\s+dung\s+|Điều\s+này)\b.*?(?=(?:\n|$|Điều\s+\d+[a-zA-Z]?\s*[\\.:]|"
+    r"\d+[a-zA-Z]?\.\s+|[a-zà-ỹđ]\)\s+))",
+    re.IGNORECASE | re.DOTALL,
+)
+LEGAL_PREAMBLE_HINT_RE = re.compile(
+    r"\b(QUỐC HỘI|CỘNG HÒA|LUẬT|NGHỊ ĐỊNH|THÔNG TƯ|QUYẾT ĐỊNH|Căn cứ|Chương|Mục)\b",
+    re.IGNORECASE,
+)
 
 
 def validate_local_model_dir(model_name: str) -> None:
@@ -99,6 +121,37 @@ def normalize_text(text: str) -> str:
     while "\n\n\n" in clean:
         clean = clean.replace("\n\n\n", "\n\n")
     return clean.strip()
+
+
+def clean_legal_text(text: str) -> str:
+    clean = normalize_text(text)
+    clean = PAGE_MARKER_RE.sub("", clean)
+    clean = NUMBER_WITH_FOOTNOTE_RE.sub(r"\1. ", clean)
+    clean = INLINE_FOOTNOTE_RE.sub("\n", clean)
+
+    kept_lines: list[str] = []
+    skip_continuation = False
+    for raw_line in clean.splitlines():
+        line = raw_line.strip()
+        if not line:
+            skip_continuation = False
+            kept_lines.append("")
+            continue
+        if STANDALONE_PAGE_NUMBER_RE.match(line):
+            continue
+        if FOOTNOTE_LINE_RE.match(line) or EFFECTIVE_NOTE_RE.match(line):
+            skip_continuation = True
+            continue
+        lower = line.lower()
+        if skip_continuation and (
+            lower.startswith(("sửa đổi", "bổ sung", "theo quy định"))
+            or "luật số" in lower
+            or "có hiệu lực kể từ" in lower
+        ):
+            continue
+        skip_continuation = False
+        kept_lines.append(raw_line)
+    return normalize_text("\n".join(kept_lines))
 
 
 def next_chunk_start(text: str, start: int, end: int) -> int:
@@ -139,7 +192,7 @@ def split_text_into_chunks(text: str, chunk_size: int, overlap: int) -> list[str
     if overlap < 0 or overlap >= chunk_size:
         raise ValueError("chunk_overlap must satisfy 0 <= overlap < chunk_size")
 
-    clean = normalize_text(text)
+    clean = clean_legal_text(text)
     if not clean:
         return []
     if len(clean) <= chunk_size:
@@ -184,7 +237,7 @@ def article_heading(article: ArticleBlock) -> str:
 
 
 def split_into_article_blocks(text: str) -> tuple[str, list[ArticleBlock]]:
-    clean = normalize_text(text)
+    clean = clean_legal_text(text)
     matches = list(ARTICLE_START_RE.finditer(clean))
     if not matches:
         return clean, []
@@ -223,6 +276,13 @@ def split_article_by_clause(article: ArticleBlock) -> list[tuple[str, str]]:
     return clauses
 
 
+def should_keep_preamble(text: str) -> bool:
+    clean = normalize_text(text)
+    if len(clean) < MIN_CHUNK_CHARS:
+        return False
+    return bool(LEGAL_PREAMBLE_HINT_RE.search(clean[:1200]))
+
+
 def split_long_legal_text(text: str, chunk_size: int) -> list[str]:
     return split_text_into_chunks(
         text=text,
@@ -240,18 +300,19 @@ def build_legal_chunks_for_file(
     preamble, articles = split_into_article_blocks(text)
     chunks: list[ChunkItem] = []
 
-    for part_index, part in enumerate(split_long_legal_text(preamble, chunk_size), start=1):
-        chunk_id = f"{source_file}::preamble_{part_index}"
-        chunks.append(
-            ChunkItem(
-                chunk_id=chunk_id,
-                domain=domain,
-                source_file=source_file,
-                text=part,
-                chunk_index=-1,
-                chunk_type="preamble",
+    if should_keep_preamble(preamble):
+        for part_index, part in enumerate(split_long_legal_text(preamble, chunk_size), start=1):
+            chunk_id = f"{source_file}::preamble_{part_index}"
+            chunks.append(
+                ChunkItem(
+                    chunk_id=chunk_id,
+                    domain=domain,
+                    source_file=source_file,
+                    text=part,
+                    chunk_index=-1,
+                    chunk_type="preamble",
+                )
             )
-        )
 
     for article in articles:
         article_slug = make_article_slug(article.article_id)
@@ -380,6 +441,42 @@ def collect_chunks(
     return items
 
 
+def collect_chunks_for_files(
+    processed_dir: Path,
+    file_paths: list[Path],
+    chunk_size: int,
+) -> list[ChunkItem]:
+    items: list[ChunkItem] = []
+    for file_path in file_paths:
+        file_path = file_path.resolve()
+        text = file_path.read_text(encoding="utf-8", errors="ignore")
+        relative = file_path.relative_to(processed_dir.resolve())
+        domain = relative.parts[0] if relative.parts else "Unknown"
+        source_file = str(relative).replace("\\", "/")
+        chunks = build_legal_chunks_for_file(
+            text=text,
+            source_file=source_file,
+            domain=domain,
+            chunk_size=chunk_size,
+        )
+        for idx, chunk in enumerate(chunks):
+            chunk.chunk_index = idx
+            items.append(
+                ChunkItem(
+                    chunk_id=chunk.chunk_id,
+                    domain=chunk.domain,
+                    source_file=chunk.source_file,
+                    text=chunk.text,
+                    chunk_index=idx,
+                    chunk_type=chunk.chunk_type,
+                    article_id=chunk.article_id,
+                    article_title=chunk.article_title,
+                    clause_id=chunk.clause_id,
+                )
+            )
+    return items
+
+
 def embed_chunks(texts: list[str], model_name: str, batch_size: int) -> np.ndarray:
     validate_local_model_dir(model_name)
 
@@ -461,6 +558,32 @@ def write_metadata_jsonl(items: list[ChunkItem], output_path: Path) -> None:
                 "text": item.text,
             }
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+def read_metadata_items(metadata_path: Path) -> list[ChunkItem]:
+    if not metadata_path.exists():
+        return []
+
+    items: list[ChunkItem] = []
+    with metadata_path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            items.append(
+                ChunkItem(
+                    chunk_id=str(row.get("chunk_id", "")),
+                    domain=str(row.get("domain", "")),
+                    source_file=str(row.get("source_file", "")),
+                    text=str(row.get("text", "")),
+                    chunk_index=int(row.get("chunk_index", -1)),
+                    chunk_type=str(row.get("chunk_type", "")),
+                    article_id=str(row.get("article_id", "")),
+                    article_title=str(row.get("article_title", "")),
+                    clause_id=str(row.get("clause_id", "")),
+                )
+            )
+    return items
 
 
 def write_manifest(
@@ -561,6 +684,115 @@ def build_vector_store(
         "embedding_dim": int(vectors.shape[1]),
         "index_path": str(FAISS_INDEX_PATH),
         "embeddings_path": str(EMBEDDINGS_NPY_PATH),
+        "metadata_path": str(METADATA_PATH),
+    }
+
+
+def append_files_to_vector_store(
+    processed_files: list[Path],
+    processed_dir: Path,
+    chunk_size: int,
+    embedding_model: str,
+    batch_size: int,
+) -> dict[str, int | str | list[str]]:
+    ensure_directories()
+    if not processed_files:
+        raise ValueError("processed_files must not be empty")
+
+    processed_dir = processed_dir.resolve()
+    new_chunks = collect_chunks_for_files(
+        processed_dir=processed_dir,
+        file_paths=processed_files,
+        chunk_size=chunk_size,
+    )
+    if not new_chunks:
+        raise RuntimeError("No chunks found for uploaded file.")
+
+    existing_items = read_metadata_items(METADATA_PATH)
+    existing_sources = {item.source_file for item in new_chunks}
+    duplicate_sources = existing_sources & {item.source_file for item in existing_items}
+    manifest_payload = {}
+    if MANIFEST_PATH.exists():
+        manifest_payload = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+
+    if duplicate_sources:
+        kept_items = [
+            item for item in existing_items if item.source_file not in existing_sources
+        ]
+        all_items = kept_items + new_chunks
+        vectors = embed_chunks(
+            texts=[item.text for item in all_items],
+            model_name=embedding_model,
+            batch_size=batch_size,
+        )
+        index = try_build_faiss_index(vectors=vectors)
+        if index is not None:
+            index_backend = "faiss"
+            save_faiss_index(index=index, index_path=FAISS_INDEX_PATH)
+            if EMBEDDINGS_NPY_PATH.exists():
+                EMBEDDINGS_NPY_PATH.unlink()
+        else:
+            index_backend = "numpy"
+            save_numpy_index(vectors=vectors, embeddings_path=EMBEDDINGS_NPY_PATH)
+            if FAISS_INDEX_PATH.exists():
+                FAISS_INDEX_PATH.unlink()
+    else:
+        all_items = existing_items + new_chunks
+        new_vectors = embed_chunks(
+            texts=[item.text for item in new_chunks],
+            model_name=embedding_model,
+            batch_size=batch_size,
+        )
+        index_backend = str(manifest_payload.get("index_backend", "faiss")).lower()
+        if index_backend == "numpy":
+            if EMBEDDINGS_NPY_PATH.exists():
+                existing_vectors = np.load(EMBEDDINGS_NPY_PATH)
+                vectors = np.vstack([existing_vectors, new_vectors])
+            else:
+                vectors = new_vectors
+            save_numpy_index(vectors=vectors, embeddings_path=EMBEDDINGS_NPY_PATH)
+        else:
+            try:
+                import faiss
+            except ImportError:
+                index_backend = "numpy"
+                vectors = new_vectors
+                if EMBEDDINGS_NPY_PATH.exists():
+                    vectors = np.vstack([np.load(EMBEDDINGS_NPY_PATH), new_vectors])
+                save_numpy_index(vectors=vectors, embeddings_path=EMBEDDINGS_NPY_PATH)
+                if FAISS_INDEX_PATH.exists():
+                    FAISS_INDEX_PATH.unlink()
+            else:
+                index_backend = "faiss"
+                if FAISS_INDEX_PATH.exists():
+                    index = faiss.read_index(str(FAISS_INDEX_PATH))
+                else:
+                    index = faiss.IndexFlatIP(int(new_vectors.shape[1]))
+                index.add(new_vectors)
+                save_faiss_index(index=index, index_path=FAISS_INDEX_PATH)
+                vectors = new_vectors
+                if EMBEDDINGS_NPY_PATH.exists():
+                    EMBEDDINGS_NPY_PATH.unlink()
+
+    write_metadata_jsonl(items=all_items, output_path=METADATA_PATH)
+    write_manifest(
+        manifest_path=MANIFEST_PATH,
+        total_chunks=len(all_items),
+        model_name=embedding_model,
+        chunk_size=chunk_size,
+        overlap=int(manifest_payload.get("chunk_overlap", 0) or 0),
+        domains=sorted({item.domain for item in all_items}),
+        index_backend=index_backend,
+    )
+
+    return {
+        "index_backend": index_backend,
+        "added_chunks": len(new_chunks),
+        "total_chunks": len(all_items),
+        "updated_sources": sorted(existing_sources),
+        "replaced_existing": sorted(duplicate_sources),
+        "embedding_dim": int(vectors.shape[1]),
+        "index_path": str(FAISS_INDEX_PATH),
         "metadata_path": str(METADATA_PATH),
     }
 

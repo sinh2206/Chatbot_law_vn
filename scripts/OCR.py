@@ -10,6 +10,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from config import PROCESSED_DIR, RAW_DOCS_DIR, TEXT_OUTPUT_EXTENSION, ensure_directories  # noqa: E402
+from scripts.build_vector_store import clean_legal_text  # noqa: E402
 
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".webp"}
 PDF_EXTENSIONS = {".pdf"}
@@ -31,6 +32,49 @@ def normalize_text(text: str) -> str:
     while "\n\n\n" in clean:
         clean = clean.replace("\n\n\n", "\n\n")
     return clean.strip()
+
+
+def extract_pdf_text(path: Path, min_chars: int = 300) -> tuple[str, str]:
+    try:
+        import fitz
+    except ImportError as exc:
+        raise RuntimeError("Missing PDF text dependency (PyMuPDF). Install requirements first.") from exc
+
+    page_texts: list[str] = []
+    with fitz.open(path) as document:
+        for page in document:
+            blocks = page.get_text("blocks", sort=True) or []
+            lines: list[str] = []
+            for block in blocks:
+                if len(block) < 5:
+                    continue
+                block_text = normalize_text(str(block[4] or ""))
+                if not block_text:
+                    continue
+                lines.append(block_text)
+            page_text = normalize_text("\n".join(lines))
+            if page_text:
+                page_texts.append(page_text)
+
+    pymupdf_text = clean_legal_text("\n\n".join(page_texts))
+    if len(pymupdf_text) >= min_chars:
+        return pymupdf_text, "pymupdf_text"
+
+    try:
+        import pdfplumber
+    except ImportError:
+        return pymupdf_text, "pymupdf_text_short"
+
+    page_texts = []
+    with pdfplumber.open(path) as pdf:
+        for page in pdf.pages:
+            page_text = normalize_text(page.extract_text(x_tolerance=1, y_tolerance=3) or "")
+            if page_text:
+                page_texts.append(page_text)
+    pdfplumber_text = clean_legal_text("\n\n".join(page_texts))
+    if len(pdfplumber_text) > len(pymupdf_text):
+        return pdfplumber_text, "pdfplumber_text"
+    return pymupdf_text, "pymupdf_text_short"
 
 
 def iter_ocr_source_files(source_dir: Path, domains: set[str] | None) -> list[Path]:
@@ -207,6 +251,10 @@ def ocr_pdf(
     except ImportError as exc:
         raise RuntimeError("Missing PDF OCR dependency (PyMuPDF). Install requirements first.") from exc
 
+    extracted_text, method = extract_pdf_text(path)
+    if len(extracted_text) >= 300:
+        return extracted_text
+
     page_texts: list[str] = []
     with fitz.open(path) as document:
         page_count = document.page_count
@@ -221,10 +269,10 @@ def ocr_pdf(
             tesseract_cmd=tesseract_cmd,
             timeout=timeout,
         )
-        page_text = normalize_text(page_text)
+        page_text = clean_legal_text(page_text)
         if page_text:
-            page_texts.append(f"--- Trang {page_index + 1} ---\n{page_text}")
-    return "\n\n".join(page_texts)
+            page_texts.append(page_text)
+    return clean_legal_text("\n\n".join(page_texts))
 
 
 def convert_all_images(
@@ -304,6 +352,77 @@ def convert_all_images(
             print(f"[SKIP] {source}: {exc}")
 
     return converted, skipped
+
+
+def ocr_file_to_text(
+    source_path: Path,
+    lang: str = "vie+eng",
+    psm: int = 6,
+    oem: int = 3,
+    preprocess_mode: str = "adaptive",
+    tesseract_cmd: str = "",
+    timeout: float = 0,
+    pdf_dpi: int = 220,
+) -> str:
+    suffix = source_path.suffix.lower()
+    if suffix in PDF_EXTENSIONS:
+        raw_text = ocr_pdf(
+            path=source_path,
+            lang=lang,
+            psm=psm,
+            oem=oem,
+            preprocess_mode=preprocess_mode,
+            tesseract_cmd=tesseract_cmd,
+            timeout=timeout,
+            dpi=pdf_dpi,
+        )
+    elif suffix in IMAGE_EXTENSIONS:
+        raw_text = ocr_image(
+            path=source_path,
+            lang=lang,
+            psm=psm,
+            oem=oem,
+            preprocess_mode=preprocess_mode,
+            tesseract_cmd=tesseract_cmd,
+            timeout=timeout,
+        )
+    else:
+        raise ValueError(f"Unsupported OCR source type: {source_path.suffix}")
+    return clean_legal_text(raw_text)
+
+
+def ocr_file_to_processed(
+    source_path: Path,
+    target_path: Path,
+    overwrite: bool = True,
+    min_chars: int = 30,
+    lang: str = "vie+eng",
+    psm: int = 6,
+    oem: int = 3,
+    preprocess_mode: str = "adaptive",
+    tesseract_cmd: str = "",
+    timeout: float = 0,
+    pdf_dpi: int = 220,
+) -> Path:
+    if target_path.exists() and not overwrite:
+        return target_path
+
+    clean = ocr_file_to_text(
+        source_path=source_path,
+        lang=lang,
+        psm=psm,
+        oem=oem,
+        preprocess_mode=preprocess_mode,
+        tesseract_cmd=tesseract_cmd,
+        timeout=timeout,
+        pdf_dpi=pdf_dpi,
+    )
+    if len(clean) < min_chars:
+        raise RuntimeError(f"OCR text too short ({len(clean)} chars): {source_path}")
+
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    target_path.write_text(clean, encoding="utf-8")
+    return target_path
 
 
 def main() -> None:

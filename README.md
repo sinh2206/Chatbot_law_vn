@@ -143,26 +143,6 @@ docker run --rm --gpus all nvidia/cuda:12.1.0-base-ubuntu22.04 nvidia-smi
 cp .env.example .env
 ```
 
-Chạy local-only, không dùng Gemini:
-
-```env
-GEMINI_API_KEY=
-GEMINI_FALLBACK_ENABLED=false
-EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
-MIN_RETRIEVAL_SCORE=0.45
-CHAT_DB_PATH=data/chat_history.sqlite3
-```
-
-Bật Gemini fallback runtime:
-
-```env
-GEMINI_API_KEY=your_real_gemini_key
-GEMINI_MODEL=gemini-2.5-flash
-GEMINI_FALLBACK_ENABLED=true
-EMBEDDING_MODEL_NAME=data/models/vietnamese-embedding-legal
-MIN_RETRIEVAL_SCORE=0.45
-CHAT_DB_PATH=data/chat_history.sqlite3
-```
 
 ### 4. Build Docker image
 

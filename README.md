@@ -1,4 +1,4 @@
-# Chatbot Law VN RAG: Hệ thống tư vấn / pháp luật thông minh
+# Chatbot Law VN RAG: Hệ thống tư vấn pháp luật thông minh
 
 Chatbot Law VN là hệ thống hỏi đáp pháp luật Việt Nam theo kiến trúc RAG local-first. Người dùng tải mã nguồn từ GitHub về máy, build Docker, chạy backend/web, sau đó hỏi đáp trên giao diện chat đơn giản. Hệ thống luôn ưu tiên căn cứ trong kho văn bản nội bộ; Gemini chỉ được dùng như fallback runtime khi kho nội bộ thiếu hoặc không đủ căn cứ.
 

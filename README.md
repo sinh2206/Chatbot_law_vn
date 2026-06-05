@@ -81,13 +81,15 @@ Kết quả retrieval hiện tại trên `data/finetune/test_pairs.jsonl`:
 
 Với dangvantuan/vietnamese-embedding chưa được fine-tune
     data/models/vietnamese-embedding-legal đã được fine tune cho phù hợp với dự án
-|Chỉ số |	Ý nghĩa trong chatbot luật|
-|Recall@1 | Tỷ lệ câu hỏi mà chunk luật đúng nằm ngay top 1|
-|Recall@3 	Tỷ lệ câu hỏi mà chunk luật đúng nằm trong top 3|
-|Recall@5 |	Tỷ lệ câu hỏi mà chunk luật đúng nằm trong top 5|
-|Recall@10	| Tỷ lệ câu hỏi mà chunk luật đúng nằm trong top 10|
-|MRR@10 |	Đo chunk đúng xuất hiện càng cao càng tốt trong top 10|
-|NDCG@10 |	Đo chất lượng sắp xếp top 10, có xét mức độ liên quan của kết quả|
+
+| Chỉ số |	Ý nghĩa trong chatbot luật |
+| --- | ---: |
+| Recall@1 | Tỷ lệ câu hỏi mà chunk luật đúng nằm ngay top 1 |
+| Recall@3 |	Tỷ lệ câu hỏi mà chunk luật đúng nằm trong top 3 |
+| Recall@5 |	Tỷ lệ câu hỏi mà chunk luật đúng nằm trong top 5 |
+| Recall@10	| Tỷ lệ câu hỏi mà chunk luật đúng nằm trong top 10 |
+| MRR@10 |	Đo chunk đúng xuất hiện càng cao càng tốt trong top 10 |
+| NDCG@10 |	Đo chất lượng sắp xếp top 10, có xét mức độ liên quan của kết quả |
 
 ## 🛠️ Tech Stack
 

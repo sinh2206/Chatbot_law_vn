@@ -9,7 +9,6 @@ import re
 import sqlite3
 from threading import RLock
 from typing import Any
-from urllib.parse import quote_plus
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -69,12 +68,13 @@ DOCUMENT_TYPE_LABELS = {
 
 ARTICLE_RE = re.compile(r"(Điều|điều)\s+(\d+[a-zA-Z]?)")
 ARTICLE_HEADING_RE = re.compile(r"(?m)^\s*Điều\s+\d+[a-zA-Z]?\s*[\\.:]")
+ARTICLE_HEADING_CAPTURE_RE = re.compile(r"(?m)^\s*Điều\s+(\d+[a-zA-Z]?)\s*[\\.:]")
 CLAUSE_RE = re.compile(r"(?:^|\n)\s*(\d+[a-zA-Z]?)\.\s+")
 SECTION_RE = re.compile(r"(?:(?:khoản|Khoản)\s+(\d+[a-zA-Z]?))?\s*(?:Điều|điều)\s+(\d+[a-zA-Z]?)")
-
-EXTERNAL_DOCUMENT_URLS = {
-    "59/2014/QH13": "https://congbao.chinhphu.vn/van-ban/luat-so-59-2014-qh13-7667.htm",
-}
+SENTENCE_BOUNDARY_RE = re.compile(r"(?<=[.!?;:])\s+(?=[A-ZĐ0-9])")
+LEADING_LEGAL_BOUNDARY_RE = re.compile(
+    r"(?m)(^Điều\s+\d+[a-zA-Z]?\s*[\\.:]|^\d+[a-zA-Z]?\.\s+|^[a-z]\)\s+)"
+)
 
 
 class ChatRequest(BaseModel):
@@ -544,10 +544,7 @@ class RagEngine:
         if deduped_citations:
             lines.append("Căn cứ pháp lý:")
             for citation in deduped_citations[:5]:
-                line = f"- {citation['citation']}"
-                if citation.get("url"):
-                    line += f"\n  Link tham khảo: {citation['url']}"
-                lines.append(line)
+                lines.append(f"- {citation['citation']}")
         return "\n".join(line for line in lines if line.strip())
 
     def _source_payload(self, item: RetrievedItem) -> dict[str, Any]:
@@ -563,10 +560,71 @@ class RagEngine:
         if article_match:
             start = max(0, article_match.start())
             text = text[start:]
-        snippet = text[:snippet_chars].strip()
-        if len(text) > snippet_chars:
-            snippet = snippet.rstrip(" ,;:") + "..."
+        else:
+            text = self._drop_leading_fragment(text)
+        snippet = self._truncate_to_complete_sentence(text, snippet_chars).strip()
         return re.sub(r"\n{3,}", "\n\n", snippet)
+
+    def _drop_leading_fragment(self, text: str) -> str:
+        if not text:
+            return text
+        lines = text.splitlines()
+        if len(lines) > 1:
+            first_line = lines[0].strip()
+            second_line = lines[1].strip()
+            if (
+                first_line
+                and second_line
+                and first_line[:1].islower()
+                and (second_line[:1].isupper() or second_line.startswith(("Điều ", "Mục ", "Chương ")))
+                and len(first_line) < 180
+            ):
+                return "\n".join(lines[1:]).lstrip()
+        if text[:1].isupper() or text[:1].isdigit() or text.startswith(("Điều ", "Mục ", "Chương ")):
+            return text
+        legal_boundary = LEADING_LEGAL_BOUNDARY_RE.search(text)
+        sentence_boundary = SENTENCE_BOUNDARY_RE.search(text)
+        candidates = [
+            match.start()
+            for match in (legal_boundary, sentence_boundary)
+            if match is not None and 0 < match.start() < 260
+        ]
+        if not candidates:
+            return text
+        start = min(candidates)
+        return text[start:].lstrip()
+
+    def _truncate_to_complete_sentence(self, text: str, snippet_chars: int) -> str:
+        if len(text) <= snippet_chars:
+            return self._trim_trailing_fragment(text)
+        window = text[:snippet_chars].rstrip()
+        min_boundary = max(120, int(snippet_chars * 0.55))
+        boundaries = []
+        for legal_heading in ("\nĐiều ", "\nMục ", "\nChương "):
+            index = window.rfind(legal_heading, min_boundary)
+            if index != -1:
+                boundaries.append(index)
+        for match in SENTENCE_BOUNDARY_RE.finditer(window):
+            if match.start() >= min_boundary:
+                boundaries.append(match.start())
+        end = max(boundaries) if boundaries else -1
+        if end <= min_boundary:
+            end = max(window.rfind("\n", min_boundary), window.rfind(". ", min_boundary))
+        if end > min_boundary:
+            return window[:end].rstrip()
+        return self._trim_trailing_fragment(window.rstrip(" ,;:"))
+
+    def _trim_trailing_fragment(self, text: str) -> str:
+        text = text.rstrip()
+        if not text or text[-1] in ".;:!?":
+            return text
+        matches = list(re.finditer(r"[.!?;:](?=\s|$)", text))
+        if not matches:
+            return text
+        end = matches[-1].end()
+        if end < max(80, int(len(text) * 0.45)):
+            return text
+        return text[:end].rstrip()
 
     def _citation_label(self, item: RetrievedItem) -> str:
         return self._citation_payload(item)["citation"]
@@ -592,7 +650,6 @@ class RagEngine:
             parts.append(f"năm {year}")
         return {
             "citation": " ".join(parts),
-            "url": self._external_reference_url(document_number),
             "document_number": document_number,
         }
 
@@ -633,14 +690,6 @@ class RagEngine:
             suffix = "/TT"
         return f"{number_match.group(1)}/{number_match.group(2)}{suffix}"
 
-    def _external_reference_url(self, document_number: str) -> str:
-        if not document_number:
-            return ""
-        if document_number in EXTERNAL_DOCUMENT_URLS:
-            return EXTERNAL_DOCUMENT_URLS[document_number]
-        query = quote_plus(document_number)
-        return f"https://thuvienphapluat.vn/tim-kiem.aspx?keyword={query}"
-
     def _document_type_label(self, stem: str, document_number: str) -> str:
         normalized = f"{stem}_{document_number}".upper()
         if "QH" in normalized:
@@ -657,6 +706,13 @@ class RagEngine:
         return match.group(1) if match else ""
 
     def _section_label(self, text: str) -> tuple[str, str]:
+        heading_match = ARTICLE_HEADING_CAPTURE_RE.search(text)
+        if heading_match:
+            article = heading_match.group(1)
+            clause_match = CLAUSE_RE.search(text[heading_match.end() :])
+            clause = clause_match.group(1) if clause_match else ""
+            return clause, article
+
         section_match = SECTION_RE.search(text)
         if section_match:
             clause = section_match.group(1) or ""

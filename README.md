@@ -194,13 +194,26 @@ Convert rieng mot linh vuc:
 docker compose run --rm app python scripts/convert_docs_to_txt.py --domain Thue --overwrite
 ```
 
-OCR anh scan neu co:
+OCR anh/PDF scan neu co:
 
 ```bash
 docker compose run --rm app python scripts/convert_images_to_txt_ocr.py \
   --overwrite \
   --lang vie+eng \
-  --preprocess adaptive
+  --preprocess adaptive \
+  --pdf-dpi 220
+```
+
+Script OCR doc cac file `.png`, `.jpg`, `.jpeg`, `.tif`, `.tiff`, `.bmp`, `.webp`, `.pdf`
+trong `Multi-Agent/` va ghi `.txt` tuong ung vao `data/processed/`.
+Sau khi OCR them tai lieu moi, build lai vector store va reload backend:
+
+```bash
+docker compose run --rm app python scripts/build_vector_store.py \
+  --embedding-model data/models/vietnamese-embedding-legal \
+  --batch-size 64
+
+curl -X POST http://localhost:8000/reload
 ```
 
 Kiem tra output:
@@ -558,6 +571,7 @@ Nguyen tac fallback:
   - `tài liệu <ten/so hieu/file> hết hạn, cần cập nhật`
 - Sau dong canh bao, Gemini moi tim cau tra loi bang Google Search grounding.
 - Response fallback co `mode="gemini_fallback"`, `gemini_used=true`, va `sources` chua cac tai lieu/trang tham khao neu Gemini tra ve grounding.
+- Cau tra loi local chi hien can cu phap ly noi bo, khong tu chen link ngoai vao phan can cu.
 - Neu Gemini tat hoac thieu key, response co `mode="fallback_required"` hoac `mode="gemini_error"`.
 - Tat ca cau hoi/cau tra loi duoc luu vao bang SQLite `chat_messages`.
 - Xem lich su gan nhat:

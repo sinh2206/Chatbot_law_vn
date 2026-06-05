@@ -83,6 +83,38 @@ def normalize_text(text: str) -> str:
     return clean.strip()
 
 
+def next_chunk_start(text: str, start: int, end: int) -> int:
+    if start <= 0:
+        return 0
+    limit = min(end, len(text))
+    if start >= limit:
+        return start
+
+    boundary_patterns = [
+        "\nĐiều ",
+        "\nMục ",
+        "\nChương ",
+        "\n1. ",
+        "\n2. ",
+        "\n3. ",
+        ". ",
+        "; ",
+    ]
+    candidates = [
+        index + (1 if pattern.startswith("\n") else len(pattern))
+        for pattern in boundary_patterns
+        for index in [text.find(pattern, start, limit)]
+        if index != -1
+    ]
+    if candidates:
+        return min(candidates)
+
+    whitespace = text.find(" ", start, limit)
+    if whitespace != -1:
+        return whitespace + 1
+    return start
+
+
 def split_text_into_chunks(text: str, chunk_size: int, overlap: int) -> list[str]:
     if chunk_size <= 0:
         raise ValueError("chunk_size must be > 0")
@@ -116,7 +148,7 @@ def split_text_into_chunks(text: str, chunk_size: int, overlap: int) -> list[str
         if end >= total:
             break
 
-        next_start = end - overlap
+        next_start = next_chunk_start(clean, end - overlap, end + 120)
         if next_start <= start:
             next_start = start + 1
         start = next_start

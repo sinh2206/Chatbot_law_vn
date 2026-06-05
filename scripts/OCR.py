@@ -12,6 +12,8 @@ if str(ROOT_DIR) not in sys.path:
 from config import PROCESSED_DIR, RAW_DOCS_DIR, TEXT_OUTPUT_EXTENSION, ensure_directories  # noqa: E402
 
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".webp"}
+PDF_EXTENSIONS = {".pdf"}
+OCR_EXTENSIONS = IMAGE_EXTENSIONS | PDF_EXTENSIONS
 
 
 def setup_stdout_utf8() -> None:
@@ -31,12 +33,12 @@ def normalize_text(text: str) -> str:
     return clean.strip()
 
 
-def iter_image_files(source_dir: Path, domains: set[str] | None) -> list[Path]:
+def iter_ocr_source_files(source_dir: Path, domains: set[str] | None) -> list[Path]:
     files: list[Path] = []
     for path in source_dir.rglob("*"):
         if not path.is_file():
             continue
-        if path.suffix.lower() not in IMAGE_EXTENSIONS:
+        if path.suffix.lower() not in OCR_EXTENSIONS:
             continue
 
         if domains:
@@ -76,6 +78,37 @@ def load_image_bgr(path: Path):
     return image
 
 
+def load_pdf_page_bgr(path: Path, page_index: int, dpi: int):
+    try:
+        import cv2
+        import fitz
+        import numpy as np
+    except ImportError as exc:
+        raise RuntimeError(
+            "Missing PDF OCR dependencies (PyMuPDF / opencv-python / numpy). "
+            "Install requirements first."
+        ) from exc
+
+    scale = max(dpi, 72) / 72
+    with fitz.open(path) as document:
+        page = document.load_page(page_index)
+        pixmap = page.get_pixmap(
+            matrix=fitz.Matrix(scale, scale),
+            alpha=False,
+        )
+        channels = pixmap.n
+        image = np.frombuffer(pixmap.samples, dtype=np.uint8).reshape(
+            pixmap.height,
+            pixmap.width,
+            channels,
+        )
+        if channels == 1:
+            return cv2.cvtColor(image, cv2.COLOR_GRAY2BGR).copy()
+        if channels == 3:
+            return cv2.cvtColor(image, cv2.COLOR_RGB2BGR).copy()
+        return cv2.cvtColor(image[:, :, :3], cv2.COLOR_RGB2BGR).copy()
+
+
 def preprocess_image(image_bgr, mode: str):
     import cv2
 
@@ -100,8 +133,8 @@ def preprocess_image(image_bgr, mode: str):
     raise ValueError(f"Unsupported preprocess mode: {mode}")
 
 
-def ocr_image(
-    path: Path,
+def ocr_image_bgr(
+    image_bgr,
     lang: str,
     psm: int,
     oem: int,
@@ -119,8 +152,7 @@ def ocr_image(
     if tesseract_cmd.strip():
         pytesseract.pytesseract.tesseract_cmd = tesseract_cmd.strip()
 
-    image = load_image_bgr(path)
-    processed = preprocess_image(image, mode=preprocess_mode)
+    processed = preprocess_image(image_bgr, mode=preprocess_mode)
 
     config = f"--oem {oem} --psm {psm}"
     timeout_arg = timeout if timeout > 0 else None
@@ -140,6 +172,61 @@ def ocr_image(
     return text
 
 
+def ocr_image(
+    path: Path,
+    lang: str,
+    psm: int,
+    oem: int,
+    preprocess_mode: str,
+    tesseract_cmd: str,
+    timeout: float,
+) -> str:
+    return ocr_image_bgr(
+        image_bgr=load_image_bgr(path),
+        lang=lang,
+        psm=psm,
+        oem=oem,
+        preprocess_mode=preprocess_mode,
+        tesseract_cmd=tesseract_cmd,
+        timeout=timeout,
+    )
+
+
+def ocr_pdf(
+    path: Path,
+    lang: str,
+    psm: int,
+    oem: int,
+    preprocess_mode: str,
+    tesseract_cmd: str,
+    timeout: float,
+    dpi: int,
+) -> str:
+    try:
+        import fitz
+    except ImportError as exc:
+        raise RuntimeError("Missing PDF OCR dependency (PyMuPDF). Install requirements first.") from exc
+
+    page_texts: list[str] = []
+    with fitz.open(path) as document:
+        page_count = document.page_count
+
+    for page_index in range(page_count):
+        page_text = ocr_image_bgr(
+            image_bgr=load_pdf_page_bgr(path=path, page_index=page_index, dpi=dpi),
+            lang=lang,
+            psm=psm,
+            oem=oem,
+            preprocess_mode=preprocess_mode,
+            tesseract_cmd=tesseract_cmd,
+            timeout=timeout,
+        )
+        page_text = normalize_text(page_text)
+        if page_text:
+            page_texts.append(f"--- Trang {page_index + 1} ---\n{page_text}")
+    return "\n\n".join(page_texts)
+
+
 def convert_all_images(
     source_dir: Path,
     output_dir: Path,
@@ -153,6 +240,7 @@ def convert_all_images(
     tesseract_cmd: str,
     timeout: float,
     min_chars: int,
+    pdf_dpi: int,
 ) -> tuple[int, int]:
     ensure_directories()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -168,7 +256,7 @@ def convert_all_images(
                 shutil.rmtree(output_dir)
             output_dir.mkdir(parents=True, exist_ok=True)
 
-    sources = iter_image_files(source_dir=source_dir, domains=domains)
+    sources = iter_ocr_source_files(source_dir=source_dir, domains=domains)
     converted = 0
     skipped = 0
 
@@ -181,15 +269,27 @@ def convert_all_images(
             continue
 
         try:
-            raw_text = ocr_image(
-                path=source,
-                lang=lang,
-                psm=psm,
-                oem=oem,
-                preprocess_mode=preprocess_mode,
-                tesseract_cmd=tesseract_cmd,
-                timeout=timeout,
-            )
+            if source.suffix.lower() in PDF_EXTENSIONS:
+                raw_text = ocr_pdf(
+                    path=source,
+                    lang=lang,
+                    psm=psm,
+                    oem=oem,
+                    preprocess_mode=preprocess_mode,
+                    tesseract_cmd=tesseract_cmd,
+                    timeout=timeout,
+                    dpi=pdf_dpi,
+                )
+            else:
+                raw_text = ocr_image(
+                    path=source,
+                    lang=lang,
+                    psm=psm,
+                    oem=oem,
+                    preprocess_mode=preprocess_mode,
+                    tesseract_cmd=tesseract_cmd,
+                    timeout=timeout,
+                )
             clean = normalize_text(raw_text)
             if len(clean) < min_chars:
                 skipped += 1
@@ -209,7 +309,7 @@ def convert_all_images(
 def main() -> None:
     setup_stdout_utf8()
     parser = argparse.ArgumentParser(
-        description="OCR legal document images (.png/.jpg/...) into normalized .txt files."
+        description="OCR legal document images/PDF scans into normalized .txt files."
     )
     parser.add_argument("--source-dir", default=str(RAW_DOCS_DIR))
     parser.add_argument("--output-dir", default=str(PROCESSED_DIR))
@@ -237,6 +337,7 @@ def main() -> None:
         help="OCR timeout in seconds per image (0 = no timeout)",
     )
     parser.add_argument("--min-chars", type=int, default=30, help="Skip OCR output shorter than this")
+    parser.add_argument("--pdf-dpi", type=int, default=220, help="Render DPI for scanned PDFs")
     args = parser.parse_args()
 
     source_dir = Path(args.source_dir).resolve()
@@ -251,6 +352,8 @@ def main() -> None:
         raise ValueError("--oem should be in [0, 3]")
     if args.min_chars < 1:
         raise ValueError("--min-chars must be >= 1")
+    if args.pdf_dpi < 72:
+        raise ValueError("--pdf-dpi must be >= 72")
 
     converted, skipped = convert_all_images(
         source_dir=source_dir,
@@ -265,6 +368,7 @@ def main() -> None:
         tesseract_cmd=args.tesseract_cmd,
         timeout=args.timeout,
         min_chars=args.min_chars,
+        pdf_dpi=args.pdf_dpi,
     )
 
     print("\n=== OCR SUMMARY ===")

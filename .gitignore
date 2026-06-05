@@ -6,7 +6,5 @@ logs/
 reports/
 
 # Large local artifacts. Recreate/download them on each machine/server.
-model/
 data/models/
-checkpoints/
 data/*.sqlite3

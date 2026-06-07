@@ -79,7 +79,6 @@ Kết quả retrieval hiện tại trên `data/finetune/test_pairs.jsonl`:
 | `data/models/vietnamese-embedding-legal` | 0.724 | 0.896 | 0.924 | 0.944 | 0.8103 | 0.8437 |
 
 Với:
-- dangvantuan/vietnamese-embedding chưa được fine-tune
 - data/models/vietnamese-embedding-legal đã được fine tune cho phù hợp với dự án
 
 | Chỉ số |	Ý nghĩa trong chatbot luật |

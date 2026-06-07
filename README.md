@@ -76,7 +76,6 @@ Kết quả retrieval hiện tại trên `data/finetune/test_pairs.jsonl`:
 
 | Model | Recall@1 | Recall@3 | Recall@5 | Recall@10 | MRR@10 | NDCG@10 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `dangvantuan/vietnamese-embedding` | 0.460 | 0.636 | 0.676 | 0.744 | 0.5599 | 0.6047 |
 | `data/models/vietnamese-embedding-legal` | 0.724 | 0.896 | 0.924 | 0.944 | 0.8103 | 0.8437 |
 
 Với:
